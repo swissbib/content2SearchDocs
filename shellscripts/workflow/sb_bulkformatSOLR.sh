@@ -1,0 +1,50 @@
+#!/bin/sh
+
+#set -x
+
+
+#source ${HOME}/DOCPREPROCESSING_ENVIRONMENT.sh
+
+
+PROJECTDIR_DOCPREPROCESSING=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
+
+SOURCEDIR=$PROJECTDIR_DOCPREPROCESSING/data/raw
+FORMATDIR=$PROJECTDIR_DOCPREPROCESSING/data/format
+
+if [ ! -d $PROJECTDIR_DOCPREPROCESSING ]
+then
+	printf "PROJECTDIR does not exits <%s> !\n" $PROJECTDIR_DOCPREPROCESSING
+	exit 1
+fi
+
+if [ ! -d $SOURCEDIR ]
+then
+	printf "SOURCEDIR does not exits <%s> !\n" $SOURCEDIR
+	exit 1
+fi
+
+if [ ! -d $FORMATDIR ]
+then
+	printf "Creating dir <%s> ... \n" $FORMATDIR
+	mkdir $FORMATDIR
+fi
+
+TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
+
+printf "Start of the process formatting bulkload at  <%s> ...\n" $TIMESTAMP
+
+for FILE in $SOURCEDIR/*.raw.xml
+do
+FORMATFILE=`basename $FILE .raw.xml`
+FORMATFILE=$FORMATFILE.format.xml
+printf "Formatting load file <%s> ...\n" $FORMATFILE
+perl BulkMarcRecordModifierSOLR.pl $FILE $FORMATFILE
+mv $FORMATFILE $FORMATDIR
+done
+
+
+TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
+
+printf "End of the process formatting bulkload at  <%s> ...\n" $TIMESTAMP
+
+exit 0

@@ -1,0 +1,4 @@
+diese kleinen skripts zur reparatur fehlender docid in repository verlegen
+danach auf diesem server löschen
+******
+Oliver Schihin / 29.12.2011
