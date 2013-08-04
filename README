@@ -1,0 +1,31 @@
+
+content2SearchDocs is used by swissbib for the transformation of content into SearchDocs as input for so called Search-Server
+
+
+Fist initial design (in 2011) was inspired by the FAST document processing model which uses various pipes for different content resources.
+These pipes are highly customizable because of stages (generally Python plugins) to perform special transformations
+
+
+Another 'role-model' for this component is the Hydra Framework (http://findwise.github.io/Hydra/) created and maintained by http://www.findwise.com/
+
+Main characteristics:
+- pipes are formed by chaining XSLT templates in any order
+- an engine (XML2SearchDocEngine) starts the process, keeps the chained templates together and provides plugins as XSL extensions.
+Plugins may execute any kind of service. For swissbib this is at the moment:
+-- content enrichement with TOC / Abstracts.
+    Documents are fetched online from content repositories (mostly ILS) and parsed with TIKA.
+    Once content is parsed it is stored which makes a later process for the same document much faster.
+-- content enrichement with GND data
+-- use of VIAF for content enrichement
+-- special tasks like removing duplicate terms for a better relevance ranking
+- at the moment we can easily produce SearchDocs for SOLR as well as for ElasticSearch
+- because the main transformation is done with xsl templates no special knowledge of programming languages is necessary to write at least the transformation rules
+ for library related content
+
+
+possible topics for further development:
+- at the moment only XML documents are supported as input
+- ....
+
+
+
