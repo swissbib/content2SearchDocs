@@ -16,8 +16,9 @@
 
     Geschichte
     ==========
-    04.04.2012, Guenter : erstellt, mit Erweiterungen von Oliver
-    17.04.2012, Oliver  : erweitert um skip-Bedingung
+    04.04.2012 : Guenter : erstellt, mit Erweiterungen von Oliver
+    17.04.2012 : Oliver  : erweitert um skip-Bedingung
+    09.08.2013 : Oliver : angepasst für neue Holdingsstruktur CBS 7.x
     -->
     
     <xsl:output omit-xml-declaration="yes" />
