@@ -45,7 +45,7 @@
                         <xsl:value-of select="'true'" />                    
                     </xsl:when>
                     <xsl:when test="some $x in $sublibs/library
-                        satisfies $x = /record/datafield[@tag='852']/subfield[@code='b']">
+                        satisfies $x = /record/datafield[@tag='852']/subfield[@code='F']">
                         <xsl:value-of select="'true'" />                    
                     </xsl:when>
                     <xsl:when test="some $x in $networks/database
@@ -57,7 +57,7 @@
                         <xsl:value-of select="'true'" />                    
                     </xsl:when>
                     <xsl:when test="some $x in $sublibs/library
-                        satisfies $x = /record/datafield[@tag='949']/subfield[@code='b']">
+                        satisfies $x = /record/datafield[@tag='949']/subfield[@code='F']">
                         <xsl:value-of select="'true'" />                    
                     </xsl:when>
                     <xsl:when test="some $x in $networks/database
