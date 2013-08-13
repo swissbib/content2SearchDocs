@@ -1,0 +1,12 @@
+
+#frequent document processing without HoldingsDB Updates
+00 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21 * * * /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/bin/sb_UpdateFeedSOLR.sh -d/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/data/update/request  >> /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/log/update/frequentUpdateShell.log 2>&1
+
+
+#45 22 * * *   /swissbib_index/solrDocumentProcessing/MarcToSolr/dist/sb_post2solr_Frequent.sh  -shttp://sb-s15.swissbib.unibas.ch:8080/solr/sb-biblio/update  >> /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/log/update/post2SolrShell.log 2>&1
+
+#threshold for MARC - Update messages got from CBS
+5,10,15,20,25,30,35,40,50,55 * * * * [ `ls -U /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/data/update/request | wc -l` -gt 25000 ] && /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/catcher/tomcat/bin/shutdown.sh -force > /dev/null 2>&1
+
+#benchmarking bb-solr-indices (sb-s7 / sb-s9)
+#40,55,10,25 1-23 * * * cd /usr/local/swissbib/solr.versions/benchmark/bin/dist; /usr/local/swissbib/solr.versions/benchmark/bin/dist/multi.bash.s6.multiclients.sh >> /usr/local/swissbib/solr.versions/benchmark/errors/error.s6.log 2>&1
