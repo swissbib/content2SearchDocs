@@ -55,7 +55,7 @@
             ***********************************
             18.11.2011 : Oliver : Korrekturen branchlib
             ***********************************
-            09.08.2013 : Oliver : Beginn Anpassungen für neues CBS
+            09.08.2013 : Oliver : Beginn Anpassungen fuer neues CBS
             ***********************************
         </desc>
     </doc>
@@ -91,127 +91,39 @@
     </xsl:template>
 
     <!-- ===========================
-         Autorenfelder (1xx/7xx/8xx) : MARC-nahe Aufbereitung, Vorstufe zur Erstellung von solr-Feld sauthor
+         Autorenfelder (1xx/7xx/8xx) : Aufbereitung der Facetten
          ===========================
-         Personen
     -->
     <xsl:template match="datafield[@tag='100']">
-        <!-- nicht invertiert (ind1="0"), leicht umzustellen falls gewuenscht (16.08.2011/osc) -->
-        <datafield tag="100" ind1="0" ind2=" ">
-            <subfield code="a">
-                <xsl:value-of select="concat(child::subfield[@code='D'], ' ', child::subfield[@code='a'])" />
-            </subfield>
-            <xsl:copy-of select="child::subfield[@code='b']" /> 
-            <xsl:copy-of select="child::subfield[@code='c']" /> 
-            <xsl:copy-of select="child::subfield[@code='d']" /> 
-            <xsl:copy-of select="child::subfield[@code='q']" /> 
-            <xsl:copy-of select="child::subfield[@code='8']" /> 
-        </datafield>
+        <xsl:call-template name="pers_facet" />
+    </xsl:template>
+    
+    <xsl:template match="datafield[@tag='700'][not(matches(child::subfield[@code='l'][1], 'eng|fre'))]">
+        <xsl:call-template name="pers_facet" />
+    </xsl:template>
+    
+    <xsl:template match="datafield[@tag='800']">
+        <xsl:call-template name="pers_facet" />
+    </xsl:template>
 
-        <!-- Autorenfeld fuer Facettennavigation
-             ergaenzt um Lebensdaten fuer alle und Titel sowie Zaehlung fuer Adel und Geistlichkeit (osc/03.08.2011) 
+    <xsl:template match="datafield[@tag='110'] | 
+                         datafield[@tag='710'] | 
+                         datafield[@tag='810']">
+        <xsl:call-template name="corp_facet" />
+    </xsl:template>
+    
+    <xsl:template name="pers_facet">
+        <xsl:copy-of select="." />
+        <!-- Autorenfacette generisch
+             ************************
+             nur Namensansetzung
+             ergaenzt um Lebensdaten, Titel sowie Zaehlung fuer Adel und Geistlichkeit (osc/13.08.2013) 
         -->
         <navAuthor>
             <xsl:value-of select="child::subfield[@code='a']"/>
             <xsl:choose>
                 <xsl:when test="child::subfield[@code='D'] and child::subfield[@code='D']/text() != ''">
                     <xsl:value-of select="concat(', ', child::subfield[@code='D'])"/>
-                   <!-- <xsl:if test="child::subfield[@code='d'] and child::subfield[@code='d']/text() != ''">
-                        <xsl:value-of select="concat(' (', child::subfield[@code='d'][1], ')')" />
-                    </xsl:if> -->
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:if test="child::subfield[@code='b'] and child::subfield[@code='b']/text() != ''">
-                        <xsl:value-of select="concat(' ', replace(child::subfield[@code='b'][1], '[,.]', ''), '.')" />
-                    </xsl:if>
-                    <xsl:if test="child::subfield[@code='c'] and child::subfield[@code='c']/text() != ''">
-                        <xsl:value-of select="concat(', ', child::subfield[@code='c'][1])" />
-                    </xsl:if>
-                    <xsl:if test="child::subfield[@code='d'] and child::subfield[@code='d']/text() != ''">
-                        <xsl:value-of select="concat(' (', child::subfield[@code='d'][1], ')')" />
-                    </xsl:if>
-                </xsl:otherwise>
-            </xsl:choose>
-        </navAuthor>
-    </xsl:template>
-
-    <xsl:template match="datafield[@tag='700'][not(matches(child::subfield[@code='l'][1], 'eng|fre'))]">
-        <!-- nicht invertiert (ind1="0"), leicht umzustellen falls gewuenscht (16.08.2011/osc) -->
-        <datafield tag="700" ind1="0" ind2=" ">
-            <subfield code="a">
-                <xsl:value-of select="concat(child::subfield[@code='D'], ' ', child::subfield[@code='a'])" />
-            </subfield>
-            <xsl:copy-of select="child::subfield[@code='b']" /> 
-            <xsl:copy-of select="child::subfield[@code='c']" /> 
-            <xsl:copy-of select="child::subfield[@code='d']" />
-            <xsl:copy-of select="child::subfield[@code='l']" />
-            <xsl:copy-of select="child::subfield[@code='q']" /> 
-            <xsl:copy-of select="child::subfield[@code='t']" />
-            <xsl:copy-of select="child::subfield[@code='4']" />
-            <xsl:copy-of select="child::subfield[@code='8']" /> 
-        </datafield>
-        
-        <!-- Autorenfeld fuer Facettennavigation -->
-        <navAuthor>
-            <xsl:value-of select="child::subfield[@code='a']"/>
-            <xsl:choose>
-                <xsl:when test="child::subfield[@code='D'] and child::subfield[@code='D']/text() != ''">
-                    <xsl:value-of select="concat(', ', child::subfield[@code='D'])"/>
-                    <!-- <xsl:if test="child::subfield[@code='d'] and child::subfield[@code='d']/text() != ''">
-                        <xsl:value-of select="concat(' (', child::subfield[@code='d'][1], ')')" />
-                    </xsl:if> -->
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:if test="child::subfield[@code='b'] and child::subfield[@code='b']/text() != ''">
-                        <xsl:value-of select="concat(' ', replace(child::subfield[@code='b'][1], '[,.]', ''), '.')" />
-                    </xsl:if>
-                    <xsl:if test="child::subfield[@code='c'] and child::subfield[@code='c']/text() != ''">
-                        <xsl:value-of select="concat(', ', child::subfield[@code='c'][1])" />
-                    </xsl:if>
-                    <xsl:if test="child::subfield[@code='d'] and child::subfield[@code='d']/text() != ''">
-                        <xsl:value-of select="concat(' (', child::subfield[@code='d'][1], ')')" />
-                    </xsl:if>
-                </xsl:otherwise>
-            </xsl:choose>
-        </navAuthor>
-        
-<!--        <xsl:if test="matches(child::subfield[@code='4'], '^[a-z][a-z][a-z]$')">
-            <navRelator>
-                <xsl:copy-of select="child::subfield[@code='a']" />
-                <xsl:copy-of select="child::subfield[@code='D']" />
-                <xsl:copy-of select="child::subfield[@code='b']" />
-                <xsl:copy-of select="child::subfield[@code='c']" />
-                <xsl:copy-of select="child::subfield[@code='d']" />
-                <xsl:copy-of select="child::subfield[@code='q']" />
-                <xsl:copy-of select="child::subfield[@code='4']" />
-            </navRelator>
-        </xsl:if>-->
-
-    </xsl:template>
-
-    <xsl:template match="datafield[@tag='800']">
-        <!-- nicht invertiert (ind1="0"), leicht umzustellen falls gewuenscht (16.08.2011/osc) -->
-        <datafield tag="800" ind1="0" ind2=" ">
-            <subfield code="a">
-                <xsl:value-of select="concat(child::subfield[@code='D'], ' ', child::subfield[@code='a'])" />
-            </subfield>
-            <xsl:copy-of select="child::subfield[@code='b']" /> 
-            <xsl:copy-of select="child::subfield[@code='c']" /> 
-            <xsl:copy-of select="child::subfield[@code='d']" /> 
-            <xsl:copy-of select="child::subfield[@code='q']" /> 
-            <xsl:copy-of select="child::subfield[@code='t']" /> 
-            <xsl:copy-of select="child::subfield[@code='v']" /> 
-        </datafield>
-        
-        <!-- Autorenfeld fuer Facettennavigation-->
-        <navAuthor>
-            <xsl:value-of select="child::subfield[@code='a']"/>
-            <xsl:choose>
-                <xsl:when test="child::subfield[@code='D'] and child::subfield[@code='D']/text() != ''">
-                    <xsl:value-of select="concat(', ', child::subfield[@code='D'])"/>
-               <!-- <xsl:if test="child::subfield[@code='d'] and child::subfield[@code='d']/text() != ''">
-                        <xsl:value-of select="concat(' (', child::subfield[@code='d'][1], ')')" />
-                    </xsl:if> -->
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:if test="child::subfield[@code='b'] and child::subfield[@code='b']/text() != ''">
@@ -228,85 +140,65 @@
         </navAuthor>
     </xsl:template>
     
-    <!-- Koerperschaften -->
-    <xsl:template match="datafield[@tag='110']">
-        <datafield tag="110" ind1="1" ind2=" ">
-            <subfield code="a">
-                <xsl:value-of select="child::subfield[@code='a']" />
-            </subfield>
-            <xsl:copy-of select="child::subfield[@code='b']" />
-            <xsl:copy-of select="child::subfield[@code='c']" /> 
-            <xsl:copy-of select="child::subfield[@code='d']" />
-            <xsl:copy-of select="child::subfield[@code='n']" /> 
-            <xsl:copy-of select="child::subfield[@code='8']" /> 
-        </datafield>
-
-        <!-- Autorenfeld mit Komma fuer Facettennavigation-->
+    <xsl:template name="corp_facet">
+        <xsl:copy-of select="." />
+        <!-- Autorenfacette generisch
+             ************************
+             Koerperschaften, komma-separierte Unterfelder 
+        -->
         <navAuthor>
             <xsl:value-of select="child::subfield[@code='a']"/>
-            <xsl:if test="child::subfield[@code='b'] and child::subfield[@code='b']/text() != ''">
-                <xsl:text>, </xsl:text>
-                <xsl:value-of select="child::subfield[@code='b']"/>
+            <xsl:if test="exists(child::subfield[@code='b']/text())">
+                <xsl:for-each select="child::subfield[@code='b']">
+                    <xsl:value-of select="concat(', ', .)"/>    
+                </xsl:for-each>
             </xsl:if>
         </navAuthor>
+    </xsl:template>
+
+    <!-- Autorenfacette source-spezifisch
+         ********************************
+         Namensansetzungen, inkl. Lebensdaten, Titel, Zaehlung 
+    -->
+    <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|700|710')]">
+        <!-- this is a random MARC tag for transport use only (13.08.2013/osc) -->
+        <datafield tag="979">
+            <subfield code="a">
+                <xsl:choose>
+                    <!-- persons -->
+                    <xsl:when test="matches(child::subfield[@code='P'], '100|700')">
+                        <xsl:value-of select="child::subfield[@code='a']" />
+                        <xsl:if test="child::subfield[@code='D'] and child::subfield[@code='D']/text() != ''">
+                            <xsl:value-of select="concat(', ', child::subfield[@code='D'])"/>
+                        </xsl:if>
+                        <xsl:if test="child::subfield[@code='b'] and child::subfield[@code='b']/text() != ''">
+                            <xsl:value-of select="concat(' ', replace(child::subfield[@code='b'][1], '[,.]', ''), '.')" />
+                        </xsl:if>
+                        <xsl:if test="child::subfield[@code='c'] and child::subfield[@code='c']/text() != ''">
+                            <xsl:value-of select="concat(', ', child::subfield[@code='c'][1])" />
+                        </xsl:if>
+                        <xsl:if test="child::subfield[@code='d'] and child::subfield[@code='d']/text() != ''">
+                            <xsl:value-of select="concat(' (', child::subfield[@code='d'][1], ')')" />
+                        </xsl:if>
+                    </xsl:when>
+                    <!-- corporations -->
+                    <xsl:when test="matches(child::subfield[@code='P'], '110|710')">
+                        <xsl:value-of select="child::subfield[@code='a']"/>
+                        <xsl:if test="exists(child::subfield[@code='b']/text())">
+                            <xsl:for-each select="child::subfield[@code='b']">
+                                <xsl:value-of select="concat(', ', .)"/>    
+                            </xsl:for-each>
+                        </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise />
+                </xsl:choose>
+            </subfield>
+            <subfield code="2">
+                <xsl:value-of select="child::subfield[@code='B']/text()" />
+            </subfield>
+        </datafield>
     </xsl:template>
     
-    <xsl:template match="datafield[@tag='710'][not(matches(child::subfield[@code='l'][1], 'eng|fre'))]">
-        <datafield tag="710" ind1="1" ind2=" ">
-            <subfield code="a">
-                <xsl:value-of select="child::subfield[@code='a']" />
-            </subfield>
-            <xsl:copy-of select="child::subfield[@code='b']" />
-            <xsl:copy-of select="child::subfield[@code='c']" /> 
-            <xsl:copy-of select="child::subfield[@code='d']" /> 
-            <xsl:copy-of select="child::subfield[@code='n']" /> 
-            <xsl:copy-of select="child::subfield[@code='t']" />
-            <xsl:copy-of select="child::subfield[@code='4']" />
-            <xsl:copy-of select="child::subfield[@code='8']" /> 
-        </datafield>
-
-        <!-- Autorenfeld mit Komma fuer Facettennavigation-->
-        <navAuthor>
-            <xsl:value-of select="child::subfield[@code='a']"/>
-            <xsl:if test="child::subfield[@code='b'] and child::subfield[@code='b']/text() != ''">
-                <xsl:text>, </xsl:text>
-                <xsl:value-of select="child::subfield[@code='b']"/>
-            </xsl:if>
-        </navAuthor>
-        
-<!--        <xsl:if test="matches(child::subfield[@code='4'], '^[a-z][a-z][a-z]$')">
-            <navRelator>
-                <xsl:copy-of select="child::subfield[@code='a']" />
-                <xsl:copy-of select="child::subfield[@code='b']" />
-                <xsl:copy-of select="child::subfield[@code='4']" />
-            </navRelator>
-        </xsl:if>-->
-        
-    </xsl:template>
-
-    <xsl:template match="datafield[@tag='810']">
-        <datafield tag="810" ind1="1" ind2=" ">
-            <subfield code="a">
-                <xsl:value-of select="child::subfield[@code='a']" />
-            </subfield>
-            <xsl:copy-of select="child::subfield[@code='b']" />
-            <xsl:copy-of select="child::subfield[@code='c']" /> 
-            <xsl:copy-of select="child::subfield[@code='d']" /> 
-            <xsl:copy-of select="child::subfield[@code='n']" /> 
-            <xsl:copy-of select="child::subfield[@code='t']" /> 
-            <xsl:copy-of select="child::subfield[@code='v']" /> 
-        </datafield>
-        
-        <!-- Autorenfeld mit Komma fuer Facettennavigation-->
-        <navAuthor>
-            <xsl:value-of select="child::subfield[@code='a']"/>
-            <xsl:if test="child::subfield[@code='b'] and child::subfield[@code='b']/text() != ''">
-                <xsl:text>, </xsl:text>
-                <xsl:value-of select="child::subfield[@code='b']"/>
-            </xsl:if>
-        </navAuthor>
-    </xsl:template>
-
     <!-- year with ranges and freshness (05.10.2012/osc) -->
     <xsl:template match="controlfield[@tag='008']">
         <xsl:variable name="datetype" select="substring(text(),7,1)"/>

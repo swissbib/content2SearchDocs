@@ -436,8 +436,11 @@
     <xsl:template name="authors">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='100'][@ind1='0']/subfield[@code='a']">
+            <xsl:for-each select="$fragment/datafield[@tag='100']/subfield[@code='a']">
                 <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')"/>
+                <xsl:if test="following-sibling::subfield[@code='D']/text()">
+                    <xsl:value-of select="concat(', ', following-sibling::subfield[@code='D'][1])" />
+                </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='q']/text()">
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='q'][1], ')')" />
                 </xsl:if>
@@ -454,11 +457,11 @@
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='700'][@ind1='0']/subfield[@code='a']">
-                <!--                <xsl:choose>
-                                    <xsl:when test="matches(following-sibling::subfield[@code='l'], 'fre|eng')" />
-                                    <xsl:otherwise>-->
+            <xsl:for-each select="$fragment/datafield[@tag='700']/subfield[@code='a']">
                 <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')"/>
+                <xsl:if test="following-sibling::subfield[@code='D']/text()">
+                    <xsl:value-of select="concat(', ', following-sibling::subfield[@code='D'][1])" />
+                </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='q']/text()">
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='q'][1], ')')" />
                 </xsl:if>
@@ -474,11 +477,12 @@
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
-                <!--                    </xsl:otherwise>
-                                </xsl:choose> -->
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='800'][@ind1='0']/subfield[@code='a']">
+            <xsl:for-each select="$fragment/datafield[@tag='800']/subfield[@code='a']">
                 <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')"/>
+                <xsl:if test="following-sibling::subfield[@code='D']/text()">
+                    <xsl:value-of select="concat(', ', following-sibling::subfield[@code='D'][1])" />
+                </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='q']/text()">
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='q'][1], ')')" />
                 </xsl:if>
@@ -762,7 +766,7 @@
             <xsl:with-param name="fieldname" select="'author2_additional'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <!-- author facet-->
+        <!-- generic author facet-->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/navAuthor">
                 <xsl:value-of select="concat(replace(., '\[forme avant 2007\]', '', 'i'), '##xx##')" />
@@ -773,6 +777,13 @@
             <xsl:with-param name="fieldname" select="'navAuthor'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+        <!-- source specific author facet -->
+        <xsl:for-each select="$fragment/datafield[@tag='979']/subfield[@code='a']">
+            <xsl:variable name="source" select="following-sibling::subfield[@code='2']" />
+            <field name="{concat('navAuthor_', $source)}">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
         <xsl:for-each select="$fragment/sortauthor">
             <field name="author_sort">
                 <xsl:value-of select="." />
