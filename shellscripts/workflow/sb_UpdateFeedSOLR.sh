@@ -32,7 +32,7 @@ inputpath=${PROJECTDIR_DOCPROCESSING}/data/inputfilesFrequent
 confFile=${PROJECTDIR_DOCPROCESSING}/dist/config.properties
 outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfilesFrequent
 postjar=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
-marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/xml2solr.processing.jar
+marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/xml2SearchEngineDoc.jar
 logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR.log
 logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_frequent.log
 outputsubdir=outsub
@@ -47,7 +47,7 @@ LOGFILE=$LOGDIR/Load.$TIMESTAMP.log
 
 function usage()
 {
- printf "usage: $0 -w <weeding mode LONG [swissbib green] or SHORT [basel bern]> -d <directory>\n"
+ printf "usage: $0 [-c <optional config file - default config.properties]> -d <directory>\n"
 }
  
 function initialize()
@@ -110,16 +110,14 @@ function preChecks()
     printf "in preChecks ...\n" >> $LOGFILE
 
     #-z: the length of string is zero
-    [ -z  $WEEDINGMODE -o -z $UPDATEDIR ] && usage
+    [ -z  $CONFIGFILE ] && CONFIGFILE="config.properties"
+    [ -z $UPDATEDIR ] && usage && printf "UPDATEDIR is not defined " >> $LOGFILE &&  exit 9
 
     #-n: True if the length of "STRING" is non-zero.
-    [ ! -n "$WEEDINGMODE" ] && echo "weeding mode  is not set" >>$LOGFILE && exit 9
-    [ ! -d "$UPDATEDIR" ] && echo "UPDATEDIR is not a directory" >>$LOGFILE && exit 9
+    #[ ! -n "$WEEDINGMODE" ] && echo "weeding mode  is not set" >>$LOGFILE && exit 9
+    [ ! -d "$UPDATEDIR" ] && printf "UPDATEDIR is not a directory" >>$LOGFILE && exit 9
 
-    if test $WEEDINGMODE != 'SHORT' && test $WEEDINGMODE != 'LONG'
-    then
-       echo "weeding mode  is either SHORT nor LONG" >> $LOGFILE && exit 9
-    fi
+    printf "UpdateDir for collected CBS messages: <%s>... \n" $UPDATEDIR >> $LOGFILE
 
 
 
@@ -250,18 +248,6 @@ function checkLoadDirTransdir()
     fi
 
 
-    # check for empty dir
-    if [ "$(ls -U $TRANSDIR)" ]
-    then
-         printf "Feed directory not empty <%s> ...\n" $TRANSDIR >> $LOGFILE
-         printf "Moving files to <%s> ...\n" ${PROJECTDIR_DOCPREPROCESSING}/tmp>> $LOGFILE
-         mv *.xml ${PROJECTDIR_DOCPREPROCESSING}/tmp
-    else
-        printf "Feed directory is empty <%s>.\n" $TRANSDIR >> $LOGFILE
-    fi
-
-
-
 }
 
 
@@ -283,19 +269,19 @@ function prepareRecordsForSearchDocsEngine()
     printf "in processHoldingsUpdate ...\n" >> $LOGFILE
 
 
-    # check for empty feed dir
+    # check for empty dir
     if [ "$(ls -U $TRANSDIR)" ]
     then
-        printf "Feed directory not empty <%s> ...\n" $TRANSDIR >> $LOGFILE
-        mkdir -p ${PROJECTDIR_DOCPREPROCESSING}/tmp/feed_$TIMESTAMP
-        printf "Moving files to <%s> ...\n" ${PROJECTDIR_DOCPREPROCESSING}/tmp/feed_$TIMESTAMP >> $LOGFILE
-        mv $TRANSDIR/*.xml ${PROJECTDIR_DOCPREPROCESSING}/tmp/feed_$TIMESTAMP
+         printf "Feed directory $TRANSDIR not empty ...\n"  >> $LOGFILE
+         printf "Moving files to ${PROJECTDIR_DOCPREPROCESSING}/tmp ...\n" >> $LOGFILE
+         mv *.xml ${PROJECTDIR_DOCPREPROCESSING}/tmp
     else
-        printf "Feed directory before update procedure is empty <%s>.\n" $TRANSDIR >> $LOGFILE
+        printf "Feed directory $TRANSDIR is empty. \n"  >> $LOGFILE
     fi
 
+
     cd $DATADIR
-    FORMATFILE=Bulkupdate_$TIMESTAMP_2SearchDocs
+    FORMATFILE=${TIMESTAMP}_Bulkupdate_2SearchDocs
 
     printf "now in datadir -> collecting all the Request messages into one bulkfile ...<%s>\n" $FORMATFILE >> $LOGFILE
 
@@ -369,7 +355,7 @@ function documentProcessingMarc2SearchEngineDoc()
             -DOUTPUT.DIR=${outputsubdirdetail}              \
             -DTARGET.SEARCHENGINE=org.swissbib.documentprocessing.solr.XML2SOLRDocEngine \
             -DXPATH.DIR=${xsltPath}                         \
-            -DSKIPRECORDS=false
+            -DSKIPRECORDS=false                             \
             -jar ${marc2Solrjar}
 
         #setTimestamp
@@ -415,13 +401,13 @@ printf "Starting frequent Index update (sb_UpdateFeedSOLR.sh)  at <%s>...\n" ${C
 initialize
 
 #it seems getopts doesn't run in within function scope...
-while getopts hw:d: OPTION
+while getopts hc:d: OPTION
 do
   case $OPTION in
     h) usage
 	exit 9
 	;;
-    w) WEEDINGMODE=$OPTARG;;		# swissbib green or Basel / Bern
+    c) CONFIGFILE=$OPTARG;;		# swissbib green or Basel / Bern
     d) UPDATEDIR=$OPTARG;;
     
     *) printf "unknown option -%c\n" $OPTION; usage; exit;;
@@ -429,12 +415,12 @@ do
 done
 
 
-printf "weeding Mode: <%s>... \n" $WEEDINGMODE >> $LOGFILE
-printf "UpdateDir for collected CBS messages: <%s>... \n" $UPDATEDIR >> $LOGFILE
+
 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#call for prechecks
 preChecks
+
 
 
 #### Update process is now ready to start: Move current records in tmp load directory ################################
@@ -453,7 +439,7 @@ printf "Starting update procedure at <%s> for `ls -U | wc -l` files ...\n" ${TIM
 # move proceeded update records away from SRURecordUpdate directory
 find ${UPDATEDIR} -name "REQ_*.xml" -print | xargs -i mv {} ${DATADIR}
 
-#starting tomcat to receive further requests 
+#starting tomcat to receive further requests
 printf "Starting tomcat .\n" >> $LOGFILE
 ${PROJECTDIR_DOCPREPROCESSING}/catcher/tomcat/bin/startup.sh >> $LOGFILE
 
@@ -479,8 +465,8 @@ documentProcessingMarc2SearchEngineDoc
 #end feeding SOLR index
 
 
-      
- 
+
+
 cd $TRANSDIR
 printf "Deleting files from <%s>  ...\n" $TRANSDIR >> $LOGFILE
 find $TRANSDIR -name "*no_holdings.xml" -print | xargs -i mv {} $ARCHIVEDIR
@@ -501,5 +487,8 @@ setTimestamp
 printf "process of weeding records, deleting records in SOLR index and transformation  MARC Structure  to SOLR Document structure has finished at: <%s>\n" $CURRENT_TIMESTAMP >> $LOGFILE
 
 rm -f $LOCKFILE
-  
+
 exit 0
+
+
+

@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# version 1.0 project swissbib UB Basel, Guenter Hipler, 2012-04-24
+# version 1.1 project swissbib UB Basel, Guenter Hipler, 2013-08-13
+# adaptations for new VuFind Index
 
 PROJECTDIR_DOCPREPROCESSING=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
 PROJECTDIR_DOCPROCESSING=/swissbib_index/solrDocumentProcessing/MarcToSolr
@@ -102,7 +103,7 @@ function preChecks()
 function moveDocuments()
 {
 
-    printf "moving Document at <%s> ...\n" ${CURRENT_TIMESTAMP} >> ${LOGSPOST2SOLR}
+    printf "moving Document at ${CURRENT_TIMESTAMP} ...\n"  >> ${LOGSPOST2SOLR}
 
     #-z: the length of string is zero
 
@@ -138,18 +139,15 @@ function post2solr ()
             -Dcommit=no   \
             -jar ${POSTJAR} ${POSTDIR} >> ${LOGSPOST2SOLR}
 
-        #rm -r ${POSTDIRBASE_TO}/${d}
-
+        printf "processing of directory ${POSTDIRBASE_TO}/${d} has finished - now send the commit to ${INDEXINGMASTERURL} ...\n"  >> ${LOGSPOST2SOLR}
+        java  \
+            -Durl=${INDEXINGMASTERURL} \
+            -Dcommit=yes   \
+            -jar ${POSTJAR}  >> ${LOGSPOST2SOLR}
 
 
     done
 
-    #now start the commit
-    printf "now send the commit to <%s> ...\n" ${INDEXINGMASTERURL} >> ${LOGSPOST2SOLR}
-    java  \
-        -Durl=${INDEXINGMASTERURL} \
-        -Dcommit=yes   \
-        -jar ${POSTJAR}  >> ${LOGSPOST2SOLR}
 
 
 }
