@@ -12,42 +12,33 @@
 
     <doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
         <desc>
-            swissbib.solr.step1.xsl ist die erste Stufe der Verarbeitung im Document-Processing zur Aufbereitung 
-            der Daten vor der eigentlich Indexierung
+            Dieses Skript ist die erste Stufe (Step1) der Verarbeitung im Document-Processing zur Aufbereitung 
+            der Daten vor der eigentlich Indexierung.
             
-            Der Schritt ist angelehnt an die stages des document processing von FAST
-            Neben FAST internen stages wie LanguageDetection, Kopieren von Attributen, Deduplictaion
-            gibt es die haupsaechlich von OCLV erstellten stages
-            a) Kopie der kompletten urspruenglichen Struktur in ein eigenes Feld
-            b) Erweiterung der urspruenglichen MARC - Struktur mit Feldern und Daten, die fuer das Indexieren 
-            benoetigt werden (in oclc.xsl abgehandelt)
+            Stages
+            ------
+            1) Kopie der kompletten urspruenglichen Struktur in ein eigenes Feld
+            2) Erweiterung der urspruenglichen MARC-Struktur mit Feldern und Daten, die fuer das Indexieren 
+            benoetigt werden
+            3) Mappen der erstellten und erweiterten Struktur auf die Indexfelder (primaer in Step2)
             
-            c) Mappen der erstellten und erweiterten Struktur auf die Indexfelder des FAST-Index (Definiert im Indexprofil)
-            (mehrheitlich in swissbib.solr.step2.xsl)
+            Die Anreicherungen mit XSLT-Verarbeitungen genuegen nicht. Deshalb werden in Java geschriebene 
+            XSLT-Extensions eingesetzt (alle eingebunden in Step2)
+            * Dedublierung Inhalte
+            * Anreicherung von TOC / Volltexte (Apache TIKA)
+            * Anreicherung GND-Nebenvarianten
+            * Anreicherung VIAF-Nebenvarianten
             
-            SOLR bietet diese stages in der recht komfortablen FAST Form (noch) nicht an
-            
-            Deshalb vorerst 2 eigene XSLT Scripte, die die Transformationen und Anreicherungen abbilden
-            
-            Die Anreicherungen nur mit XSLT Verarbeitungen genuegen nicht (auch FAST verwendet fuer weitergehende Verarbeitungen
-            Python Komponenten)
-            Zu diesem Zweck verwenden wir in Java geschriebene XSLT Extensions
-            (bspw. das Fetchen von externen Anreicherungsdaten [TOC, Abstracts und sonstige
-            Volltexte]. Fuer das Extrahieen dieser Daten setzen wir TIKA ein)
-            
-            
-            Anfangs waren beide scripte in 'einem' XSLT Template vereint (oclc.solr.xsl)
-            Dieses XSLT wird dann jedoch sehr gross und damit unuebersichtlich.
-            
-            Zu pruefen bleibt noch, ob die Aufteilung in mehere templates und das Verketten in einem java - Programm
-            nicht Performancenachteile mit sich bringt (meherer templates, Kopieren von streams etc)
+            ************************
+            www.swissbib.org
+            guenter.hipler@unibas.ch
+            oliver.schihin@unibas.ch
+            ************************
             
             Versionen
             =========
             
-            0.9 : Adaption des im Herbst 2010 von Guenther erstellten Stylesheets durch Oliver
-                  ueberarbeitet, aufgeraeumt
-                  offene Punkte in ssorttitle, ISBN sind weiterhin offen (mit hip klaeren)
+            01.10.2010 : Guenter : erstellt
             ***********************************
             23.09.2011 : Oliver : ueberarbeitet
             ***********************************
@@ -90,15 +81,18 @@
         <xsl:apply-templates/>
     </xsl:template>
     
-    <!-- DocID
+    <!-- =====
+         DocID
          sortfields
-         institutions and networks/unions
+         institutions and networks / unions
+         URIs for TIKA
+         ==================================
     -->
     
     <xsl:template match="controlfield[@tag='001']">
-        <myDocId>
+        <myDocID>
             <xsl:value-of select="."/>
-        </myDocId>
+        </myDocID>
         <sortauthor>
             <xsl:choose>
                 <xsl:when test="following-sibling::datafield[@tag='100']/subfield[@code='a']">
@@ -154,7 +148,6 @@
                         <xsl:value-of select="substring($sortoutput,1,30)"/>
                     </xsl:if>
                 </xsl:when>
-                <!-- Anpassungen (11.11.2011 / osc) : take only one instance to avoid trouble with #001171992 from IDSLU -->
                 <xsl:when test="following-sibling::datafield[@tag='490'][1]/subfield[@code='a'][1]">
                     <xsl:value-of select="substring(following-sibling::datafield[@tag='490'][1]/subfield[@code='a'][1],1,30)"/>
                 </xsl:when>
@@ -179,6 +172,10 @@
             <xsl:call-template name="UnionAndBranchlib">           
                 <xsl:with-param name="union" select="child::subfield[@code='B']" />                
             </xsl:call-template>
+            <uri856>
+                <xsl:value-of select="child::subfield[@code='u'][1]"/>
+            </uri856>
+            <xsl:copy-of select="current()"/>
         </xsl:for-each>
         <xsl:for-each select="following-sibling::datafield[@tag='949']">   
             <xsl:call-template name="UnionAndBranchlib">
@@ -187,10 +184,14 @@
             </xsl:call-template>
         </xsl:for-each>
         <xsl:for-each select="following-sibling::datafield[@tag='956']">
-            <xsl:call-template name="UnionAndBranchlib">
+<!--            <xsl:call-template name="UnionAndBranchlib">
                 <xsl:with-param name="union" select="child::subfield[@code='B']" />
                 <xsl:with-param name="branchlib" select="child::subfield[@code='a']" />
-            </xsl:call-template>
+            </xsl:call-template>-->
+            <uri956>
+                <xsl:value-of select="./subfield[@code='u'][1]"/>   
+            </uri956>
+            <xsl:copy-of select="current()"/>
         </xsl:for-each>
     </xsl:template>
     
@@ -220,7 +221,105 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
+    
+    <!-- Dates / Years -->
+    
+    <xsl:template match="controlfield[@tag='008']">
+        <xsl:variable name="datetype" select="substring(text(),7,1)"/>
+        <xsl:variable name="year1" select="substring(text()[1],8,4)" />
+        <xsl:variable name="year2" select="replace(substring(text()[1],12,4), '9999', '2013')" />
+        <xsl:choose>
+            <xsl:when test="matches($datetype, '[spt]') and matches($year1, '[\d]{4}')">
+                <year>
+                    <xsl:value-of select="$year1" />
+                </year>
+                <freshness>
+                    <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
+                </freshness>
+                <sortyear>
+                    <xsl:value-of select="$year1" />
+                </sortyear>
+            </xsl:when>
+            <xsl:when test="matches($datetype, '[mr]') and (matches($year1, '[\d]{4}') or matches($year2, '[\d]{4}'))">
+                <xsl:if test="matches($year1, '[\d]{4}')">
+                    <year>
+                        <xsl:value-of select="$year1" />
+                    </year>
+                </xsl:if>
+                <xsl:if test="matches($year2, '[012][\d]{3}')">
+                    <year>
+                        <xsl:value-of select="$year2" />
+                    </year>
+                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="matches($year1, '[\d]{4}')">
+                        <freshness>
+                            <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
+                        </freshness>
+                        <sortyear>
+                            <xsl:value-of select="$year1" />
+                        </sortyear>
+                    </xsl:when>
+                    <xsl:otherwise />
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="matches($datetype, '[cdik]')">
+                <xsl:choose>
+                    <xsl:when test="matches($year1, '[\d]{4}') and matches($year2, '[012][\d]{3}')">
+                        <xsl:if test="$year1 &gt; $year2">
+                            <freshness>
+                                <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
+                            </freshness>
+                        </xsl:if>
+                        <xsl:if test="$year2 &gt; $year1">
+                            <freshness>
+                                <xsl:value-of select="concat($year2, '-01-01T00:00:00Z')" />
+                            </freshness>
+                        </xsl:if>
+                        <sortyear>
+                            <xsl:value-of select="$year1" />
+                        </sortyear>
+                        <xsl:call-template name="yearranges">
+                            <xsl:with-param name="year1" as="xs:integer" select="xs:integer($year1)" />
+                            <xsl:with-param name="year2" as="xs:integer" select="xs:integer($year2)" />
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="matches($year1, '[\d]{4}') and not(matches($year2, '[\d]{4}'))">
+                        <year>
+                            <xsl:value-of select="$year1" />
+                        </year>
+                        <freshness>
+                            <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
+                        </freshness>
+                        <sortyear>
+                            <xsl:value-of select="$year1" />
+                        </sortyear>
+                    </xsl:when>
+                    <xsl:when test="matches($year2, '[\d]{4}') and not(matches($year1, '[\d]{4}'))">
+                        <year>
+                            <xsl:value-of select="$year2" />
+                        </year>
+                        <freshness>
+                            <xsl:value-of select="concat($year2, '-01-01T00:00:00Z')" />
+                        </freshness>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise />
+        </xsl:choose>
+        <xsl:copy-of select="current()"> </xsl:copy-of>
+    </xsl:template>
+    
+    <xsl:template name="yearranges">
+        <xsl:param name="year1" />
+        <xsl:param name="year2" />
+        <xsl:for-each select="$year1 to $year2">
+            <year>
+                <xsl:sequence select="."  />
+            </year>
+        </xsl:for-each>
+    </xsl:template>
+    
     <!-- ===========================
          Autorenfelder (1xx/7xx/8xx) : Aufbereitung der Facetten
          ===========================
@@ -328,136 +427,6 @@
                 <xsl:value-of select="child::subfield[@code='B']/text()" />
             </subfield>
         </datafield>
-    </xsl:template>
-    
-    <!-- year with ranges and freshness (05.10.2012/osc) -->
-    <xsl:template match="controlfield[@tag='008']">
-        <xsl:variable name="datetype" select="substring(text(),7,1)"/>
-        <xsl:variable name="year1" select="substring(text()[1],8,4)" />
-        <xsl:variable name="year2" select="replace(substring(text()[1],12,4), '9999', '2013')" />
-        <xsl:choose>
-            <xsl:when test="matches($datetype, '[spt]') and matches($year1, '[\d]{4}')">
-                <year>
-                    <xsl:value-of select="$year1" />
-                </year>
-                <freshness>
-                    <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
-                </freshness>
-                <sortyear>
-                    <xsl:value-of select="$year1" />
-                </sortyear>
-            </xsl:when>
-            <xsl:when test="matches($datetype, '[mr]') and (matches($year1, '[\d]{4}') or matches($year2, '[\d]{4}'))">
-                <xsl:if test="matches($year1, '[\d]{4}')">
-                    <year>
-                        <xsl:value-of select="$year1" />
-                    </year>
-                </xsl:if>
-                <xsl:if test="matches($year2, '[012][\d]{3}')">
-                    <year>
-                        <xsl:value-of select="$year2" />
-                    </year>
-                </xsl:if>
-                <xsl:choose>
-                    <xsl:when test="matches($year1, '[\d]{4}')">
-                        <freshness>
-                            <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
-                        </freshness>
-                        <sortyear>
-                            <xsl:value-of select="$year1" />
-                        </sortyear>
-                    </xsl:when>
-                    <xsl:otherwise />
-                </xsl:choose>
-            </xsl:when>
-            <xsl:when test="matches($datetype, '[cdik]')">
-                    <xsl:choose>
-                        <xsl:when test="matches($year1, '[\d]{4}') and matches($year2, '[012][\d]{3}')">
-                            <xsl:if test="$year1 &gt; $year2">
-                                <freshness>
-                                    <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
-                                </freshness>
-                            </xsl:if>
-                            <xsl:if test="$year2 &gt; $year1">
-                                <freshness>
-                                    <xsl:value-of select="concat($year2, '-01-01T00:00:00Z')" />
-                                </freshness>
-                            </xsl:if>
-                            <sortyear>
-                                <xsl:value-of select="$year1" />
-                            </sortyear>
-                            <xsl:call-template name="yearranges">
-                                <xsl:with-param name="year1" as="xs:integer" select="xs:integer($year1)" />
-                                <xsl:with-param name="year2" as="xs:integer" select="xs:integer($year2)" />
-                            </xsl:call-template>
-                        </xsl:when>
-                        <xsl:when test="matches($year1, '[\d]{4}') and not(matches($year2, '[\d]{4}'))">
-                            <year>
-                                <xsl:value-of select="$year1" />
-                            </year>
-                            <freshness>
-                                <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
-                            </freshness>
-                            <sortyear>
-                                <xsl:value-of select="$year1" />
-                            </sortyear>
-                        </xsl:when>
-                        <xsl:when test="matches($year2, '[\d]{4}') and not(matches($year1, '[\d]{4}'))">
-                            <year>
-                                <xsl:value-of select="$year2" />
-                            </year>
-                            <freshness>
-                                <xsl:value-of select="concat($year2, '-01-01T00:00:00Z')" />
-                            </freshness>
-                        </xsl:when>
-                    </xsl:choose>
-            </xsl:when>
-            <xsl:otherwise />
-        </xsl:choose>
-        <xsl:copy-of select="current()"> </xsl:copy-of>
-    </xsl:template>
-    
-    <xsl:template name="yearranges">
-        <xsl:param name="year1" />
-        <xsl:param name="year2" />
-        <xsl:for-each select="$year1 to $year2">
-            <year>
-                <xsl:sequence select="."  />
-            </year>
-        </xsl:for-each>
-    </xsl:template>
-
-    <!-- URI  : je einzeln behandelt, ohne unnoetiges Feld <uri>
-                muss noch angeschaut werden (18.08.2011/osc) -->
-    <!--  First take field 956, than 856; Separator Pipe, 
-          counter limit: only proceed once, as template may match twice 
-    -->
-    <!--<xsl:template match="datafield[@tag='856'] | datafield[@tag='956'] ">-->
-        <!-- reduziert (18.08.2011/osc) -->
-        <!--<xsl:variable name="counter">
-            <xsl:number count="//datafield[@tag='856'] | //datafield[@tag='956']"/>
-        </xsl:variable>
-        <xsl:if test="$counter &lt; 2 ">
-            <uri>
-                <xsl:value-of select="//datafield[@tag='956'][position()=1]/subfield[@code='u']"/>
-                <xsl:text>|</xsl:text>
-                <xsl:value-of select="//datafield[@tag='856'][position()=1]/subfield[@code='u']"/>
-                </uri>-->
-    <xsl:template match="datafield[@tag='856']">
-        <xsl:for-each select=".">
-            <uri856>
-                <xsl:value-of select="./subfield[@code='u']"/>
-            </uri856>
-            <xsl:copy-of select="current()"/>
-        </xsl:for-each>
-    </xsl:template>
-    <xsl:template match="datafield[@tag='956'][1]">
-        <xsl:for-each select=".">
-            <uri956>
-                <xsl:value-of select="./subfield[@code='u']"/>   
-            </uri956>
-            <xsl:copy-of select="current()"/>
-        </xsl:for-each>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -16,18 +16,18 @@
 /> 
 
     <doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
-    <desc>mapping to vufind-schema
+    <desc>
+        Dieses Skript ist die zweite Stufe (step2) der Verarbeitung im Document-Processing zur Aufbereitung 
+        der Daten vor der eigentlich Indexierung.
+        Siehe Kurzbeschreibung im Step1, Dokumentation im wiki, Issues, etc.
+        
+        ************************
+        www.swissbib.org
+        guenter.hipler@unibas.ch
+        oliver.schihin@unibas.ch
+        ************************
 
-        2013-02-07 GH
-        integration of complete holdings structure into the index as stored field
-        -> template createHoldings and additional parameter holdingsStructure to inject the preprocessed holdings structure
-        by XML2SolrDocsEngine. By now the whole structure is stored into one solr field and has to be parsed by the application
-        possible further development (or alternative): each holding tag (which is basically a String type) could be separated by a pattern
-        Then the same mechanism as for deduplication could be used
-        <!--<xsl:sequence select="fn:tokenize($uniqueStrValues,'##xx##')"/>-->
-        and so on...
-
-
+        07.02.2013 : Guenter : integration of complete holdings structure into the index as stored field
         ****************************
         09.08.2013 : Oliver : Beginn Anpassungen neues CBS
         ****************************
@@ -329,7 +329,7 @@
     <xsl:template name="id_type">
         <xsl:param name="fragment" />
         <field name="id">
-            <xsl:value-of select="$fragment/myDocId" />
+            <xsl:value-of select="$fragment/myDocID" />
         </field>
         <field name="recordtype">marc</field>
     </xsl:template>
@@ -1220,7 +1220,7 @@
         <xsl:if test="exists($fragment//datafield[@tag='490']/subfield[@code='9'])">
             <field name="hierarchytype">series</field>
             <field name="is_hierarchy_id">
-                <xsl:value-of select="$fragment/myDocId" />
+                <xsl:value-of select="$fragment/myDocID" />
             </field>
 <!--            <field name="is_hierarchy_title">
                 <xsl:value-of select="$fragment/datafield[@tag='245']/subfield[@code='a']" />
@@ -2916,27 +2916,31 @@
     <xsl:template name="fulltext">
         <xsl:param name="fragment"/>
         <!-- reduziert (18.08.2011/osc) -->
-        <xsl:variable name="di" select="$fragment/myDocId"/>
+        <xsl:variable name="di" select="$fragment/myDocID"/>
         <!-- ich muss hier noch etwas einbauen, dass das Feld nicht aufgebaut wird, wenn kein Text zurueckgeliefert wird -->
         <xsl:for-each select="$fragment/uri856">
             <xsl:variable name="TikaFacade" select="java-tika-ext:new()"/>
             <xsl:variable name="url856" select="."/>
             <xsl:variable name="fulltextcontent" select="java-tika-ext:readURLContent($TikaFacade ,string($url856),$di)"/>
-            <field name="fulltext">
-                <xsl:text disable-output-escaping="yes">&lt;![CDATA[</xsl:text>
-                <xsl:value-of select="$fulltextcontent"/>
-                <xsl:text disable-output-escaping="yes">]]&gt;</xsl:text>
-            </field>
+            <xsl:if test="$fulltextcontent != ''">
+                <field name="fulltext">
+                    <xsl:text disable-output-escaping="yes">&lt;![CDATA[</xsl:text>
+                    <xsl:value-of select="$fulltextcontent"/>
+                    <xsl:text disable-output-escaping="yes">]]&gt;</xsl:text>
+                </field>
+            </xsl:if>
         </xsl:for-each>
         <xsl:for-each select="$fragment/uri956">
             <xsl:variable name="TikaFacade" select="java-tika-ext:new()"/>
             <xsl:variable name="url956" select="."/>
             <xsl:variable name="fulltextcontent" select="java-tika-ext:readURLContent($TikaFacade ,string($url956),$di)"/>
-            <field name="fulltext">
-                <xsl:text disable-output-escaping="yes">&lt;![CDATA[</xsl:text>
-                <xsl:value-of select="$fulltextcontent"/>
-                <xsl:text disable-output-escaping="yes">]]&gt;</xsl:text>
-            </field>
+            <xsl:if test="$fulltextcontent != ''">
+                <field name="fulltext">
+                    <xsl:text disable-output-escaping="yes">&lt;![CDATA[</xsl:text>
+                    <xsl:value-of select="$fulltextcontent"/>
+                    <xsl:text disable-output-escaping="yes">]]&gt;</xsl:text>
+                </field>
+            </xsl:if>
         </xsl:for-each>
     </xsl:template>
     
