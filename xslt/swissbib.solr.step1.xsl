@@ -89,6 +89,137 @@
     <xsl:template match="record">
         <xsl:apply-templates/>
     </xsl:template>
+    
+    <!-- DocID
+         sortfields
+         institutions and networks/unions
+    -->
+    
+    <xsl:template match="controlfield[@tag='001']">
+        <myDocId>
+            <xsl:value-of select="."/>
+        </myDocId>
+        <sortauthor>
+            <xsl:choose>
+                <xsl:when test="following-sibling::datafield[@tag='100']/subfield[@code='a']">
+                    <xsl:value-of select="following-sibling::datafield[@tag='100']/subfield[@code='a']"/>
+                    <xsl:if test="following-sibling::datafield[@tag='100']/subfield[@code='D'] and 
+                        following-sibling::datafield[@tag='100']/subfield[@code='D']/text() != ''">
+                        <xsl:value-of select="following-sibling::datafield[@tag='100']/subfield[@code='D']"/>
+                    </xsl:if>
+                </xsl:when>
+                <xsl:when test="following-sibling::datafield[@tag='700']/subfield[@code='a']">
+                    <xsl:value-of select="following-sibling::datafield[@tag='700']/subfield[@code='a']"/>
+                    <xsl:if test="following-sibling::datafield[@tag='700']/subfield[@code='D'] and 
+                        following-sibling::datafield[@tag='700']/subfield[@code='D']/text() != ''">
+                        <xsl:value-of select="following-sibling::datafield[@tag='700']/subfield[@code='D']"/>
+                    </xsl:if>
+                </xsl:when>
+                <xsl:when test="following-sibling::datafield[@tag='110']/subfield[@code='a']">
+                    <xsl:value-of select="following-sibling::datafield[@tag='110']/subfield[@code='a']"/>
+                    <xsl:if test="following-sibling::datafield[@tag='110']/subfield[@code='b'] and 
+                        following-sibling::datafield[@tag='110']/subfield[@code='b']/text() != ''">
+                        <xsl:value-of select="following-sibling::datafield[@tag='110']/subfield[@code='b']"/>
+                    </xsl:if>
+                </xsl:when>
+                <xsl:when test="following-sibling::datafield[@tag='710']/subfield[@code='a']">
+                    <xsl:value-of select="following-sibling::datafield[@tag='710']/subfield[@code='a']"/>
+                    <xsl:if test="following-sibling::datafield[@tag='710']/subfield[@code='b'] and 
+                        following-sibling::datafield[@tag='710']/subfield[@code='b']/text() != ''">
+                        <xsl:value-of select="following-sibling::datafield[@tag='710']/subfield[@code='b']"/>
+                    </xsl:if>
+                </xsl:when>
+                <xsl:when test="following-sibling::datafield[@tag='111']/subfield[@code='a']">
+                    <xsl:value-of select="following-sibling::datafield[@tag='111']/subfield[@code='a']"/>
+                </xsl:when>
+                <xsl:when test="following-sibling::datafield[@tag='711']/subfield[@code='a']">
+                    <xsl:value-of select="following-sibling::datafield[@tag='711']/subfield[@code='a']"/>
+                </xsl:when>
+            </xsl:choose>
+        </sortauthor>
+        
+        <sorttitle>
+            <xsl:choose>
+                <xsl:when test="following-sibling::datafield[@tag='245']/subfield[@code='a'] != '@'">
+                    <xsl:variable name="sorttitle">
+                        <xsl:value-of select="following-sibling::datafield[@tag='245']/subfield[@code='a']"/>
+                    </xsl:variable>
+                    <xsl:if test="string-length($sorttitle) &gt; 0">
+                        <xsl:variable name="indicator">
+                            <xsl:value-of select="following-sibling::datafield[@tag='245'][1]/@ind2"/>
+                        </xsl:variable>
+                        <xsl:variable name="sortoutput">
+                            <xsl:value-of select="substring($sorttitle, $indicator+1)"/>
+                        </xsl:variable>
+                        <xsl:value-of select="substring($sortoutput,1,30)"/>
+                    </xsl:if>
+                </xsl:when>
+                <!-- Anpassungen (11.11.2011 / osc) : take only one instance to avoid trouble with #001171992 from IDSLU -->
+                <xsl:when test="following-sibling::datafield[@tag='490'][1]/subfield[@code='a'][1]">
+                    <xsl:value-of select="substring(following-sibling::datafield[@tag='490'][1]/subfield[@code='a'][1],1,30)"/>
+                </xsl:when>
+                <xsl:when test="following-sibling::datafield[@tag='773'][1]/subfield[@code='t'][1]">
+                    <xsl:value-of select="substring(following-sibling::datafield[@tag='773'][1]/subfield[@code='t'][1],1,30)"/>
+                </xsl:when>
+            </xsl:choose>
+        </sorttitle>
+        
+        <!-- =========
+             Preparing fields institution and network
+             =========
+        -->
+        
+        <xsl:for-each select="following-sibling::datafield[@tag='852']">   
+            <xsl:call-template name="UnionAndBranchlib">
+                <xsl:with-param name="union" select="child::subfield[@code='B']" />
+                <xsl:with-param name="branchlib" select="child::subfield[@code='F']" />
+            </xsl:call-template>
+        </xsl:for-each> 
+        <xsl:for-each select="following-sibling::datafield[@tag='856']">   
+            <xsl:call-template name="UnionAndBranchlib">           
+                <xsl:with-param name="union" select="child::subfield[@code='B']" />                
+            </xsl:call-template>
+        </xsl:for-each>
+        <xsl:for-each select="following-sibling::datafield[@tag='949']">   
+            <xsl:call-template name="UnionAndBranchlib">
+                <xsl:with-param name="union" select="child::subfield[@code='B']" />
+                <xsl:with-param name="branchlib" select="child::subfield[@code='F']" />
+            </xsl:call-template>
+        </xsl:for-each>
+        <xsl:for-each select="following-sibling::datafield[@tag='956']">
+            <xsl:call-template name="UnionAndBranchlib">
+                <xsl:with-param name="union" select="child::subfield[@code='B']" />
+                <xsl:with-param name="branchlib" select="child::subfield[@code='a']" />
+            </xsl:call-template>
+        </xsl:for-each>
+    </xsl:template>
+    
+    <!-- IDS Unions get an additional union 'IDS', rest without changes -->
+    <xsl:template name="UnionAndBranchlib" >
+        <xsl:param name="union" />        
+        <xsl:param name="branchlib" />
+        <xsl:choose>
+            <xsl:when test="matches($union, '^IDS|^NEBIS')">
+                <network>
+                    <xsl:text>IDS</xsl:text>
+                </network>
+                <network>
+                    <xsl:value-of select="$union"/>
+                </network>
+                <branchlib>
+                    <xsl:value-of select="$branchlib"/>
+                </branchlib>
+            </xsl:when>
+            <xsl:otherwise>
+                <branchlib>
+                    <xsl:value-of select="$branchlib"/>
+                </branchlib>
+                <network>
+                    <xsl:value-of select="$union"/>
+                </network>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 
     <!-- ===========================
          Autorenfelder (1xx/7xx/8xx) : Aufbereitung der Facetten
@@ -327,205 +458,6 @@
             </uri956>
             <xsl:copy-of select="current()"/>
         </xsl:for-each>
-    </xsl:template>
-    
-
-    <!--  sortauthor -->
-    <!--  order for entry in sortauthor: 100a, 700a, 110a, 710a, 111a, 711a -->
-    <!--  sorttitle, 245$a, 'Nichtsortierkennzeichen' in indicator 2 -->
-    <!-- network and branchlib: 949 and 852 can be treated alike; 856 misses $b-->
-<!--    <xsl:template match="Docid">-->
-    <xsl:template match="controlfield[@tag='001']">
-        <myDocId>
-            <xsl:value-of select="."/>
-        </myDocId>
-        <sortauthor>
-            <xsl:choose>
-                <xsl:when test="following-sibling::datafield[@tag='100']/subfield[@code='a']">
-                    <xsl:value-of select="following-sibling::datafield[@tag='100']/subfield[@code='a']"/>
-                    <xsl:if test="following-sibling::datafield[@tag='100']/subfield[@code='D'] and 
-                            following-sibling::datafield[@tag='100']/subfield[@code='D']/text() != ''">
-                        <xsl:value-of select="following-sibling::datafield[@tag='100']/subfield[@code='D']"/>
-                    </xsl:if>
-                </xsl:when>
-                <xsl:when test="following-sibling::datafield[@tag='700']/subfield[@code='a']">
-                    <xsl:value-of select="following-sibling::datafield[@tag='700']/subfield[@code='a']"/>
-                    <xsl:if test="following-sibling::datafield[@tag='700']/subfield[@code='D'] and 
-                            following-sibling::datafield[@tag='700']/subfield[@code='D']/text() != ''">
-                        <xsl:value-of select="following-sibling::datafield[@tag='700']/subfield[@code='D']"/>
-                    </xsl:if>
-                </xsl:when>
-                <xsl:when test="following-sibling::datafield[@tag='110']/subfield[@code='a']">
-                    <xsl:value-of select="following-sibling::datafield[@tag='110']/subfield[@code='a']"/>
-                    <xsl:if test="following-sibling::datafield[@tag='110']/subfield[@code='b'] and 
-                            following-sibling::datafield[@tag='110']/subfield[@code='b']/text() != ''">
-                        <xsl:value-of select="following-sibling::datafield[@tag='110']/subfield[@code='b']"/>
-                    </xsl:if>
-                </xsl:when>
-                <xsl:when test="following-sibling::datafield[@tag='710']/subfield[@code='a']">
-                    <xsl:value-of select="following-sibling::datafield[@tag='710']/subfield[@code='a']"/>
-                    <xsl:if test="following-sibling::datafield[@tag='710']/subfield[@code='b'] and 
-                            following-sibling::datafield[@tag='710']/subfield[@code='b']/text() != ''">
-                        <xsl:value-of select="following-sibling::datafield[@tag='710']/subfield[@code='b']"/>
-                    </xsl:if>
-                </xsl:when>
-                <xsl:when test="following-sibling::datafield[@tag='111']/subfield[@code='a']">
-                    <xsl:value-of select="following-sibling::datafield[@tag='111']/subfield[@code='a']"/>
-                </xsl:when>
-                <xsl:when test="following-sibling::datafield[@tag='711']/subfield[@code='a']">
-                    <xsl:value-of select="following-sibling::datafield[@tag='711']/subfield[@code='a']"/>
-                </xsl:when>
-            </xsl:choose>
-        </sortauthor>
-
-        <sorttitle>
-            <xsl:choose>
-                <xsl:when test="following-sibling::datafield[@tag='245']/subfield[@code='a'] != '@'">
-                    <xsl:variable name="sorttitle">
-                        <xsl:value-of select="following-sibling::datafield[@tag='245']/subfield[@code='a']"/>
-                    </xsl:variable>
-                    <xsl:if test="string-length($sorttitle) &gt; 0">
-                        <xsl:variable name="indicator">
-                            <xsl:value-of select="following-sibling::datafield[@tag='245'][1]/@ind2"/>
-                        </xsl:variable>
-                        <xsl:variable name="sortoutput">
-                            <xsl:value-of select="substring($sorttitle, $indicator+1)"/>
-                        </xsl:variable>
-                        <xsl:value-of select="substring($sortoutput,1,30)"/>
-                    </xsl:if>
-                </xsl:when>
-                <!-- Anpassungen (11.11.2011 / osc) : take only one instance to avoid trouble with #001171992 from IDSLU -->
-                <xsl:when test="following-sibling::datafield[@tag='490'][1]/subfield[@code='a'][1]">
-                    <xsl:value-of select="substring(following-sibling::datafield[@tag='490'][1]/subfield[@code='a'][1],1,30)"/>
-                </xsl:when>
-                <xsl:when test="following-sibling::datafield[@tag='773'][1]/subfield[@code='t'][1]">
-                    <xsl:value-of select="substring(following-sibling::datafield[@tag='773'][1]/subfield[@code='t'][1],1,30)"/>
-                </xsl:when>
-            </xsl:choose>
-        </sorttitle>
-        
-        <!-- =========
-             Holdings treatment
-             =========
-        -->
-        <!-- Schriftenreihen, haeufig ohne Holding, erhalten Eintrag in snetwork (27.11.2011/osc) -->
-        <xsl:for-each select="following-sibling::datafield[@tag='035']">
-            <xsl:choose>
-                <xsl:when test="matches(following-sibling::datafield[@tag='898'][1]/subfield[@code='a'], '^CR030[01]0')">
-                    <xsl:if test="matches(./subfield[@code='a']/text(), '^\(IDS|^\(NEBIS|^\(ABN|^\(BGR|^\(SGBN|^\(SBT|^\(SNL|\(RERO')">
-                    <xsl:call-template name="UnionAndBranchlib">
-                        <xsl:with-param name="union" select="substring-before(substring-after(., '('), ')')" />
-                    </xsl:call-template>
-                    </xsl:if>
-                </xsl:when>
-                <xsl:otherwise />
-            </xsl:choose>
-        </xsl:for-each>
-        <xsl:for-each select="following-sibling::datafield[@tag='852']">   
-            <xsl:call-template name="UnionAndBranchlib">
-                <xsl:with-param name="branchlib" select="child::subfield[@code='b']" />
-                <xsl:with-param name="union" select="child::subfield[@code='B']" />
-            </xsl:call-template>
-        </xsl:for-each> 
-        <xsl:for-each select="following-sibling::datafield[@tag='856']">   
-            <xsl:call-template name="UnionAndBranchlib">           
-                <xsl:with-param name="union" select="child::subfield[@code='B']" />                
-            </xsl:call-template>
-        </xsl:for-each>
-        <xsl:for-each select="following-sibling::datafield[@tag='949']">   
-            <xsl:call-template name="UnionAndBranchlib">
-                <xsl:with-param name="branchlib" select="child::subfield[@code='b']" />
-                <xsl:with-param name="union" select="child::subfield[@code='B']" />
-            </xsl:call-template>
-        </xsl:for-each>
-        <xsl:for-each select="following-sibling::datafield[@tag='956']">
-            <xsl:call-template name="UnionAndBranchlib">
-                <xsl:with-param name="branchlib" select="child::subfield[@code='a']" />
-                <xsl:with-param name="union" select="child::subfield[@code='B']" />
-            </xsl:call-template>
-        </xsl:for-each>
-    </xsl:template>
-
-    <!-- 949 and 852 can be treated alike; 856 misses $b, 956 has branchlib in $a -->
-    <xsl:template name="UnionAndBranchlib" >
-        <xsl:param name="union" />        
-        <xsl:param name="branchlib" />
-        <xsl:choose>
-            <xsl:when test="matches($union, 'RERO')">
-                <xsl:if test="string-length($branchlib) = 8">
-                    <branchlib>
-                        <xsl:value-of select="concat('R', substring($branchlib,0,5))"/>
-                    </branchlib>
-                    <network>
-                        <xsl:value-of select="concat('R', substring($branchlib,0,2))"/>
-                    </network>
-                    <network>
-                        <xsl:value-of select="$union"/>
-                    </network>
-                </xsl:if>
-                <xsl:if test="string-length($branchlib) = 9">
-                    <branchlib>
-                        <xsl:value-of select="concat('R', substring($branchlib,0,6))"/>
-                    </branchlib>
-                    <network>
-                        <xsl:value-of select="concat('R', substring($branchlib,0,3))"/>
-                    </network>
-                    <network>
-                        <xsl:value-of select="$union"/>
-                    </network>
-                </xsl:if>
-                <xsl:if test="not($branchlib)">
-                    <network>
-                        <xsl:value-of select="$union" />
-                    </network>
-                </xsl:if>
-            </xsl:when>
-            <xsl:when test="$union = 'SNL'">
-                <xsl:if test="string-length($branchlib) = 5">
-                    <branchlib>
-                        <xsl:value-of select="concat('S', substring($branchlib,0,2))"/>
-                    </branchlib>
-                </xsl:if>
-                <network>
-                    <xsl:value-of select="$union"/>
-                </network>
-            </xsl:when>
-            <xsl:when test="matches($union, '^IDS|^NEBIS')">
-                <network>
-                    <xsl:text>IDS</xsl:text>
-                </network>
-                <network>
-                    <xsl:value-of select="$union"/>
-                </network>
-                <branchlib>
-                    <xsl:value-of select="$branchlib"/>
-                </branchlib>
-            </xsl:when>
-            <xsl:otherwise>
-                <branchlib>
-                    <xsl:value-of select="$branchlib"/>
-                </branchlib>
-                <network>
-                    <xsl:value-of select="$union"/>
-                </network>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <!--  ISBN (020 $a, $z; entferne zusaetzliche Informationen) -->
-    <xsl:template match="datafield[@tag='020']">
-        <datafield tag="020" ind1=" " ind2=" ">
-            <xsl:for-each select="child::subfield[@code='a']">
-                <subfield code="a">
-                   <xsl:value-of select="replace(., '^[\D]*([\d\-\.]+x?).*$', '$1', 'i')" />
-                </subfield>
-            </xsl:for-each>
-            <xsl:for-each select="child::subfield[@code='z']">
-                <subfield code="z">
-                    <xsl:value-of select="replace(., '^[\D]*([\d\-\.]+x?).*$', '$1', 'i')" />
-                </subfield>
-            </xsl:for-each>
-        </datafield>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -1287,22 +1287,6 @@
         </xsl:call-template>
     </xsl:template>
     
-    <xsl:template name="institution">
-        <xsl:param name="fragment"/>
-        <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/branchlib">
-                <xsl:if test=". != ''">
-                    <xsl:value-of select="concat(., '##xx##')" />  
-                </xsl:if>
-            </xsl:for-each>        
-        </xsl:variable>
-        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
-        <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'institution'"/>
-            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-        </xsl:call-template>
-    </xsl:template>        
-    
     <xsl:template name="union">
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
@@ -1318,7 +1302,23 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
-    
+
+    <xsl:template name="institution">
+        <xsl:param name="fragment"/>
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/branchlib">
+                <xsl:if test=". != ''">
+                    <xsl:value-of select="concat(., '##xx##')" />  
+                </xsl:if>
+            </xsl:for-each>        
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'institution'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>        
+
     <xsl:template name="itemnote">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
