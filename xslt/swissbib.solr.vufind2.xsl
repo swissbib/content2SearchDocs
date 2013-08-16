@@ -268,9 +268,6 @@
             <xsl:call-template name="subundef">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
-            <xsl:call-template name="submusic">
-                <xsl:with-param name="fragment" select="record" />
-            </xsl:call-template>
             <xsl:call-template name="sublocal">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -278,9 +275,6 @@
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
             <xsl:call-template name="fulltext">
-                <xsl:with-param name="fragment" select="record" />
-            </xsl:call-template>
-            <xsl:call-template name="submusic">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
             <xsl:call-template name="proctime_fullrecord">
@@ -2514,71 +2508,67 @@
         </xsl:call-template>
     </xsl:template>
     
-    <!-- SPEZIAL- UND LOKALSCHLAGWORTE / KLASSIFIKATIONEN (FELDER 690/691) -->
-    <!-- Schlagwortkette Musik (690 FJ/LA) -->
-    <!-- neue Indikatoren IM schon mal aufgenommen, wird Ende 2012 eingefuehrt (25.05.2012/osc) -->
-    <xsl:template name="submusic">
-        <xsl:param name="fragment" />
-        <xsl:for-each select="$fragment/datafield[@tag='690'][matches(@ind1, 'F|L|I')][matches(@ind2, 'J|A|M')]/subfield[@code='a']">
-            <field name="submusic">
-                <xsl:choose>
-                    <xsl:when test="matches(., '^[^-]')">
-                        <xsl:value-of select="concat(., ' -- ', following-sibling::subfield[@code='q'][1])" />
-                    </xsl:when>
-                    <xsl:when test="matches(., '^-')">
-                        <xsl:value-of select="following-sibling::subfield[@code='q']" />
-                    </xsl:when>
-                </xsl:choose>
-                <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                    <xsl:value-of select="concat(' -- (', following-sibling::subfield[@code='t'][1], ')')" />
-                </xsl:if>
-                <xsl:if test="following-sibling::subfield[@code='o']/text()">
-                    <xsl:value-of select="concat(' -- ', following-sibling::subfield[@code='o'][1])" />
-                </xsl:if>
-                <xsl:if test="following-sibling::subfield[@code='v']/text()">
-                    <xsl:value-of select="concat(' -- [', following-sibling::subfield[@code='v'][1], ']')" />
-                </xsl:if>
-                <xsl:if test="following-sibling::subfield[@code='x']/text()">
-                    <xsl:value-of select="concat(' -- ', following-sibling::subfield[@code='x'][1])" />
-                </xsl:if>
-            </field>
-        </xsl:for-each>
-    </xsl:template>
-
-    <!-- Lokalbeschlagwortung (690 ** $a, b, c, d) -->
+    <!-- Lokalbeschlagwortung (690 ## / 691 ##)
+         * enthält auch Text aus Klassifikationsfelder (fuer Notation s. Template subclassif)
+         * ohne eigene Indexe (bei Bedarf wieder einbauen)
+         * inkl. Beschlagwortung Musik (bei Bedarf separat fuehren) (altes Template submusic)
+    -->
     <xsl:template name="sublocal">
         <xsl:param name="fragment" />
-        <xsl:for-each select="$fragment/datafield[@tag='690']/subfield[@code='a']">
-            <xsl:variable name="ind1" select="../@ind1" />
-            <xsl:variable name="ind2" select="../@ind2" />
-            <field name="{concat('sublocal_', $ind1, $ind2)}">
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='690']/subfield[@code='a'] |
+                                  $fragment/datafield[@tag='691']/subfield[@code='a']">
                 <xsl:value-of select="." />
-                <xsl:if test="following-sibling::subfield[@code='b']/text()">
-                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='b'][1])" />
-                </xsl:if>
-                <xsl:if test="following-sibling::subfield[@code='c']/text()">
-                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='c'][1])" />
-                </xsl:if>
-                <xsl:if test="following-sibling::subfield[@code='d']/text()">
-                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='d'][1])" />
-                </xsl:if>
-            </field>
-        </xsl:for-each>
+                <xsl:for-each select="following-sibling::subfield[@code='b']">
+                    <xsl:value-of select="concat(', ', .)" />
+                </xsl:for-each>
+                <xsl:for-each select="following-sibling::subfield[@code='c']">
+                    <xsl:value-of select="concat(', ', .)" />
+                </xsl:for-each>
+                <xsl:for-each select="following-sibling::subfield[@code='d']">
+                    <xsl:value-of select="concat(', ', .)" />
+                </xsl:for-each>
+                <xsl:for-each select="following-sibling::subfield[@code='e']">
+                    <xsl:value-of select="concat(', ', .)" />
+                </xsl:for-each>
+                <xsl:for-each select="following-sibling::subfield[@code='t']">
+                    <xsl:value-of select="concat(', ', .)" />
+                </xsl:for-each>
+                <xsl:for-each select="following-sibling::subfield[@code='o']">
+                    <xsl:value-of select="concat(', ', .)" />
+                </xsl:for-each>
+                <xsl:for-each select="following-sibling::subfield[@code='v']">
+                    <xsl:value-of select="concat(', ', .)" />
+                </xsl:for-each>
+                <xsl:for-each select="following-sibling::subfield[@code='x']">
+                    <xsl:value-of select="concat(', ', .)" />
+                </xsl:for-each>
+                <xsl:text>##xx##</xsl:text>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'sublocal'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
     </xsl:template>
     
-    <!-- Lokale Klassifikationen (691 ** $a, mit ETH UDC) -->
+    <!-- Lokale Klassifikationen (691 ## $u)
+         * ohne eigene Indexe (bei Bedarf einbauen)
+         * inkl. ETH UDC
+    -->
     <xsl:template name="subclassif">
         <xsl:param name="fragment" />
-        <xsl:for-each select="$fragment/datafield[@tag='691']/subfield[@code='a']">
-            <field name="subclassif">
-                <xsl:value-of select="." />
-            </field>
-            <!--<xsl:variable name="ind1" select="../@ind1" />
-            <xsl:variable name="ind2" select="../@ind2" />
-            <field name="{concat('subclassif_', $ind1, $ind2)}">
-                <xsl:value-of select="." />
-            </field>-->
-        </xsl:for-each>
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='691']/subfield[@code='u']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'subclassif'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
     </xsl:template>
 
     <!-- fetching TOC fulltext -->
