@@ -43,6 +43,9 @@ CURRENT_TIMESTAMP=`date +%Y%m%d%H%M%S`
 
 LOGFILE=$LOGDIR/Load.$TIMESTAMP.log
 
+BULKFILE_TIMESTAMP=`date +%Y%m%d%H%M%S`
+DELETE_TIMESTAMP=`date +%Y%m%d%H%M%S`
+
 
 
 function usage()
@@ -205,7 +208,10 @@ function processHoldingsDelete()
 
             setTimestamp
 
-            outputsubdirDelete=${outDirBase}/${CURRENT_TIMESTAMP}_IdsToDelete
+            #two underscores because should be sorted before the update file
+
+            #should be sorted before updates
+            outputsubdirDelete=${outDirBase}/${DELETE_TIMESTAMP}_AIdsToDelete
 
             mkdir -p ${outputsubdirDelete}
 
@@ -281,7 +287,8 @@ function prepareRecordsForSearchDocsEngine()
 
 
     cd $DATADIR
-    FORMATFILE=${TIMESTAMP}_Bulkupdate_2SearchDocs
+
+    FORMATFILE=${BULKFILE_TIMESTAMP}_Bulkupdate_2SearchDocs
 
     printf "now in datadir -> collecting all the Request messages into one bulkfile ...<%s>\n" $FORMATFILE >> $LOGFILE
 
@@ -396,6 +403,10 @@ function documentProcessingMarc2SearchEngineDoc()
 setTimestamp
 printf "Starting frequent Index update (sb_UpdateFeedSOLR.sh)  at <%s>...\n" ${CURRENT_TIMESTAMP} >> $LOGFILE
 
+DELETE_TIMESTAMP = `date +%Y%m%d%H%M%S`
+
+#we need some time to set a later timestamp as part of the bulkfile name
+sleep 5
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#call for initialization
 initialize
@@ -444,6 +455,7 @@ printf "Starting tomcat .\n" >> $LOGFILE
 ${PROJECTDIR_DOCPREPROCESSING}/catcher/tomcat/bin/startup.sh >> $LOGFILE
 
 
+BULKFILE_TIMESTAMP = `date +%Y%m%d%H%M%S`
 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#call for DB - deletes (Holdings) and deletions on in index in search engine
