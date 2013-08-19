@@ -1058,6 +1058,21 @@
             <xsl:with-param name="fieldname" select="'format'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='908']/subfield">
+                <xsl:if test="matches(@code, '[a-j]')">
+                    <xsl:value-of select="concat(., '##xx##')" />
+                </xsl:if>
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='913']/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'idscodes'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+        </xsl:call-template>
     </xsl:template>
 
     <xsl:template name="bibid">
@@ -2517,7 +2532,8 @@
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='690']/subfield[@code='a'] |
-                                  $fragment/datafield[@tag='691']/subfield[@code='a']">
+                                  $fragment/datafield[@tag='691']/subfield[@code='a'] |
+                                  $fragment/datafield[@tag='695']/subfield[@code='a']">
                 <xsl:value-of select="." />
                 <xsl:for-each select="following-sibling::subfield[@code='b']">
                     <xsl:value-of select="concat(', ', .)" />
