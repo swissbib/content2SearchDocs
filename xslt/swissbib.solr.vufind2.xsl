@@ -35,7 +35,6 @@
     </desc>
 </doc>
     
-    
     <xsl:param name="holdingsStructure" select="''"/>
 
     <!--=================
@@ -238,9 +237,6 @@
             <xsl:call-template name="sublocal">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
-            <xsl:call-template name="subclassif">
-                <xsl:with-param name="fragment" select="record" />
-            </xsl:call-template>
             <xsl:call-template name="fulltext">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -294,14 +290,17 @@
         </xsl:call-template>
     </xsl:template>
     
+    <!-- classifications -->
     <xsl:template name="classifications">
         <xsl:param name="fragment" />
-        <!-- udc fields, standard and non-standard (11.10.2012 / osc) -->
+        <!-- subject category codes (MARC field 072) -->
         <xsl:for-each select="$fragment/datafield[@tag='072']/subfield[@code='a']">
-            <field name="classif_072">
+            <xsl:variable name="source" select="following-sibling::subfield[@code='2']/text()" />
+            <field name="{concat('classif_', $source)}">
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
+        <!-- UDC fields, standard and non-standard (11.10.2012 / osc) -->
         <xsl:for-each select="$fragment/datafield[@tag='080']/subfield[@code='a']">
             <field name="classif_udc">
                 <xsl:value-of select="concat(., following-sibling::subfield[@code='x'][1], following-sibling::subfield[@code='x'][2], following-sibling::subfield[@code='x'][3])" />
@@ -317,7 +316,7 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
-        <!-- ddc fields, standard and non-standard (11.10.2012 / osc) -->
+        <!-- DDC fields, standard and non-standard (11.10.2012 / osc) -->
         <xsl:for-each select="$fragment/datafield[@tag='082']/subfield[@code='a']">
             <field name="classif_ddc">
                 <xsl:value-of select="." />
@@ -333,7 +332,7 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
-        <!-- rvk and other classifications (11.10.2012 / osc) -->
+        <!-- RVK / ZDBS classifications  -->
         <xsl:for-each select="$fragment/datafield[@tag='084']/subfield[@code='a']">
             <xsl:if test="matches(following-sibling::subfield[@code='2'], 'rvk', 'i')">
                 <field name="classif_rvk">
@@ -346,6 +345,18 @@
                 </field>
             </xsl:if>
         </xsl:for-each>
+        <!-- local classifications (without source code) -->
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='691']/subfield[@code='u']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'classif_local'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+        <!-- droit systematique (law classification) -->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind1, 'L')][matches(@ind2, '1')]/subfield[@code='u'] | 
                 $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='a']">
@@ -2439,24 +2450,6 @@
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
             <xsl:with-param name="fieldname" select="'sublocal'" />
-            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-        </xsl:call-template>
-    </xsl:template>
-    
-    <!-- Lokale Klassifikationen (691 ## $u)
-         * ohne eigene Indexe (bei Bedarf einbauen)
-         * inkl. ETH UDC
-    -->
-    <xsl:template name="subclassif">
-        <xsl:param name="fragment" />
-        <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='691']/subfield[@code='u']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-        </xsl:variable>
-        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
-        <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'subclassif'" />
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
