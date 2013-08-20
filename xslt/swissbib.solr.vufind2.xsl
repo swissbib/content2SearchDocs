@@ -836,46 +836,10 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- series titles -->
     <xsl:template name="series">
         <xsl:param name="fragment" />
-        <xsl:variable name="replPattern">^\w.* </xsl:variable>
         <xsl:variable name="forDeduplication">
-                <!-- check out 440 $x for issn linking (22.09.2011/osc) -->
-            <xsl:for-each select="$fragment/datafield[@tag='440']/subfield[@code='a']">
-                <xsl:variable name="f440sfn">
-                    <xsl:if test="following-sibling::subfield[@code='n'] and following-sibling::subfield[@code='p']">
-                        <xsl:value-of select="concat('. ', following-sibling::subfield[@code='n'][1], ', ')" />
-                    </xsl:if>
-                    <xsl:if test="following-sibling::subfield[@code='n'] and not(following-sibling::subfield[@code='p'])">
-                        <xsl:value-of select="concat('. ', following-sibling::subfield[@code='n'][1])" />
-                    </xsl:if>
-                </xsl:variable>
-                <xsl:variable name="f440sfp">
-                    <xsl:if test="following-sibling::subfield[@code='p'] and following-sibling::subfield[@code='n']">
-                        <xsl:value-of select="following-sibling::subfield[@code='p'][1]" />
-                    </xsl:if>
-                    <xsl:if test="following-sibling::subfield[@code='p'] and not(following-sibling::subfield[@code='n'])">
-                        <xsl:value-of select="concat('. ', following-sibling::subfield[@code='p'][1])" />
-                    </xsl:if>
-                </xsl:variable>
-                <xsl:variable name="f440sfv" select="if(following-sibling::subfield[@code='v'])
-                                                     then concat(' ; ', replace(following-sibling::subfield[@code='v'][1], $replPattern, '', 'i'))
-                                                     else()" />
-                <xsl:if test="not(following-sibling::subfield[@code='n']
-                              or following-sibling::subfield[@code='p']
-                              or following-sibling::subfield[@code='v'])">
-                    <xsl:value-of select="concat(replace(., '\.$', ''), '##xx##')" />
-                </xsl:if>
-                <xsl:if test="following-sibling::subfield[@code='n']
-                              or following-sibling::subfield[@code='p']
-                              or following-sibling::subfield[@code='v']">
-                    <xsl:value-of select="concat(replace(., '\.$', ''),
-                                          $f440sfn,
-                                          $f440sfp,
-                                          $f440sfv,
-                                         '##xx##')" />
-                </xsl:if>
-            </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='490']/subfield[@code='a']">
                 <xsl:value-of select="." />
                 <xsl:if test="following-sibling::subfield[@code='v']">
@@ -894,6 +858,7 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- journal titles -->
     <xsl:template name="journals">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
