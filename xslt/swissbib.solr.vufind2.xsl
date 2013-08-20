@@ -582,7 +582,7 @@
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'navAuthor'"/>
+            <xsl:with-param name="fieldname" select="'navAuthor_full'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <!-- source specific author facet -->
@@ -1312,6 +1312,9 @@
                 <xsl:value-of select="concat(., '##xx##')" />  
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='590']/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" />  
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='752']/subfield[@code='d']">
                 <xsl:value-of select="concat(., '##xx##')" />  
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='852']/subfield[@code='a']">
