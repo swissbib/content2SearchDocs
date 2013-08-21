@@ -2458,7 +2458,7 @@
     <xsl:template name="proctime_fullrecord">
         <xsl:param name="nativeXML"/>
         <field name="time_processed">
-            <xsl:value-of select="current-dateTime()" />
+            <xsl:value-of select="concat(adjust-dateTime-to-timezone(current-dateTime(), (PT0H)), 'Z')" />
         </field>
         <field name="fullrecord">
             <xsl:text disable-output-escaping="yes">&lt;![CDATA[&lt;?xml version="1.0"?&gt;</xsl:text>
