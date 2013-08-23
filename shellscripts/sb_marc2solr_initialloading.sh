@@ -12,12 +12,18 @@ function marc2solrAndPost ()
 {
 
     #nr=1
-    for datei in ${inputpath}/*.xml
+    for datei in ${inputpath}/*.gz
     do
         #actually the name convention I assume is only possible for initial loading
-        outputsubdir=`basename ${datei} .format.xml`
+
+
+        echo "unzip $datei" >> ${logscriptflow}
+        gunzip ${datei}
+
+        outputsubdir=`basename ${datei} .format.xml.gz`
         outputsubdirdetail=${outDirBase}/${outputsubdir}
-        echo ${outputsubdirdetail}
+
+        echo "subdirectory for search engine documents:   ${outputsubdirdetail}"  >> ${logscriptflow}
         mkdir -p ${outputsubdirdetail}
 
         TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
@@ -25,6 +31,7 @@ function marc2solrAndPost ()
 
         #DLOGDEDUPLICATION = true -> intensives logging eines jeden Aufrufs der deduplucation Methode
         #in marcxml2solrlog4j org.swissbib.documentprocessing.plugins.RemoveDuplicates auch auf INFO setzen!
+
 
         java -Xms2048m -Xmx2048m                        \
             -Dlog4j.configuration=marcxml2solrlog4j.xml \
@@ -36,6 +43,7 @@ function marc2solrAndPost ()
             -DTARGET.SEARCHENGINE=org.swissbib.documentprocessing.solr.XML2SOLRDocEngine  \
             -DSKIPRECORDS=false                         \
             -jar ${marc2Solrjar}
+
 
 
 
@@ -51,6 +59,13 @@ function marc2solrAndPost ()
     #    nr=$(($nr+1))
 
 
+        echo "now all the created files conatining search engine docs will be zipped " >> ${logscriptflow}
+        gzip ${outputsubdirdetail}/*.xml
+
+        echo "now gzip the inputfile again" >> ${logscriptflow}
+        gzip  ${inputpath}/${outputsubdir}.format.xml
+
+
     done
 
 
@@ -61,9 +76,17 @@ function marc2solrAndPost ()
 
 xsltPath=${PROJECTDIR_DOCPROCESSING}/xslt###${PROJECTDIR_DOCPROCESSING}/xsltskipRecords
 #inputpath=${PROJECTDIR_DOCPROCESSING}/data/inputfiles
-inputpath=${PROJECTDIR_FREQUENT}/data/format
+
+
+#inputpath=${PROJECTDIR_FREQUENT}/data/format
+
+inputpath=/home/swissbib/temp/sbs1/format
+
 confFile=${PROJECTDIR_DOCPROCESSING}/dist/config.properties
-outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles
+#outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles
+
+outDirBase=/home/swissbib/temp/sbs1/outputdir
+
 postjar=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
 marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/xml2SearchEngineDoc.jar
 logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR.log
