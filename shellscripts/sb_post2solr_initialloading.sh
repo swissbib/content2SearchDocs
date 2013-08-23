@@ -61,6 +61,9 @@ function post2solr ()
        setTimestamp
        printf "start posting to SOLR in <%s>\n" ${dir} >> ${LOGFILE}
 
+       printf "unzip the files with Search documents" >> ${LOGFILE}
+       gunzip ${POSTDIRBASE}/$dir/*.gz
+
        POSTDIR=${POSTDIRBASE}/$dir/*.xml
 
        java -Xms1024m -Xmx1024m \
@@ -74,6 +77,10 @@ function post2solr ()
                 -Durl=${URLSOLRINDEXSERVER} \
                 -Dcommit=yes   \
                 -jar ${POSTJAR}  >> ${LOGFILE}
+
+       printf "now zip the posted files again" >> ${LOGFILE}
+       gzip ${POSTDIRBASE}/$dir/*.xml
+
 
 #        rm -r $file
 
