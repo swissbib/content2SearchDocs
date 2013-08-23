@@ -229,7 +229,7 @@
         <xsl:variable name="year1" select="substring(text()[1],8,4)" />
         <xsl:variable name="year2" select="replace(substring(text()[1],12,4), '9999', '2013')" />
         <xsl:choose>
-            <xsl:when test="matches($datetype, '[spt]') and matches($year1, '[\d]{4}')">
+            <xsl:when test="matches($datetype, '[espt]') and matches($year1, '[\d]{4}')">
                 <year>
                     <xsl:value-of select="$year1" />
                 </year>
