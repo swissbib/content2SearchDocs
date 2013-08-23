@@ -2,9 +2,7 @@
 
 #set -x
 
-
 #source ${HOME}/DOCPREPROCESSING_ENVIRONMENT.sh
-
 
 PROJECTDIR_DOCPREPROCESSING=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
 
@@ -13,13 +11,13 @@ FORMATDIR=$PROJECTDIR_DOCPREPROCESSING/data/format
 
 if [ ! -d $PROJECTDIR_DOCPREPROCESSING ]
 then
-	printf "PROJECTDIR does not exits <%s> !\n" $PROJECTDIR_DOCPREPROCESSING
+	printf "PROJECTDIR does not exist <%s> !\n" $PROJECTDIR_DOCPREPROCESSING
 	exit 1
 fi
 
 if [ ! -d $SOURCEDIR ]
 then
-	printf "SOURCEDIR does not exits <%s> !\n" $SOURCEDIR
+	printf "SOURCEDIR does not exist <%s> !\n" $SOURCEDIR
 	exit 1
 fi
 
@@ -39,9 +37,10 @@ FORMATFILE=`basename $FILE .raw.xml`
 FORMATFILE=$FORMATFILE.format.xml
 printf "Formatting load file <%s> ...\n" $FORMATFILE
 perl BulkMarcRecordModifierSOLR.pl $FILE $FORMATFILE
-mv $FORMATFILE $FORMATDIR
+printf "Zip and move load file <%s> ...\n" $FORMATFILE
+gzip $FORMATFILE
+mv $FORMATFILE.gz $FORMATDIR
 done
-
 
 TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
 
