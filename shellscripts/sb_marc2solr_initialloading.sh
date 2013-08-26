@@ -1,21 +1,13 @@
 #!/bin/bash
 
-
-
-#
-PROJECTDIR_DOCPROCESSING=/swissbib_index/solrDocumentProcessing/MarcToSolr
-PROJECTDIR_FREQUENT=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
-
 #ulimit -v unlimited
 
 function marc2solrAndPost ()
 {
-
     #nr=1
     for datei in ${inputpath}/*.gz
     do
         #actually the name convention I assume is only possible for initial loading
-
 
         echo "unzip $datei" >> ${logscriptflow}
         gunzip ${datei}
@@ -32,11 +24,10 @@ function marc2solrAndPost ()
         #DLOGDEDUPLICATION = true -> intensives logging eines jeden Aufrufs der deduplucation Methode
         #in marcxml2solrlog4j org.swissbib.documentprocessing.plugins.RemoveDuplicates auch auf INFO setzen!
 
-
         java -Xms2048m -Xmx2048m                        \
             -Dlog4j.configuration=marcxml2solrlog4j.xml \
             -DLOGDEDUPLICATION=false                    \
-            -DINPUT.FILE=${datei}                       \
+            -DINPUT.FILE=${datei/.gz/}                  \
             -DCONF.ADDITIONAL.PROPS.FILE=${confFile}    \
             -DOUTPUT.DIR=${outputsubdirdetail}          \
             -DXPATH.DIR=${xsltPath}                     \
@@ -44,59 +35,46 @@ function marc2solrAndPost ()
             -DSKIPRECORDS=false                         \
             -jar ${marc2Solrjar}
 
-
-
-
 #        TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
 #        echo "\nstart posting to SOLR - see logfiles for more details"${TIMESTAMP}"\n" >> ${logscriptflow}
-
-
 #        java -Xms1024m -Xmx1024m \
 #            -Durl=${indexingMasterUrl} \
 #             -jar ${postjar} $outputsubdirdetail/*.xml >> ${logSendToSolr}
-
 #        rm -r $outputsubdirdetail
     #    nr=$(($nr+1))
-
 
         echo "now all the created files conatining search engine docs will be zipped " >> ${logscriptflow}
         gzip ${outputsubdirdetail}/*.xml
 
         echo "now gzip the inputfile again" >> ${logscriptflow}
-        gzip  ${inputpath}/${outputsubdir}.format.xml
-
+        gzip  ${datei/.gz/}
 
     done
 
-
 }
 
+# path definitions
+PROJECTDIR_DOCPROCESSING=/swissbib_index/solrDocumentProcessing/MarcToSolr
 
-
+PROJECTDIR_FREQUENT=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
 
 xsltPath=${PROJECTDIR_DOCPROCESSING}/xslt###${PROJECTDIR_DOCPROCESSING}/xsltskipRecords
-#inputpath=${PROJECTDIR_DOCPROCESSING}/data/inputfiles
 
-
-#inputpath=${PROJECTDIR_FREQUENT}/data/format
-
-inputpath=/home/swissbib/temp/sbs1/format
+inputpath=${PROJECTDIR_FREQUENT}/data/format
 
 confFile=${PROJECTDIR_DOCPROCESSING}/dist/config.properties
-#outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles
 
-outDirBase=/home/swissbib/temp/sbs1/outputdir
+outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles
 
 postjar=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
 marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/xml2SearchEngineDoc.jar
 logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR.log
 logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_initialloading.log
-indexingMasterUrl=http://sb-s6.swissbib.unibas.ch:8080/solr/update
+#indexingMasterUrl=[undefined at the moment]
 
-
+# definitions and function call
 TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
 echo "sb_marc2solr_initialloading.sh started: "${TIMESTAMP}"\n" >> ${logscriptflow}
-
 
 marc2solrAndPost
 
