@@ -60,7 +60,7 @@ PROJECTDIR_FREQUENT=/swissbib_index/solrDocumentProcessing/FrequentInitialPrePro
 
 xsltPath=${PROJECTDIR_DOCPROCESSING}/xslt###${PROJECTDIR_DOCPROCESSING}/xsltskipRecords
 
-inputpath=${PROJECTDIR_FREQUENT}/data/format
+inputpath=${PROJECTDIR_FREQUENT}/data/format_1
 
 confFile=${PROJECTDIR_DOCPROCESSING}/dist/config.properties
 
