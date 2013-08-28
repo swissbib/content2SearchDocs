@@ -230,16 +230,17 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
 
         String remoteContent = "";
 
-        PreparedStatement statement = prepStats.get("select");
+        //PreparedStatement statement = prepStats.get("select");
+        PreparedStatement statement = prepStats.get("selectOnlyUrl");
+
 
         try {
 
-            statement.setString(1,docid);
-            statement.setString(2,url);
+            //statement.setString(1,docid);
+            //statement.setString(2,url);
 
+            statement.setString(1,url);
             ResultSet rs = statement.executeQuery();
-
-
 
             while (rs.next()) {
                 remoteContent = rs.getString("content");
@@ -425,7 +426,16 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
         try {
             tempPrepared = dbConnection.prepareStatement( "select * from content " +
                     " where docid = ? and url = ? " );
+
+
             prepStats.put("select", tempPrepared);
+
+
+            tempPrepared = dbConnection.prepareStatement( "select * from content " +
+                    " where  url = ? " );
+
+            prepStats.put("selectOnlyUrl", tempPrepared);
+
 
 
             tempPrepared = dbConnection.prepareStatement( "insert into content " +
