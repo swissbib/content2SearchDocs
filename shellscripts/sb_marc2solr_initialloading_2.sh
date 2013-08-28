@@ -25,7 +25,7 @@ function marc2solrAndPost ()
         #in marcxml2solrlog4j org.swissbib.documentprocessing.plugins.RemoveDuplicates auch auf INFO setzen!
 
         java -Xms2048m -Xmx2048m                        \
-            -Dlog4j.configuration=marcxml2solrlog4j_1.xml \
+            -Dlog4j.configuration=marcxml2solrlog4j_2.xml \
             -DLOGDEDUPLICATION=false                    \
             -DINPUT.FILE=${datei/.gz/}                  \
             -DCONF.ADDITIONAL.PROPS.FILE=${confFile}    \
@@ -60,7 +60,7 @@ PROJECTDIR_FREQUENT=/swissbib_index/solrDocumentProcessing/FrequentInitialPrePro
 
 xsltPath=${PROJECTDIR_DOCPROCESSING}/xslt###${PROJECTDIR_DOCPROCESSING}/xsltskipRecords
 
-inputpath=${PROJECTDIR_FREQUENT}/data/format_1
+inputpath=${PROJECTDIR_FREQUENT}/data/format_2
 
 confFile=${PROJECTDIR_DOCPROCESSING}/dist/config.properties
 
@@ -68,8 +68,8 @@ outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles
 
 postjar=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
 marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/xml2SearchEngineDoc.jar
-logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR.log
-logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_initialloading.log
+logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR_2.log
+logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_initialloading_2.log
 #indexingMasterUrl=[undefined at the moment]
 
 # definitions and function call

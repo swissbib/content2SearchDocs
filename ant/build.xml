@@ -107,7 +107,8 @@
 
     <fileset id="fs.shellscripts" dir="${basedir}/shellscripts">
 
-        <include name="sb_marc2solr_initialloading.sh"/>
+        <include name="sb_marc2solr_initialloading_1.sh"/>
+        <include name="sb_marc2solr_initialloading_2.sh"/>
         <include name="sb_post2solr_Frequent.sh"/>
         <include name="sb_post2solr_initialloading.sh"/>
         <include name="sb_post2solr_ead_initialloading.sh"/>
