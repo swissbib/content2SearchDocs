@@ -27,7 +27,7 @@ POSTJAR=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
 
 function usage()
 {
- printf "usage: $0 -s <URL solr index server> e.g. http://sb-s15.swissbib.unibas.ch:8080/update/sb-biblio \n"
+ printf "usage: $0 -s <URL solr index server> e.g. http://sb-s15.swissbib.unibas.ch:8080/solr/sb-biblio/update \n"
 }
 
 function setTimestamp()
