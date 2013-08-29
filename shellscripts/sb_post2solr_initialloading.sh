@@ -3,6 +3,12 @@
 # oliver.schihin@unibas.ch / 21.11.2011
 #erweitert: Guenter Hipler 3.5.2012
 
+#29.8.2013 GH: now unzip and zip of files
+#example how to call the scrip
+
+#
+
+
 PROJECTDIR_DOCPROCESSING=/swissbib_index/solrDocumentProcessing/MarcToSolr
 LOGDIR=${PROJECTDIR_DOCPROCESSING}/data/log
 
@@ -21,7 +27,7 @@ POSTJAR=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
 
 function usage()
 {
- printf "usage: $0 -s <URL solr index server>\n"
+ printf "usage: $0 -s <URL solr index server> e.g. http://sb-s15.swissbib.unibas.ch:8080/update/sb-biblio \n"
 }
 
 function setTimestamp()
