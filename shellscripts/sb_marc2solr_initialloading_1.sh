@@ -68,8 +68,8 @@ outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles
 
 postjar=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
 marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/xml2SearchEngineDoc.jar
-logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR.log
-logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_initialloading.log
+logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR_1.log
+logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_initialloading_1.log
 #indexingMasterUrl=[undefined at the moment]
 
 # definitions and function call
