@@ -81,6 +81,9 @@
             <xsl:call-template name="itemid">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="filter">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
             <xsl:call-template name="ctrlnum">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -1157,6 +1160,25 @@
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
             <xsl:with-param name="fieldname" select="'itemid_isn_mv'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <xsl:template name="filter">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='898']/subfield[@code='a']">
+                <xsl:choose>
+                    <xsl:when test="matches(., '53$')">
+                        <xsl:text>online##xx##</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise />
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'filter_str_mv'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
