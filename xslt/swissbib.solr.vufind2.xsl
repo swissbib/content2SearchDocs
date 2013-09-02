@@ -1170,7 +1170,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='898']/subfield[@code='a']">
                 <xsl:choose>
                     <xsl:when test="matches(., '53$')">
-                        <xsl:text>online##xx##</xsl:text>
+                        <xsl:text>ONL##xx##</xsl:text>
                     </xsl:when>
                     <xsl:otherwise />
                 </xsl:choose>
