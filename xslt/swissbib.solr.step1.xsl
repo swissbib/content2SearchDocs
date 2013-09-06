@@ -211,6 +211,17 @@
                     <xsl:value-of select="$branchlib"/>
                 </branchlib>
             </xsl:when>
+            <xsl:when test="matches($union, 'RERO')">
+                <network>
+                    <xsl:value-of select="$union" />
+                </network>
+                <network>
+                    <xsl:value-of select="substring($branchlib, 1, 4)" />
+                </network>
+                <branchlib>
+                    <xsl:value-of select="$branchlib"/>
+                </branchlib>
+            </xsl:when>
             <xsl:otherwise>
                 <branchlib>
                     <xsl:value-of select="$branchlib"/>
