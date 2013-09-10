@@ -93,6 +93,9 @@
             <xsl:call-template name="freshness">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="publplace">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
             <xsl:call-template name="authors">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -809,7 +812,7 @@
         </xsl:call-template>
         <xsl:for-each select="$fragment/sorttitle">
             <field name="title_sort">
-                <xsl:value-of select="." />
+                <xsl:value-of select="replace(., '[\W]', '')" />
             </field>
         </xsl:for-each>
      </xsl:template>
@@ -1238,6 +1241,25 @@
         </xsl:call-template>
     </xsl:template>
     
+    <xsl:template name="publplace">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='752']">
+                <xsl:for-each select="child::subfield[@code='a']">
+                    <xsl:value-of select="concat(., '##xx##')" />
+                </xsl:for-each>
+                <xsl:for-each select="child::subfield[@code='d']">
+                    <xsl:value-of select="concat(., '##xx##')" />
+                </xsl:for-each>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)" />
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'publplace_txt_mv'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+        </xsl:call-template>
+    </xsl:template>
+    
     <!-- additional content, anything not indexed somewhere else -->
     <xsl:template name="add_fields">
         <xsl:param name="fragment"/>
@@ -1353,9 +1375,6 @@
             <xsl:for-each select="$fragment/datafield[@tag='590']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" />  
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='752']/subfield[@code='d']">
-                <xsl:value-of select="concat(., '##xx##')" />  
-            </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='852']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" />  
             </xsl:for-each>
@@ -1395,6 +1414,21 @@
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='b']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='c']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='d']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='e']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='f']">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='x']">
