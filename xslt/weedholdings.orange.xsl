@@ -19,6 +19,7 @@
     -->
     
     <xsl:output omit-xml-declaration="yes" />
+    <xsl:variable name="orange-sublibs"></xsl:variable>
     
     <xsl:template match="*">
         <xsl:element name="{local-name()}">
@@ -28,7 +29,7 @@
     </xsl:template>
     
     <xsl:template match="datafield[@tag='852']">
-        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E2[45]|E3[019]|E44|E5[069]|E60|E7[15]|E96|N0[123]')">
+        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02')">
             <xsl:element name="datafield" >
                 <xsl:attribute name="tag">852</xsl:attribute>
                 <xsl:attribute name="ind1">
@@ -43,7 +44,7 @@
     </xsl:template>
     
     <xsl:template match="datafield[@tag='949']">
-        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E2[45]|E3[019]|E44|E5[069]|E60|E7[15]|E96|N0[123]')">
+        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02')">
             <xsl:element name="datafield" >
                 <xsl:attribute name="tag">949</xsl:attribute>
                 <xsl:attribute name="ind1">

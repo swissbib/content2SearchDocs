@@ -25,22 +25,11 @@
     
     <!-- Check Zweigstellen gegen Items und Holdings -->
     <xsl:variable name="sublibs">
-        <library>E24</library><!-- Fachhochschule Nordwestschweiz, Pädagogik Brugg -->
-        <library>E25</library><!-- Berner Fachhochschule - Architektur, Holz und Bau, Biel -->
         <library>E30</library><!-- Bibliothek Exakte Wissenschaften, Universität Bern -->
-        <library>E31</library><!-- Fachhochschule Nordwestschweiz, Pädagogik Aarau -->
-        <library>E39</library><!-- Fachhochschule Nordwestschweiz, Pädagogik Solothurn -->
         <library>E44</library><!-- Fachhochschule Nordwestschweiz, Hochschulbibliothek Muttenz -->
-        <library>E50</library><!-- Fachhochschule Nordwestschweiz, Bibliothek Olten -->
-        <library>E56</library><!-- Berner Fachhochschule - Technik und Informatik, Biel -->
-        <library>E59</library><!-- Berner Fachhochschule - Architektur, Holz und Bau / Technik und Informatik, Burgdorf -->
-        <library>E60</library><!-- Fachhochschule Nordwestschweiz, Technik und Wirtschaft, Windisch -->
-        <library>E71</library><!-- BFH - Agrar-, Forst- und Lebensmittelwissenschaften, Zollikofen -->
-        <library>E75</library><!-- Fachhochschule Nordwestschweiz, Gestaltung, Aarau -->
         <library>E96</library><!-- Schweizerische Nationalbank, Bibliothek Bern -->
         <library>N01</library><!-- FHNW Pädagogik Basel  -->
         <library>N02</library><!-- FHNW Pädagogik ISP, Basel --> 
-        <library>N03</library><!-- FHNW Pädagogik Liestal  -->
     </xsl:variable>
     
     <xsl:template match="/">
