@@ -19,7 +19,6 @@
     -->
     
     <xsl:output omit-xml-declaration="yes" />
-    <xsl:variable name="orange-sublibs"></xsl:variable>
     
     <xsl:template match="*">
         <xsl:element name="{local-name()}">
