@@ -911,9 +911,10 @@
 
     <!-- format : swissbib codes and IDS specific codes -->
     <xsl:template name="format">
+        <!-- format field with simplified codes for facet and search (898b)-->
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='898']/subfield[@code='a']">
+            <xsl:for-each select="$fragment/datafield[@tag='898']/subfield[@code='b']">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
         </xsl:variable>
@@ -922,6 +923,18 @@
             <xsl:with-param name="fieldname" select="'format'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+        <!-- format field with extended codes for testing (898a) -->
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='898']/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'format_str_mv'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+        </xsl:call-template>
+        <!-- IDS specific codes (source: 906/907 or 9013) -->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='908']/subfield">
                 <xsl:if test="matches(@code, '[a-j]')">
@@ -1413,26 +1426,10 @@
     <xsl:template name="localcode">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='a']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='b']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='c']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='d']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='e']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='f']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield[@code='x']">
-                <xsl:value-of select="concat(., '##xx##')" />
+            <xsl:for-each select="$fragment/datafield[@tag='909']/subfield">
+                <xsl:if test="matches(@code, '[a-x]')">
+                    <xsl:value-of select="concat(., '##xx##')" />
+                </xsl:if>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)" />
