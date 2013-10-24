@@ -1529,7 +1529,7 @@
                 <xsl:value-of select="."/>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='0']/subfield[@code='y']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='0']/subfield[@code='y']">
                 <xsl:value-of select="."/>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
@@ -1547,7 +1547,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='650'][@ind2='0']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" />  
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='0']/subfield[@code='x']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='0']/subfield[@code='x']">
                 <xsl:value-of select="concat(., '##xx##')" />  
             </xsl:for-each> 
         </xsl:variable>
@@ -1582,7 +1582,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='655'][@ind2='0']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='0']/subfield[@code='v']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='0']/subfield[@code='v']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -1657,7 +1657,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='648'][@ind2='2']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='2']/subfield[@code='y']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='2']/subfield[@code='y']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -1674,7 +1674,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='650'][@ind2='2']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='2']/subfield[@code='x']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='2']/subfield[@code='x']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -1709,7 +1709,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='655'][@ind2='2']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='2']/subfield[@code='v']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='2']/subfield[@code='v']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -1963,7 +1963,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='648'][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='y']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='y']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -1980,7 +1980,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='650'][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='x']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='x']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -2014,7 +2014,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='655'][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='v']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'rero')]/subfield[@code='v']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -2089,7 +2089,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='648'][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='y']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='y']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -2106,7 +2106,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='650'][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='x']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='x']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -2140,7 +2140,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='655'][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='v']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idsbb')]/subfield[@code='v']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -2222,7 +2222,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idszbz')]/subfield[@code='y']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idszbz')]/subfield[@code='y']">
                 <xsl:choose>
                     <xsl:when test="matches(., '^[0-9]{4}')">
                         <xsl:value-of select="concat('Geschichte ', ., '##xx##')" />
@@ -2246,7 +2246,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='650'][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idszbz')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idszbz')]/subfield[@code='x']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idszbz')]/subfield[@code='x']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -2280,7 +2280,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='655'][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idszbz')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idszbz')]/subfield[@code='v']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][starts-with(descendant::subfield[@code='2'][1],'idszbz')]/subfield[@code='v']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='695'][starts-with(descendant::subfield[@code='2'][1], 'idszbz')]/subfield[@code='a']">
@@ -2345,7 +2345,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='648'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='y']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='y']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -2362,7 +2362,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='650'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='x']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='x']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
@@ -2396,7 +2396,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='655'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='v']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'sbt', 'i')]/subfield[@code='v']">
                 <xsl:value-of select="concat(., '##xx##')" /> 
             </xsl:for-each>        
         </xsl:variable>
