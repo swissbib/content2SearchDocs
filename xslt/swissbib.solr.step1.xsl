@@ -274,7 +274,7 @@
                     <xsl:otherwise />
                 </xsl:choose>
             </xsl:when>
-            <xsl:when test="matches($datetype, '[cdik]')">
+            <xsl:when test="matches($datetype, '[cdikq]')">
                 <xsl:choose>
                     <xsl:when test="matches($year1, '[\d]{4}') and matches($year2, '[012][\d]{3}')">
                         <xsl:if test="$year1 &gt; $year2">
