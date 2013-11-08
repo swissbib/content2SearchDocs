@@ -243,6 +243,9 @@
             <xsl:call-template name="subundef">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="submusic">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
             <xsl:call-template name="sublocal">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -2446,43 +2449,36 @@
         </xsl:call-template>
     </xsl:template>
     
-    <!-- Lokalbeschlagwortung (690 ## / 691 ##)
+    <!-- Lokalbeschlagwortung Musik (Ketten, Feld 692 -->
+    <xsl:template name="submusic">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='692'][matches(subfield[@code='2']/text(), 'idsmgb', 'i')]/subfield">
+                <xsl:if test="matches(@code, '[a-x]')">
+                    <xsl:value-of select="concat(., '##xx##')" />
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'submusic'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <!-- Lokalbeschlagwortung (690 / 691 / 695)
          * enthält auch Text aus Klassifikationsfelder (fuer Notation s. Template subclassif)
          * ohne eigene Indexe (bei Bedarf wieder einbauen)
-         * inkl. Beschlagwortung Musik (bei Bedarf separat fuehren) (altes Template submusic)
     -->
     <xsl:template name="sublocal">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='690']/subfield[@code='a'] |
-                                  $fragment/datafield[@tag='691']/subfield[@code='a'] |
-                                  $fragment/datafield[@tag='695']/subfield[@code='a']">
-                <xsl:value-of select="." />
-                <xsl:for-each select="following-sibling::subfield[@code='b']">
-                    <xsl:value-of select="concat(', ', .)" />
-                </xsl:for-each>
-                <xsl:for-each select="following-sibling::subfield[@code='c']">
-                    <xsl:value-of select="concat(', ', .)" />
-                </xsl:for-each>
-                <xsl:for-each select="following-sibling::subfield[@code='d']">
-                    <xsl:value-of select="concat(', ', .)" />
-                </xsl:for-each>
-                <xsl:for-each select="following-sibling::subfield[@code='e']">
-                    <xsl:value-of select="concat(', ', .)" />
-                </xsl:for-each>
-                <xsl:for-each select="following-sibling::subfield[@code='t']">
-                    <xsl:value-of select="concat(', ', .)" />
-                </xsl:for-each>
-                <xsl:for-each select="following-sibling::subfield[@code='o']">
-                    <xsl:value-of select="concat(', ', .)" />
-                </xsl:for-each>
-                <xsl:for-each select="following-sibling::subfield[@code='v']">
-                    <xsl:value-of select="concat(', ', .)" />
-                </xsl:for-each>
-                <xsl:for-each select="following-sibling::subfield[@code='x']">
-                    <xsl:value-of select="concat(', ', .)" />
-                </xsl:for-each>
-                <xsl:text>##xx##</xsl:text>
+            <xsl:for-each select="$fragment/datafield[@tag='690']/subfield |
+                                  $fragment/datafield[@tag='691']/subfield |
+                                  $fragment/datafield[@tag='695']/subfield">
+                <xsl:if test="matches(@code, '[a-e|t|o|v|x]')">
+                    <xsl:value-of select="concat(., '##xx##')" />
+                </xsl:if>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
