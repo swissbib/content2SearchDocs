@@ -372,7 +372,14 @@
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind1, 'L')][matches(@ind2, '1')]/subfield[@code='u'] | 
                                   $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
-                <xsl:value-of select="concat(replace(., '(^[\D]*[\s])([0-9]{1,2}[.]?[0-9]{0,2})([\s]?.*$)', '$2'), '##xx##')" />
+                <xsl:choose>
+                    <xsl:when test="matches(., '^D')">
+                        <xsl:value-of select="concat(., '##xx##')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="concat(replace(., '(^[\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*$)', '$2'), '##xx##')" />
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
