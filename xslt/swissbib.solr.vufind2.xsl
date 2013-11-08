@@ -371,7 +371,7 @@
         <!-- droit systematique (law classification) -->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind1, 'L')][matches(@ind2, '1')]/subfield[@code='u'] | 
-                $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='a']">
+                                  $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
                 <xsl:value-of select="concat(replace(., '(^[\D]*[\s])([0-9]{1,2}[.]?[0-9]{0,2})([\s]?.*$)', '$2'), '##xx##')" />
             </xsl:for-each>
         </xsl:variable>
