@@ -393,14 +393,39 @@
     <xsl:template name="authors">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='100']/subfield[@code='a']">
-                <xsl:call-template name="pers_sf" />
+            <!-- personal entries -->
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '100|700|800')]/subfield[@code='a'] |
+                                  $fragment/datafield[@tag='880'][matches(child::subfield[@code='6'],'100|700|800')]/subfield[@code='a'] |
+                                  $fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '100|700')]/subfield[@code='a']">
+                <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')" />
+                <xsl:if test="following-sibling::subfield[@code='D']">
+                    <xsl:value-of select="concat(', ', following-sibling::subfield[@code='D'][1])" />
+                </xsl:if>
+                <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='700']/subfield[@code='a']">
-                <xsl:call-template name="pers_sf" />
+            <!-- corporate entries -->
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '110|710|810')]/subfield[@code='a'] |
+                                  $fragment/datafield[@tag='880'][matches(child::subfield[@code='6'],'110|710|810')]/subfield[@code='a'] |
+                                  $fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '110|710|810')]/subfield[@code='a']">
+                <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')" />
+                <xsl:if test="following-sibling::subfield[@code='b']">
+                    <xsl:for-each select="following-sibling::subfield[@code='b']">
+                        <xsl:value-of select="concat(', ', .)" />
+                    </xsl:for-each>
+                </xsl:if>
+                <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='800']/subfield[@code='a']">
-                <xsl:call-template name="pers_sf" />
+            <!-- meeting entries -->
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '111|711|811')]/subfield[@code='a'] |
+                                  $fragment/datafield[@tag='880'][matches(child::subfield[@code='6'],'111|711|811')]/subfield[@code='a'] |
+                                  $fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '111|711|811')]/subfield[@code='a']">
+                <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')" />
+                <xsl:if test="following-sibling::subfield[@code='e']">
+                    <xsl:for-each select="following-sibling::subfield[@code='e']">
+                        <xsl:value-of select="concat(', ', .)" />
+                    </xsl:for-each>
+                </xsl:if>
+                <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
@@ -409,188 +434,22 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='100']/subfield[@code='8']">
-                    <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='700']/subfield[@code='8']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '100|700|800')]/subfield[matches(@code, '[b-su-z8]')] |
+                                  $fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '100|700|800')]/subfield[matches(@code, '[b-su-z]')]">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='800']/subfield[@code='8']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '110|710|810')]/subfield[matches(@code, '[c-su-z]')] |
+                                  $fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '110|710|810')]/subfield[matches(@code, '[c-su-z]')]">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='880'][starts-with(descendant::subfield[@code='6'],'100')]/subfield[@code='a']">
-                <xsl:call-template name="pers_sf" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='880'][starts-with(descendant::subfield[@code='6'],'700')]/subfield[@code='a']">
-                <xsl:call-template name="pers_sf" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='110']/subfield[@code='8']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='110']/subfield[@code='c']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='110']/subfield[@code='d']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='110']/subfield[@code='n']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='710']/subfield[@code='8']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='710']/subfield[@code='c']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='710']/subfield[@code='d']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='710']/subfield[@code='n']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='810']/subfield[@code='8']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='810']/subfield[@code='c']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='810']/subfield[@code='d']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='810']/subfield[@code='n']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='8']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='n']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='f']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='g']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='h']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='j']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='k']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='l']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='p']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='q']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='s']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='t']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='u']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='x']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='8']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='n']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='f']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='g']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='h']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='j']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='k']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='l']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='p']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='q']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='s']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='t']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='u']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='x']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='c']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='d']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='c']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='d']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='811']/subfield[@code='c']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='811']/subfield[@code='d']">
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '111|711|811')]/subfield[matches(@code, '[b-df-su-z]')] |
+                                  $fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '111|711|811')]/subfield[matches(@code, '[b-df-su-z]')]">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
             <xsl:with-param name="fieldname" select="'author_additional'"/>
-            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-        </xsl:call-template>
-        <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='110']/subfield[@code='a']">
-                <xsl:call-template name="corp_sf" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='710']/subfield[@code='a']">
-                <xsl:call-template name="corp_sf" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='810']/subfield[@code='a']">
-                <xsl:call-template name="corp_sf" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='111']/subfield[@code='a']">
-                <xsl:call-template name="meet_sf" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='711']/subfield[@code='a']">
-                <xsl:call-template name="meet_sf" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='811']/subfield[@code='a']">
-                <xsl:call-template name="meet_sf" />
-            </xsl:for-each>
-        </xsl:variable>
-        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
-        <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'author2'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <!-- generic author facet-->
@@ -639,24 +498,6 @@
             <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
         </xsl:if>
         <xsl:text>##xx##</xsl:text>    
-    </xsl:template>
-    <xsl:template name="corp_sf">
-        <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')"/>
-        <xsl:if test="following-sibling::subfield[@code='b']">
-            <xsl:for-each select="following-sibling::subfield[@code='b']">
-                <xsl:value-of select="concat(', ', .)" />
-            </xsl:for-each>
-        </xsl:if>
-        <xsl:text>##xx##</xsl:text>
-    </xsl:template>
-    <xsl:template name="meet_sf">
-        <xsl:value-of select="." />
-        <xsl:if test="following-sibling::subfield[@code='e']">
-            <xsl:for-each select="following-sibling::subfield[@code='e']">
-                <xsl:value-of select="concat(', ', .)" />
-            </xsl:for-each>
-        </xsl:if>
-        <xsl:text>##xx##</xsl:text>
     </xsl:template>
 
     <!-- Template zur Erstellung der Titelfelder gemaess VF-Standard

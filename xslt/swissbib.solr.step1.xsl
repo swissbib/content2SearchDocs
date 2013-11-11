@@ -401,7 +401,8 @@
          ********************************
          Namensansetzungen, inkl. Lebensdaten, Titel, Zaehlung 
     -->
-    <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|700|710')]">
+    <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')]">
+        <xsl:copy-of select="current()" /> 
         <!-- this is a random MARC tag for transport use only (13.08.2013/osc) -->
         <datafield tag="979">
             <subfield code="a">
