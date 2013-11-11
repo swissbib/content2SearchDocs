@@ -212,7 +212,6 @@ class ProcessSrwMessages:
         os.system("mv " + self.UPDATEDIRLOAD + os.sep + updateTarFile + self.ARCHIVEDIR)
 
 
-
         hALL_UPDATES_FILE.flush()
         hALL_UPDATES_FILE.close()
 
@@ -232,7 +231,7 @@ class ProcessSrwMessages:
             + " -DTARGET.SEARCHENGINE=org.swissbib.documentprocessing.solr.XML2SOLRDocEngine"   \
             + " -DXPATH.DIR=" + self.XSLTPATH                                                   \
             + " -DSKIPRECORDS=false"                                                            \
-            " -jar " + self.MARC2SOLRJAR
+            + " -jar " + self.MARC2SOLRJAR
 
 
         #run Java program for creation of SearchEngine documents
@@ -243,6 +242,8 @@ class ProcessSrwMessages:
 
 
         os.system("mv " + ALL_UPDATES_FILE_WITH_PATH + " " + self.ARCHIVEDIR)
+        os.system("gzip " + self.ARCHIVEDIR + os.sep + ALL_UPDATES_FILE)
+
 
 
     def currentDateTime(self,onlyDate = False, wait = False):
@@ -268,7 +269,7 @@ if __name__ == '__main__':
     from optparse import OptionParser
 
     #usage = "usage: %prog -u [updateDir] -d [deleteDir] -c [confFile] >> [path-to-log-file][name].log 2>&1"
-    usage = "usage: %prog -u [updateDir] -d [deleteDir]  >> [path-to-log-file][name].log 2>&1"
+    usage = "usage: %prog -u [updateDir] -d [deleteDir] "
 
     #parser = OptionParser(usage=usage)
     parser = OptionParser(usage=usage)
