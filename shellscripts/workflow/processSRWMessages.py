@@ -159,13 +159,13 @@ class ProcessSrwMessages:
         numberOfFiles = len(glob.glob(self.DELETEDIRLOAD + os.sep + "REQ_*.xml"))
         if numberOfFiles > 0:
 
-            self.writeLogMessage("{0} messages to delete search docs\n".format(numberOfFiles))
+            self.writeLogMessage("{0} messages to delete search docs".format(numberOfFiles))
 
             OUTPUT_SUBDIR_DELETE = self.OUTDIRBASE + os.sep + self.currentDateTime() + "_AIdsToDelete"
 
             os.system("mkdir -p " + OUTPUT_SUBDIR_DELETE)
 
-            delete_File = OUTPUT_SUBDIR_DELETE + os.sep + "idsToDelete." + self.currentDateTime(wait=True)
+            delete_File = OUTPUT_SUBDIR_DELETE + os.sep + "idsToDelete." + self.currentDateTime(wait=True) + ".xml"
             hDelete_File =  open(delete_File,"w")
             hDelete_File.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + os.linesep)
             hDelete_File.write("<delete>" + os.linesep)
@@ -192,14 +192,14 @@ class ProcessSrwMessages:
             deleteTarFile = self.currentDateTime() + ".deleteMessages.tar.gz "
             cmd = "tar cfz " + self.UPDATEDIR + os.sep + deleteTarFile +  " " + self.DELETEDIRLOAD  + " --remove-files"
             os.system(cmd)
-            os.system("mv " + self.UPDATEDIRLOAD + os.sep + deleteTarFile + self.ARCHIVEDIR)
+            os.system("mv " + self.UPDATEDIR + os.sep + deleteTarFile + self.ARCHIVEDIR)
             os.system("mkdir -p " + self.DELETEDIRLOAD)
 
 
 
     def processUpdateMessages(self):
 
-        self.writeLogMessage("starting processUpdateMessages at: {0}\n".format(self.currentDateTime()))
+        self.writeLogMessage("starting processUpdateMessages at: {0}".format(self.currentDateTime()))
 
         stringCurrentDate = self.currentDateTime(wait=True)
         ALL_UPDATES_FILE_BASE = stringCurrentDate +  "_Bulkupdate_2SearchDocs"
@@ -210,9 +210,14 @@ class ProcessSrwMessages:
         os.system("cd " + self.UPDATEDIRLOAD)
 
         numberOfFiles = len(glob.glob(self.UPDATEDIRLOAD + os.sep + "REQ_*.xml"))
-        self.writeLogMessage("{0} messages to update search docs\n".format(numberOfFiles))
+        self.writeLogMessage("{0} messages to update search docs".format(numberOfFiles))
+
+        self.writeLogMessage("files with update messages:")
+
 
         for fname in os.listdir(self.UPDATEDIRLOAD):
+
+            self.writeLogMessage("update file {0} ".format(fname))
 
             with open(self.UPDATEDIRLOAD + os.sep +  fname,"r") as hUpdateFile:
                 contentUpdateFile = hUpdateFile.read()
@@ -222,6 +227,7 @@ class ProcessSrwMessages:
                 #os.remove(self.UPDATEDIRLOAD + os.sep + fname)
 
 
+        self.LOGFILE.flush()
 
         #seems to be a little bit cumbersome but we get a too many argument exception trying to include the update messages into a tar file using a file pattern
         #therefor I include the whole LoadDir into the zipped tar file and create then a new directory because of the remove-files parameter which removes obviously the whole load Dir
@@ -240,7 +246,7 @@ class ProcessSrwMessages:
         os.system("mkdir -p " + OUTPUT_SUBDIR_DETAIL)
 
 
-        self.writeLogMessage("Java program for creating SearchDocs {0} is going to be called at: {1}\n".format(self.JAVA_PROGRAM_CREATING_SEARCHDOCS, self.currentDateTime()))
+        self.writeLogMessage("Java program for creating SearchDocs {0} is going to be called at: {1}".format(self.JAVA_PROGRAM_CREATING_SEARCHDOCS, self.currentDateTime()))
 
         cmdline =  "java -Xms2048m -Xmx2048m"                                                   \
             + " -Dlog4j.configuration=" + self.LOGCONFIGmarc2SOLR                               \
@@ -258,7 +264,7 @@ class ProcessSrwMessages:
         #todo: look for better communication with subprocess
         os.popen(cmdline)
 
-        self.writeLogMessage("Java program for creating SearchDocs has finished at: {0}\n".format( self.currentDateTime()))
+        self.writeLogMessage("Java program for creating SearchDocs has finished at: {0}".format( self.currentDateTime()))
 
 
         os.system("mv " + ALL_UPDATES_FILE_WITH_PATH + " " + self.ARCHIVEDIR)
@@ -277,7 +283,7 @@ class ProcessSrwMessages:
             return datetime.now().strftime("%Y%m%d%H%M%S")
 
     def writeLogMessage(self, message):
-        self.LOGFILE.write("-->>" + message )
+        self.LOGFILE.write("-->>  " + message  + "   <<----\n" )
 
 
 
@@ -327,7 +333,7 @@ if __name__ == '__main__':
 
     except Exception as argsError:
         if not srwMessages is None:
-            srwMessages.writeLogMessage("Exception occured: {0} ".format(argsError))
+            srwMessages.writeLogMessage("Exception occured in control script: {0} ".format(argsError))
 
     finally:
         if not srwMessages is None:
