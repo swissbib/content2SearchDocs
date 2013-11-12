@@ -312,6 +312,12 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
+        <!-- local category codes (MARC field 912) -->
+        <xsl:for-each select="$fragment/datafield[@tag='912']/subfield[@code='a']">
+            <field name="classif_912">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
         <!-- UDC fields, standard and non-standard (11.10.2012 / osc) -->
         <xsl:for-each select="$fragment/datafield[@tag='080']/subfield[@code='a']">
             <field name="classif_udc">
