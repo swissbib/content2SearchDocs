@@ -22,12 +22,17 @@ class ProcessSrwMessages:
 
         self.JAVA_PROGRAM_CREATING_SEARCHDOCS = "xml2SearchEngineDoc.jar"
 
+
         self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
+
         self.PROJECTDIR_DOCPREPROCESSING = "/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing"
-        self.UPDATEDIRLOAD= self.PROJECTDIR_DOCPREPROCESSING + "/data/update/loadUpdate"
-        self.DELETEDIRLOAD= self.PROJECTDIR_DOCPREPROCESSING + "/data/update/loadDelete"
+
+        self.UPDATEDIR = self.PROJECTDIR_DOCPREPROCESSING + "/data/update"
+
+        self.UPDATEDIRLOAD= self.UPDATEDIR + "/loadUpdate"
+        self.DELETEDIRLOAD= self.UPDATEDIR + "/loadDelete"
         self.LOGDIR= self.PROJECTDIR_DOCPREPROCESSING + "/log/update"
-        self.ARCHIVEDIR= self.PROJECTDIR_DOCPREPROCESSING + "/data/update/archive"
+        self.ARCHIVEDIR= self.UPDATEDIR + "/archive"
         self.INPUTPATH = self.PROJECTDIR_DOCPROCESSING + "/data/inputfilesFrequent"
         self.OUTDIRBASE = self.PROJECTDIR_DOCPROCESSING + "/data/outputfilesFrequent"
         self.TRANSDIR = self.PROJECTDIR_DOCPREPROCESSING + "/feed"
@@ -35,6 +40,7 @@ class ProcessSrwMessages:
         self.CONFFILE=self.PROJECTDIR_DOCPROCESSING + "/dist/config.properties"
         self.XSLTPATH = self.PROJECTDIR_DOCPROCESSING  + "/xslt"
         self.MARC2SOLRJAR= self.PROJECTDIR_DOCPROCESSING + "/dist/" + self.JAVA_PROGRAM_CREATING_SEARCHDOCS
+        self.CATCHER_WEBAPP_PATH = self.PROJECTDIR_DOCPREPROCESSING +  "/catcher/tomcat/bin"
 
 
         self.__initialize()
@@ -108,7 +114,7 @@ class ProcessSrwMessages:
 
     def shutdownMessageCatcher(self):
         #startResult = os.popen('/opt/swissbib/tools/java.tools/tomcat7-axis2/bin/shutdown.sh -force').read()
-        startResult = os.popen('/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/catcher/tomcat/bin/shutdown.sh -force').read()
+        startResult = os.popen( self.CATCHER_WEBAPP_PATH + os.sep + 'shutdown.sh -force').read()
         #environment variables in shell
         #http://stackoverflow.com/questions/8365394/set-environment-variable-in-python-script
         #do something with result
@@ -119,7 +125,7 @@ class ProcessSrwMessages:
 
     def startMessageCatcher(self):
         #shutDownResult = os.popen('/opt/swissbib/tools/java.tools/tomcat7-axis2/bin/startup.sh').read()
-        shutDownResult = os.popen('/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/catcher/tomcat/bin/startup.sh').read()
+        shutDownResult = os.popen(self.CATCHER_WEBAPP_PATH + os.sep + 'startup.sh').read()
         #do something with result
 
 
@@ -128,10 +134,15 @@ class ProcessSrwMessages:
     def moveSRWmessagesToLoadDirs(self):
 
         #move update messages
-        os.system("mv " + self.upDir + "/*"  + " " + self.UPDATEDIRLOAD)
+        for fname in os.listdir(self.upDir):
+            os.system("mv " + self.upDir + os.sep  + fname +  " " + self.UPDATEDIRLOAD)
 
         #move delete messages
-        os.system("mv " + self.delDir  + "/*"  + " " +   self.DELETEDIRLOAD)
+        #os.system("mv " + self.delDir  + "/*"  + " " +   self.DELETEDIRLOAD)
+        #we cannot use just mv " + self.delDir  + "/*" because we get an exception too many arguments
+        #this method is a little bit slower but more secure
+        for fname in os.listdir(self.delDir):
+            os.system("mv " + self.delDir + os.sep  + fname +  " " + self.DELETEDIRLOAD)
 
 
 
@@ -145,7 +156,7 @@ class ProcessSrwMessages:
         #</delete>
 
 
-        numberOfFiles = len(glob.glob(self.DELETEDIRLOAD + os.sep + "*"))
+        numberOfFiles = len(glob.glob(self.DELETEDIRLOAD + os.sep + "REQ_*.xml"))
         if numberOfFiles > 0:
 
             self.writeLogMessage("{0} messages to delete search docs\n".format(numberOfFiles))
@@ -177,11 +188,12 @@ class ProcessSrwMessages:
             hDelete_File.flush()
             hDelete_File.close()
 
+            #see remark in processUpdateMessages
             deleteTarFile = self.currentDateTime() + ".deleteMessages.tar.gz "
-            cmd = "tar cfz " + self.DELETEDIRLOAD + os.sep + deleteTarFile + self.DELETEDIRLOAD + os.sep + "REQ_*.xml" + " --remove-files"
+            cmd = "tar cfz " + self.UPDATEDIR + os.sep + deleteTarFile +  " " + self.DELETEDIRLOAD  + " --remove-files"
             os.system(cmd)
-            os.system("mv " + self.DELETEDIRLOAD + os.sep + deleteTarFile + self.ARCHIVEDIR)
-
+            os.system("mv " + self.UPDATEDIRLOAD + os.sep + deleteTarFile + self.ARCHIVEDIR)
+            os.system("mkdir -p " + self.DELETEDIRLOAD)
 
 
 
@@ -197,6 +209,9 @@ class ProcessSrwMessages:
 
         os.system("cd " + self.UPDATEDIRLOAD)
 
+        numberOfFiles = len(glob.glob(self.UPDATEDIRLOAD + os.sep + "REQ_*.xml"))
+        self.writeLogMessage("{0} messages to update search docs\n".format(numberOfFiles))
+
         for fname in os.listdir(self.UPDATEDIRLOAD):
 
             with open(self.UPDATEDIRLOAD + os.sep +  fname,"r") as hUpdateFile:
@@ -206,10 +221,15 @@ class ProcessSrwMessages:
                 # at the moment delete file (better archive it)
                 #os.remove(self.UPDATEDIRLOAD + os.sep + fname)
 
+
+
+        #seems to be a little bit cumbersome but we get a too many argument exception trying to include the update messages into a tar file using a file pattern
+        #therefor I include the whole LoadDir into the zipped tar file and create then a new directory because of the remove-files parameter which removes obviously the whole load Dir
         updateTarFile = self.currentDateTime() + ".updateMessages.tar.gz "
-        cmd = "tar cfz " + self.UPDATEDIRLOAD + os.sep + updateTarFile + self.UPDATEDIRLOAD + os.sep + "REQ_*.xml" + " --remove-files"
+        cmd = "tar cfz " + self.UPDATEDIR + os.sep + updateTarFile +  " " + self.UPDATEDIRLOAD  + " --remove-files"
         os.system(cmd)
-        os.system("mv " + self.UPDATEDIRLOAD + os.sep + updateTarFile + self.ARCHIVEDIR)
+        os.system("mv " + self.UPDATEDIR + os.sep + updateTarFile + self.ARCHIVEDIR)
+        os.system("mkdir -p " + self.UPDATEDIRLOAD)
 
 
         hALL_UPDATES_FILE.flush()
