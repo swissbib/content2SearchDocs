@@ -122,7 +122,7 @@
             <include  name="BulkMarcRecordModifierSOLR.pl"/>
             <include  name="MarcRecordModifierSOLR.pl"/>
             <include  name="sb_bulkformatSOLR.sh"/>
-            <include  name="sb_UpdateFeedSOLR.sh"/>
+            <!--<include  name="sb_UpdateFeedSOLR.sh"/> -->
             <include name="processSRWMessages.py" />
 
             <!--<include  name="sb_UpdateFeedSOLRBasel.sh"/> -->
