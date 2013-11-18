@@ -166,6 +166,8 @@
 
         <!--First let's compile the classes-->
         <javac debug="on"
+               target="1.6"
+               source="1.6"
                fork="true"
                destdir="${build.dir}/classes"
                srcdir="${basedir}/src"
