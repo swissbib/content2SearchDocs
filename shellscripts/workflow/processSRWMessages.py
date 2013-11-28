@@ -38,7 +38,7 @@ class ProcessSrwMessages:
         self.TRANSDIR = self.PROJECTDIR_DOCPREPROCESSING + "/feed"
         self.LOGCONFIGmarc2SOLR = "marcxml2solrlog4j_1.xml"
         self.CONFFILE=self.PROJECTDIR_DOCPROCESSING + "/dist/config.properties"
-        self.XSLTPATH = self.PROJECTDIR_DOCPROCESSING  + "/xslt"
+        self.XSLTPATH = self.PROJECTDIR_DOCPROCESSING  + "/xslt" + "###" + self.PROJECTDIR_DOCPROCESSING + "/xsltskipRecords"
         self.MARC2SOLRJAR= self.PROJECTDIR_DOCPROCESSING + "/dist/" + self.JAVA_PROGRAM_CREATING_SEARCHDOCS
         self.CATCHER_WEBAPP_PATH = self.PROJECTDIR_DOCPREPROCESSING +  "/catcher/tomcat/bin"
 
