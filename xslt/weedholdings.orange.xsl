@@ -43,7 +43,7 @@
     </xsl:template>
     
     <xsl:template match="datafield[@tag='949']">
-        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02')">
+        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02|RETROS')">
             <xsl:element name="datafield" >
                 <xsl:attribute name="tag">949</xsl:attribute>
                 <xsl:attribute name="ind1">
@@ -66,7 +66,7 @@
          j=Signatur 1, s=Signatur 2 -->
     
     <xsl:template match="datafield[@tag=949]/subfield">
-        <xsl:if test="matches(@code, 'F|B|j|s|x|z')">
+        <xsl:if test="matches(@code, 'F|B|j|s|x|z|u')">
             <xsl:copy-of select="." />    
         </xsl:if>
     </xsl:template>

@@ -37,7 +37,7 @@
     </xsl:template>
     
     <xsl:template match="datafield[@tag='949']">
-        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02')">
+        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02|RETROS')">
             <xsl:copy-of select="."/>
             <xsl:apply-templates/>
         </xsl:if>
