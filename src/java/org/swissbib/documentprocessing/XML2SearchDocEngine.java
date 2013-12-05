@@ -209,11 +209,14 @@ public abstract class XML2SearchDocEngine {
             long lineSum = 0;
 
             long numberRecordsweededOut = 0;
+            long totalNumberOfRecords = 0;
 
             while ((line = readerStream.readLine()) != null ) {
                 lineCounter++;
                 if (recordline.matcher(line).find())
                 {
+
+                    totalNumberOfRecords++;
 
                     try {
 
@@ -284,7 +287,9 @@ public abstract class XML2SearchDocEngine {
                 marc2SolrExceptionlogger.error(line);
             }
 
-            marcXMLlogger.info("Documents processed:" + lineSum);
+            marcXMLlogger.info("total number of records in package: " + totalNumberOfRecords);
+            marcXMLlogger.info("number of documents processed for search engine: " + lineSum);
+            marcXMLlogger.info("number of documents skipped: " + numberRecordsweededOut);
 
 
         }  catch (FileNotFoundException fnfEx) {
