@@ -279,7 +279,16 @@
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/controlfield[@tag='008']">
-                <xsl:value-of select="concat($fragment/substring(controlfield[@tag='008'][1],36,3), '##xx##')" />
+				<!-- Test, if language not coded but fill characters -->
+				<xsl:variable name="lang" select="substring(text()[1],36,3)"/>
+				<xsl:choose>
+				    <xsl:when test="matches($lang, '\|\|\|')">
+						<xsl:value-of select="concat('und', '##xx##')" />
+				    </xsl:when>
+				    <xsl:otherwise>
+				        <xsl:value-of select="concat($fragment/substring(controlfield[@tag='008'][1],36,3), '##xx##')" />
+				    </xsl:otherwise>
+				</xsl:choose>		                
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
