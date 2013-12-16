@@ -1068,7 +1068,7 @@
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'itemid_isn_mv'"/>
+            <xsl:with-param name="fieldname" select="'itemid'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
