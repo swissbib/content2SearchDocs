@@ -1562,10 +1562,11 @@
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='650'][@ind2='2']/subfield[@code='a']">
-                <xsl:value-of select="concat(., '##xx##')" /> 
-            </xsl:for-each>        
-            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='2']/subfield[@code='x']">
-                <xsl:value-of select="concat(., '##xx##')" /> 
+                <xsl:value-of select="."/> 
+                <xsl:if test="following-sibling::subfield[@code='x']/text()">
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='x'][1])" />
+                </xsl:if>        
+            <xsl:text>##xx##</xsl:text>
             </xsl:for-each>        
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
