@@ -411,7 +411,7 @@
                     <xsl:when test="matches(child::subfield[@code='P'], '100|700')">
                         <xsl:value-of select="child::subfield[@code='a']" />
                         <xsl:if test="child::subfield[@code='D'] and child::subfield[@code='D']/text() != ''">
-                            <xsl:value-of select="concat(', ', child::subfield[@code='D'])"/>
+                            <xsl:value-of select="concat(', ', replace(child::subfield[@code='D'], '\. -$', ''))"/>
                         </xsl:if>
                         <xsl:if test="child::subfield[@code='b'] and child::subfield[@code='b']/text() != ''">
                             <xsl:value-of select="concat(' ', replace(child::subfield[@code='b'][1], '[,.]', ''), '.')" />
@@ -420,7 +420,7 @@
                             <xsl:value-of select="concat(', ', child::subfield[@code='c'][1])" />
                         </xsl:if>
                         <xsl:if test="child::subfield[@code='d'] and child::subfield[@code='d']/text() != ''">
-                            <xsl:value-of select="concat(' (', child::subfield[@code='d'][1], ')')" />
+                            <xsl:value-of select="concat(' (', replace(child::subfield[@code='d'][1], '\. -$', ''), ')')" />
                         </xsl:if>
                     </xsl:when>
                     <!-- corporations -->
