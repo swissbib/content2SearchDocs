@@ -237,6 +237,21 @@
             <xsl:call-template name="subform_sbt">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
+            <xsl:call-template name="subpers_jurivoc">
+                <xsl:with-param name="fragment" select="record"/>
+            </xsl:call-template>
+            <xsl:call-template name="subtime_jurivoc">
+                <xsl:with-param name="fragment" select="record"/>
+            </xsl:call-template>
+            <xsl:call-template name="subtop_jurivoc">
+                <xsl:with-param name="fragment" select="record"/>
+            </xsl:call-template>
+            <xsl:call-template name="subgeo_jurivoc">
+                <xsl:with-param name="fragment" select="record"/>
+            </xsl:call-template>            
+            <xsl:call-template name="subform_jurivoc">
+                <xsl:with-param name="fragment" select="record"/>
+            </xsl:call-template>
             <xsl:call-template name="gndnum">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
@@ -1060,15 +1075,15 @@
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='852']/subfield[@code='j']">
-                <xsl:value-of select="concat(preceding-sibling::subfield[@code='F'], '_', ., '##xx##')" />
+                <xsl:value-of select="concat(preceding-sibling::subfield[@code='F'], '_', replace(., '[\W\s\+]', '_', ''), '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='949']/subfield[@code='j']">
-                <xsl:value-of select="concat(preceding-sibling::subfield[@code='F'], '_', ., '##xx##')" />
+                <xsl:value-of select="concat(preceding-sibling::subfield[@code='F'], '_', replace(., '[\W\s\+]', '_', ''), '##xx##')" />
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'itemid'"/>
+            <xsl:with-param name="fieldname" select="'itemid_isn_mv'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -2297,6 +2312,121 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
+
+
+    <!-- ===
+        JURIVOC 
+        === -->
+    
+    <xsl:template name="subpers_jurivoc">
+        <xsl:param name="fragment"/>
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='600'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='a']">
+                <xsl:value-of select="."/>
+                <xsl:if test="following-sibling::subfield[@code='b']/text()">
+                    <xsl:value-of select="concat(', ', following-sibling::subfield[@code='b'][1])" />
+                </xsl:if>
+                <xsl:if test="following-sibling::subfield[@code='c']/text()">
+                    <xsl:for-each select="following-sibling::subfield[@code='c']">
+                        <xsl:value-of select="concat(', ', .)"/>
+                    </xsl:for-each>
+                </xsl:if>
+                <xsl:if test="following-sibling::subfield[@code='d']/text()">
+                    <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
+                </xsl:if>
+                <xsl:if test="following-sibling::subfield[@code='t']/text()">
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                </xsl:if>
+                <xsl:text>##xx##</xsl:text>
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='610'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='a']">
+                <xsl:value-of select="." />
+                <xsl:if test="following-sibling::subfield[@code='b']/text()">
+                    <xsl:for-each select="following-sibling::subfield[@code='b']">
+                        <xsl:value-of select="concat(', ', .)"/>
+                    </xsl:for-each>
+                </xsl:if>
+                <xsl:if test="following-sibling::subfield[@code='t']/text()">
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                </xsl:if>
+                <xsl:text>##xx##</xsl:text>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'subpers_jurivoc'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <xsl:template name="subtime_jurivoc">
+        <xsl:param name="fragment"/>
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='648'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" /> 
+            </xsl:for-each>        
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='y']">
+                <xsl:value-of select="concat(., '##xx##')" /> 
+            </xsl:for-each>        
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'subtime_jurivoc'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <xsl:template name="subtop_jurivoc">
+        <xsl:param name="fragment"/>
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='650'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" /> 
+            </xsl:for-each>        
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='x']">
+                <xsl:value-of select="concat(., '##xx##')" /> 
+            </xsl:for-each>        
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'subtop_jurivoc'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <xsl:template name="subgeo_jurivoc">
+        <xsl:param name="fragment"/>
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='651'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" /> 
+            </xsl:for-each>        
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='z']">
+                <xsl:value-of select="concat(., '##xx##')" /> 
+            </xsl:for-each>        
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'subgeo_jurivoc'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <xsl:template name="subform_jurivoc">
+        <xsl:param name="fragment"/>
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='655'][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" /> 
+            </xsl:for-each>        
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='7'][matches(descendant::subfield[@code='2'][1],'jurivoc', 'i')]/subfield[@code='v']">
+                <xsl:value-of select="concat(., '##xx##')" /> 
+            </xsl:for-each>        
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'subform_jurivoc'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+
 
     <!-- allgemeines Feld subundef, wird nicht in Facette navSubidsbb kopiert (25.05.2012/osc) 
          erweitert für Felder 653 (4.9.2012/osc) -->
