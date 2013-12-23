@@ -4,7 +4,6 @@
 #
 # bernd.luchner@unibas.ch / 17.12.2013 : Pfadanpassungen für ErmToSolr
 #
-#
 
 PROJECTDIR_DOCPROCESSING=/swissbib_index/solrDocumentProcessing/ErmToSolr
 LOGDIR=${PROJECTDIR_DOCPROCESSING}/data/log
@@ -28,29 +27,22 @@ function setTimestamp()
 
 function preChecks()
 {
-
     printf "in preChecks ...\n" >> $LOGFILE
-
 
     if [ ! -d ${POSTDIRBASE} ]
     then
             printf "ERROR : base directory for files to be posted does not exist!\n" >>$LOGFILE && exit 9
     fi
 
-
     #-z: the length of string is zero
     [ -z  ${URLSOLRINDEXSERVER} ] && usage
 
     #-n: True if the length of "STRING" is non-zero.
     [ ! -n "${URLSOLRINDEXSERVER}" ] && echo "solr index server  is not set" >>$LOGFILE && exit 9
-
 }
-
 
 function post2solr ()
 {
-
-
    for dir in `ls ${POSTDIRBASE}`
     do
 
@@ -67,7 +59,6 @@ function post2solr ()
         -Dcommit=no   \
         -jar ${POSTJAR} ${POSTDIR} >> ${LOGFILE}
 
-
          printf "now send the commit to ${URLSOLRINDEXSERVER} ...\n"  >> ${LOGFILE}
             java  \
                 -Durl=${URLSOLRINDEXSERVER} \
@@ -77,12 +68,10 @@ function post2solr ()
        printf "now zip the posted files again" >> ${LOGFILE}
        gzip ${POSTDIRBASE}/$dir/*.xml
 
-
 #        rm -r $file
 
     done
 }
-
 
 while getopts hs: OPTION
 do
@@ -100,9 +89,9 @@ preChecks
 
 setTimestamp
 
-printf "sb_post2solr_initialloading.sh started at <%s>: ... \n" ${CURRENT_TIMESTAMP} >> ${LOGFILE}
+printf "sb_ermpost2solr_initialloading.sh started at <%s>: ... \n" ${CURRENT_TIMESTAMP} >> ${LOGFILE}
 
 post2solr
 
 setTimestamp
-printf "sb_post2solr_initialloading.sh finished at <%s>: ...\n" ${CURRENT_TIMESTAMP} >> ${LOGFILE}
+printf "sb_ermpost2solr_initialloading.sh finished at <%s>: ...\n" ${CURRENT_TIMESTAMP} >> ${LOGFILE}
