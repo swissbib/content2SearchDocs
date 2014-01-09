@@ -161,7 +161,7 @@ class ProcessSrwMessages:
 
             self.writeLogMessage("{0} messages to delete search docs".format(numberOfFiles))
 
-            OUTPUT_SUBDIR_DELETE = self.OUTDIRBASE + os.sep + self.currentDateTime() + "_AIdsToDelete"
+            OUTPUT_SUBDIR_DELETE = self.OUTDIRBASE + os.sep + self.currentDateTime() + "_ZIdsToDelete"
 
             os.system("mkdir -p " + OUTPUT_SUBDIR_DELETE)
 
@@ -326,9 +326,9 @@ if __name__ == '__main__':
 
         srwMessages.startMessageCatcher()
 
-        srwMessages.processDeleteMessages()
-
         srwMessages.processUpdateMessages()
+
+        srwMessages.processDeleteMessages()
 
 
     except Exception as argsError:
