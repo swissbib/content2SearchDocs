@@ -30,6 +30,7 @@
         <library>E96</library><!-- Schweizerische Nationalbank, Bibliothek Bern -->
         <library>N01</library><!-- FHNW Pädagogik Basel  -->
         <library>N02</library><!-- FHNW Pädagogik ISP, Basel --> 
+        <library>N03</library><!-- FHNW PH, Liestal -->
     </xsl:variable>
     
     <xsl:template match="/">

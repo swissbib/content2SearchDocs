@@ -28,7 +28,7 @@
     </xsl:template>
     
     <xsl:template match="datafield[@tag='852']">
-        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02')">
+        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02|N03')">
             <xsl:element name="datafield" >
                 <xsl:attribute name="tag">852</xsl:attribute>
                 <xsl:attribute name="ind1">
@@ -43,7 +43,7 @@
     </xsl:template>
     
     <xsl:template match="datafield[@tag='949']">
-        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02|RETROS')">
+        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E96|N01|N02|N03|RETROS')">
             <xsl:element name="datafield" >
                 <xsl:attribute name="tag">949</xsl:attribute>
                 <xsl:attribute name="ind1">
