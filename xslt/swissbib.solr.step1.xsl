@@ -238,7 +238,7 @@
     <xsl:template match="controlfield[@tag='008']">
         <xsl:variable name="datetype" select="substring(text(),7,1)"/>
         <xsl:variable name="year1" select="substring(text()[1],8,4)" />
-        <xsl:variable name="year2" select="replace(substring(text()[1],12,4), '9999', '2013')" />
+        <xsl:variable name="year2" select="replace(substring(text()[1],12,4), '9999', '2014')" />
         <xsl:choose>
             <xsl:when test="matches($datetype, '[espt]') and matches($year1, '[\d]{4}')">
                 <year>
@@ -274,7 +274,7 @@
                     <xsl:otherwise />
                 </xsl:choose>
             </xsl:when>
-            <xsl:when test="matches($datetype, '[cdikq]')">
+            <xsl:when test="matches($datetype, '[cdikqu]')">
                 <xsl:choose>
                     <xsl:when test="matches($year1, '[\d]{4}') and matches($year2, '[012][\d]{3}')">
                         <xsl:if test="$year1 &gt; $year2">
