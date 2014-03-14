@@ -977,56 +977,35 @@
             <field name="is_hierarchy_id">
                 <xsl:value-of select="$fragment/myDocID" />
             </field>
-            <xsl:choose>
-                <xsl:when test="exists($fragment/datafield[@tag='490'][1]/subfield[@code='v'][1])">
-                    <field name="is_hierarchy_title">
-                        <xsl:value-of select="concat($fragment/datafield[@tag='490'][1]/subfield[@code='v'][1], ' : ', $fragment/datafield[@tag='245']/subfield[@code='a'][1], ' (', $fragment/sortyear, ')')" />
-                    </field>
-                </xsl:when>
-                <xsl:otherwise>
-                    <field name="is_hierarchy_title">
-                        <xsl:value-of select="concat($fragment/datafield[@tag='245']/subfield[@code='a'][1], ' (', $fragment/sortyear, ')')" />
-                    </field>
-                </xsl:otherwise>
-            </xsl:choose>
-            <xsl:variable name="forDeduplication">
-                <xsl:for-each select="$fragment/datafield[@tag='490']/subfield[@code='9']">
-                    <xsl:value-of select="concat(., '##xx##')" />
-                </xsl:for-each>
-            </xsl:variable>
-            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
-            <xsl:call-template name="createUniqueFields">
-                <xsl:with-param name="fieldname" select="'hierarchy_top_id'"/>
-                <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-            </xsl:call-template>
-            <xsl:call-template name="createUniqueFields">
-                <xsl:with-param name="fieldname" select="'hierarchy_parent_id'"/>
-                <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-            </xsl:call-template>
-            <xsl:variable name="forDeduplication">
-                <xsl:for-each select="$fragment/datafield[@tag='490']/subfield[@code='a']">
-                    <xsl:value-of select="concat(., '##xx##')" />
-                </xsl:for-each>
-            </xsl:variable>
-            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
-            <xsl:call-template name="createUniqueFields">
-                <xsl:with-param name="fieldname" select="'hierarchy_top_title'"/>
-                <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-            </xsl:call-template>
-            <xsl:call-template name="createUniqueFields">
-                <xsl:with-param name="fieldname" select="'hierarchy_parent_title'"/>
-                <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-            </xsl:call-template>
-            <xsl:variable name="forDeduplication">
-                <xsl:for-each select="$fragment/datafield[@tag='490']/subfield[@code='i']">
-                    <xsl:value-of select="concat(., '##xx##')" />
-                </xsl:for-each>
-            </xsl:variable>
-            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
-            <xsl:call-template name="createUniqueFields">
-                <xsl:with-param name="fieldname" select="'hierarchy_sequence'"/>
-                <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-            </xsl:call-template>
+            <xsl:for-each select="$fragment/datafield[@tag='490']/subfield[@code='9']">
+                <field name="hierarchy_top_id">
+                    <xsl:value-of select="." />
+                </field>
+                <field name="hierarchy_top_title">
+                    <xsl:value-of select="preceding-sibling::subfield[@code='a'][1]"></xsl:value-of>
+                </field>
+                <field name="hierarchy_parent_id">
+                    <xsl:value-of select="." />
+                </field>
+                <field name="hierarchy_parent_title">
+                    <xsl:value-of select="preceding-sibling::subfield[@code='a'][1]"></xsl:value-of>
+                </field>
+                <xsl:choose>
+                    <xsl:when test="exists(preceding-sibling::subfield[@code='v'])">
+                        <field name="is_hierarchy_title">
+                            <xsl:value-of select="concat(preceding-sibling::subfield[@code='v'][1], ' : ', $fragment/datafield[@tag='245']/subfield[@code='a'][1], ' (', $fragment/sortyear, ')')" />
+                        </field>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <field name="is_hierarchy_title">
+                            <xsl:value-of select="concat($fragment/datafield[@tag='245']/subfield[@code='a'][1], ' (', $fragment/sortyear, ')')" />
+                        </field>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <field name="hierarchy_sequence">
+                    <xsl:value-of select="preceding-sibling::subfield[@code='i']" />
+                </field>
+            </xsl:for-each>
         </xsl:if>
     </xsl:template>
     
