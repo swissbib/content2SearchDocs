@@ -995,6 +995,9 @@
             <field name="is_hierarchy_id">
                 <xsl:value-of select="$fragment/myDocID" />
             </field>
+            <field name="is_hierarchy_title">
+                <xsl:value-of select="$fragment/datafield[@tag='245']/subfield[@code='a'][1]"></xsl:value-of>
+            </field>
             <xsl:for-each select="$fragment/datafield[@tag='490']/subfield[@code='9']">
                 <field name="hierarchy_top_id">
                     <xsl:value-of select="." />
@@ -1010,18 +1013,18 @@
                 </field>
                 <xsl:choose>
                     <xsl:when test="exists(preceding-sibling::subfield[@code='v'])">
-                        <field name="is_hierarchy_title">
+                        <field name="title_in_hierarchy">
                             <xsl:value-of select="concat(preceding-sibling::subfield[@code='v'][1], ' : ', $fragment/datafield[@tag='245']/subfield[@code='a'][1], ' (', $fragment/sortyear, ')')" />
                         </field>
                     </xsl:when>
                     <xsl:otherwise>
-                        <field name="is_hierarchy_title">
+                        <field name="title_in_hierarchy">
                             <xsl:value-of select="concat($fragment/datafield[@tag='245']/subfield[@code='a'][1], ' (', $fragment/sortyear, ')')" />
                         </field>
                     </xsl:otherwise>
                 </xsl:choose>
                 <field name="hierarchy_sequence">
-                    <xsl:value-of select="preceding-sibling::subfield[@code='i']" />
+                    <xsl:value-of select="replace(preceding-sibling::subfield[@code='i'], '\/', '.')" />
                 </field>
             </xsl:for-each>
         </xsl:if>
