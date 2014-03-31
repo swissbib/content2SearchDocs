@@ -51,6 +51,18 @@
             <xsl:call-template name="classifications">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="jus_class_gen">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
+            <xsl:call-template name="jus_class_D">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
+            <xsl:call-template name="jus_class_E">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
+            <xsl:call-template name="jus_class_F">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
             <xsl:call-template name="format">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -398,16 +410,51 @@
             <xsl:with-param name="fieldname" select="'classif_local'" />
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <!-- droit systematique (law classification) -->
+    </xsl:template>
+    <!-- JUS classifications -->
+    <xsl:template name="jus_class_gen">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'idslu L1', 'i')]/subfield[@code='u'] |
+                                  $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
+               <xsl:choose>
+                    <xsl:when test="matches(., '^[\d].*')"> <!-- Takes care of ids-dr-sys without alphabetic prefix -->
+                        <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^[P][A|B|C][\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular Lucerne case "P# 18.0" => "18" -->
+                        <xsl:value-of select="concat(replace(., '^([P][A|B|C][\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^[P][A|B|C]')"> <!-- Takes care of Lucerne case "P# 18.12 de" => "18.12" -->
+                        <xsl:value-of select="concat(replace(., '^([P][A|B|C][\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^[A|B|C][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH 37.0 fr" => "37" -->
+                        <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^[A|B|C][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH 37.0 fr" => "37" -->
+                       <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
+                    </xsl:when>
+                   <xsl:when test="matches(., '^[A|B|C][\D][\s].*')">
+                       <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
+                   </xsl:when>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'classif_drsys_gen'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    <xsl:template name="jus_class_D">
+        <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'idslu L1', 'i')]/subfield[@code='u'] |
                                   $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
                 <xsl:choose>
-                    
                     <xsl:when test="matches(., '^PD[\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular Lucerne case "PD 18.0" => "D 18" -->
                         <xsl:value-of select="concat(replace(., '^([P])([D][\s][\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., '^PD')"> <!-- Takes care of Lucerne case "PD 18.12 de" => "D 18.12" -->
+                    <xsl:when test="matches(., '^PD[\s].*$')"> <!-- Takes care of Lucerne case "PD 18.12 de" => "D 18.12" -->
                         <xsl:value-of select="concat(replace(., '^([P])([D][\s][\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^D[\D][\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular normal case "D# 18.0" => "D 18" -->
@@ -422,24 +469,54 @@
                     <xsl:when test="matches(., '^D[\s].*')"> <!-- Takes care of Lucerne case "D 18.12 de" => "D 18.12" -->
                         <xsl:value-of select="concat(replace(., '^(D[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', 'D $2'), '##xx##')" />
                     </xsl:when>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'classif_drsys_D'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    <xsl:template name="jus_class_E">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'idslu L1', 'i')]/subfield[@code='u'] |
+                                  $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
+                <xsl:choose>
                     <xsl:when test="matches(., '^PE[\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of Lucerne case "PE 18.0 de" => E 18 -->
-                        <!--xsl:value-of select="concat(replace(., '^([P])([E][\s][\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" /-->
+                        <xsl:value-of select="concat(replace(., '^([P])([E][\s][\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^PE')"> <!-- Takes care of special case "PE 18.12 de" => E 18.12 -->
-                        <!--xsl:value-of select="concat(replace(., '^([P])([E][\s][\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" /-->
+                        <xsl:value-of select="concat(replace(., '^([P])([E][\s][\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^E[\D][\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of case "E# 18.0 de" => E 18 -->
-                        <!--xsl:value-of select="concat(replace(., '^(E[\D][\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', 'E $2'), '##xx##')" /-->
+                        <xsl:value-of select="concat(replace(., '^(E[\D][\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', 'E $2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^E[\D][\s].*')"> <!-- Takes care of case "E# 18.12 de" => E 18.12 -->
-                        <!--xsl:value-of select="concat(replace(., '^(E[\D][\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', 'E $2'), '##xx##')" /-->
+                        <xsl:value-of select="concat(replace(., '^(E[\D][\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', 'E $2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^E[\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of special case "E 18.0 de" => E 18 -->
-                        <!--xsl:value-of select="concat(replace(., '^(E[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', 'E $2'), '##xx##')" /-->
+                        <xsl:value-of select="concat(replace(., '^(E[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', 'E $2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^E[\s].*')"> <!-- Takes care of special case "E 18.12 de" => E 18.12 -->
-                        <!--xsl:value-of select="concat(replace(., '^(E[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', 'E $2'), '##xx##')" /-->
+                        <xsl:value-of select="concat(replace(., '^(E[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', 'E $2'), '##xx##')" />
                     </xsl:when>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'classif_drsys_E'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+    <xsl:template name="jus_class_F">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'idslu L1', 'i')]/subfield[@code='u'] |
+                                  $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
+                <xsl:choose>
                     <xsl:when test="matches(., '^PF[\s][\d]{1,2}[.][0]{1,2}.*$')"> <!-- Takes care of irregular Lucerne case "PF 18.0" => "F 18" -->
                         <xsl:value-of select="concat(replace(., '(^[P])([F][\s][\d]{1,2})([.][0]{1,2}[\s]?.*$)', '$2'), '##xx##')" />
                     </xsl:when>
@@ -458,27 +535,12 @@
                     <xsl:when test="matches(., '^F[\s].*')"> <!-- Takes care of special case "F 18.12 de" => F 18.12 -->
                         <xsl:value-of select="concat(replace(., '^(F[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', 'F $2'), '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., '^[\d].*')"> <!-- Takes care of ids-dr-sys without alphabetic prefix -->
-                        <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
-                    </xsl:when>
-                    <xsl:when test="matches(., '^[P][A|B|C][\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular Lucerne case "P# 18.0" => "18" -->
-                        <xsl:value-of select="concat(replace(., '^([P][A|B|C][\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
-                    </xsl:when>
-                    <xsl:when test="matches(., '^[P][A|B|C]')"> <!-- Takes care of Lucerne case "P# 18.12 de" => "18.12" -->
-                        <xsl:value-of select="concat(replace(., '^([P][A|B|C][\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
-                    </xsl:when>
-                    <xsl:when test="matches(., '^[A|B|C][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH 37.0 fr" => "37" -->
-                        <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
-                    </xsl:when>
-                    <xsl:otherwise> <!-- Takes care of irregular normal case "CA/CH 37.11 fr" => "37.11" -->
-                        <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
-                    </xsl:otherwise>
                 </xsl:choose>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'classif_drsys'"/>
+            <xsl:with-param name="fieldname" select="'classif_drsys_F'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
