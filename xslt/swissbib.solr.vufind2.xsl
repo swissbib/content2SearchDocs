@@ -430,11 +430,14 @@
                     <xsl:when test="matches(., '^[A|B|C][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH 37.0 fr" => "37" -->
                         <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., '^[A|B|C][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH 37.0 fr" => "37" -->
-                       <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
+                   <xsl:when test="matches(., '^[A|B|C][\D]*[-][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH-ZH 37.0 fr" => "37" -->
+                       <xsl:value-of select="concat(replace(., '^([\D]*[-][\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                   <xsl:when test="matches(., '^[A|B|C][\D][\s].*')">
+                   <xsl:when test="matches(., '^[A|B|C][\D][\s].*')"> <!-- Takes care of normal case "CA/CH 37.5 fr" => "37.5" -->
                        <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
+                   </xsl:when>
+                   <xsl:when test="matches(., '^[A|B|C][\D]*[-][\D]*[\s].*')"> <!-- Takes care of irregular normal case "CA/CH-ZH 37.5 fr" => "37.5" -->
+                       <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[-][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
                    </xsl:when>
                 </xsl:choose>
             </xsl:for-each>
@@ -451,19 +454,19 @@
             <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'idslu L1', 'i')]/subfield[@code='u'] |
                                   $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
                 <xsl:choose>
-                    <xsl:when test="matches(., '^PD[\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular Lucerne case "PD 18.0" => "D 18" -->
+                    <xsl:when test="matches(., '^PD[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular Lucerne case "PD 18.0" => "D 18" -->
                         <xsl:value-of select="concat(replace(., '^([P])([D][\s][\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., '^PD[\s].*$')"> <!-- Takes care of Lucerne case "PD 18.12 de" => "D 18.12" -->
+                    <xsl:when test="matches(., '^PD[\s].*')"> <!-- Takes care of Lucerne case "PD 18.12 de" => "D 18.12" -->
                         <xsl:value-of select="concat(replace(., '^([P])([D][\s][\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., '^D[\D][\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular normal case "D# 18.0" => "D 18" -->
+                    <xsl:when test="matches(., '^D[\D][\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "D# 18.0" => "D 18" -->
                         <xsl:value-of select="concat(replace(., '^(D[\D][\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', 'D $2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^D[\D][\s].*')"> <!-- Takes care of normal case "D# 18.12 de" => "D# 18.12" -->
                         <xsl:value-of select="concat(replace(., '^(D[\D][\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', 'D $2'), '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., '^D[\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular special case "D 18.0" => "D 18" -->
+                    <xsl:when test="matches(., '^D[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular special case "D 18.0" => "D 18" -->
                         <xsl:value-of select="concat(replace(., '^(D[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', 'D $2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^D[\s].*')"> <!-- Takes care of Lucerne case "D 18.12 de" => "D 18.12" -->
