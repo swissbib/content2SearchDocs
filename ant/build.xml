@@ -54,6 +54,7 @@
         <patternset>
             <!--<include  name="**/*.jar"/> -->
             <include name="**/*.jar" />
+            <include name="**/*.lic" />
         </patternset>
     </fileset>
 
@@ -166,8 +167,8 @@
 
         <!--First let's compile the classes-->
         <javac debug="on"
-               target="1.6"
-               source="1.6"
+               target="1.7"
+               source="1.7"
                fork="true"
                destdir="${build.dir}/classes"
                srcdir="${basedir}/src"

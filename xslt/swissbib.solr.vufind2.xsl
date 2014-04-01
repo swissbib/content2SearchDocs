@@ -4,9 +4,10 @@
     xmlns:java-tika-ext="java:org.swissbib.documentprocessing.plugins.FulltextContentEnrichment"
     xmlns:java-gnd-ext="java:org.swissbib.documentprocessing.plugins.GNDContentEnrichment"
     xmlns:java-viaf-ext="java:org.swissbib.documentprocessing.plugins.ViafContentEnrichment"
+    xmlns:java-dsv11-ext="java:org.swissbib.documentprocessing.plugins.DSV11ContentEnrichment"
     xmlns:java-nodouble-ext="java:org.swissbib.documentprocessing.plugins.RemoveDuplicates"
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
-    xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext">
+    xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib">
     <!--xmlns:fn="http://www.w3.org/2005/xpath-functions"> -->
     
     <xsl:output method="xml"
@@ -42,6 +43,7 @@
         =================-->
     <xsl:template match="/">
         <doc>
+
             <xsl:call-template name="id_type">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
@@ -289,7 +291,7 @@
     <!--======================
         CALLED NAMED TEMPLATES
         ======================-->
-    
+
     <xsl:template name="id_type">
         <xsl:param name="fragment" />
         <field name="id">
@@ -411,13 +413,14 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
+
     <!-- JUS classifications -->
     <xsl:template name="jus_class_gen">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'idslu L1', 'i')]/subfield[@code='u'] |
                                   $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
-               <xsl:choose>
+                <xsl:choose>
                     <xsl:when test="matches(., '^[\d].*')"> <!-- Takes care of ids-dr-sys without alphabetic prefix -->
                         <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
@@ -430,15 +433,15 @@
                     <xsl:when test="matches(., '^[A|B|C][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH 37.0 fr" => "37" -->
                         <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                   <xsl:when test="matches(., '^[A|B|C][\D]*[-][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH-ZH 37.0 fr" => "37" -->
-                       <xsl:value-of select="concat(replace(., '^([\D]*[-][\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
+                    <xsl:when test="matches(., '^[A|B|C][\D]*[-][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH-ZH 37.0 fr" => "37" -->
+                        <xsl:value-of select="concat(replace(., '^([\D]*[-][\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                   <xsl:when test="matches(., '^[A|B|C][\D][\s].*')"> <!-- Takes care of normal case "CA/CH 37.5 fr" => "37.5" -->
-                       <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
-                   </xsl:when>
-                   <xsl:when test="matches(., '^[A|B|C][\D]*[-][\D]*[\s].*')"> <!-- Takes care of irregular normal case "CA/CH-ZH 37.5 fr" => "37.5" -->
-                       <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[-][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
-                   </xsl:when>
+                    <xsl:when test="matches(., '^[A|B|C][\D][\s].*')"> <!-- Takes care of normal case "CA/CH 37.5 fr" => "37.5" -->
+                        <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^[A|B|C][\D]*[-][\D]*[\s].*')"> <!-- Takes care of irregular normal case "CA/CH-ZH 37.5 fr" => "37.5" -->
+                        <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[-][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
+                    </xsl:when>
                 </xsl:choose>
             </xsl:for-each>
         </xsl:variable>
@@ -548,6 +551,10 @@
         </xsl:call-template>
     </xsl:template>
 
+
+
+
+
     <!-- main and added entries -->
     <xsl:template name="authors">
         <xsl:param name="fragment" />
@@ -611,6 +618,44 @@
             <xsl:with-param name="fieldname" select="'author_additional'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+        <!-- added entries for IDSBB DSV11 -->
+        <!-- authors -->
+        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='B'], 'IDSBB')][matches(child::subfield[@code='P'], '100|700')]/subfield[@code='a']">
+            <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
+            <xsl:variable name="authorMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='D'], 
+                                                                                following-sibling::subfield[@code='b'],
+                                                                                following-sibling::subfield[@code='c'][1],
+                                                                                following-sibling::subfield[@code='d'],
+                                                                                following-sibling::subfield[@code='q'])), '[\W]', '')" />
+            <xsl:variable name="additionalDSV11Values" select="java-dsv11-ext:getAdditionalDSV11Values($dsv11Facade, string(100), $authorMatchString)"/>
+            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($additionalDSV11Values)"/>
+            <xsl:call-template name="createUniqueFields">
+                <xsl:with-param name="fieldname" select="'author_additional_dsv11_txt_mv'" />
+                <xsl:with-param name="fieldValues" select ="$uniqueSeqValues" />
+            </xsl:call-template>
+        </xsl:for-each>
+        <!-- corporations -->
+        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='B'], 'IDSBB')][matches(child::subfield[@code='P'], '710')]/subfield[@code='a']">
+            <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
+            <xsl:variable name="corpMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='b'][1], following-sibling::subfield[@code='b'][2], following-sibling::subfield[@code='b'][3])), '[\W]', '')" />
+            <xsl:variable name="additionalDSV11Values" select="java-dsv11-ext:getAdditionalDSV11Values($dsv11Facade, string(110), $corpMatchString)"/>
+            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($additionalDSV11Values)"/>
+            <xsl:call-template name="createUniqueFields">
+                <xsl:with-param name="fieldname" select="'author_additional_dsv11_txt_mv'" />
+                <xsl:with-param name="fieldValues" select ="$uniqueSeqValues" />
+            </xsl:call-template>
+        </xsl:for-each>
+        <!-- congresses -->
+        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='B'], 'IDSBB')][matches(child::subfield[@code='P'], '711')]/subfield[@code='a']">
+            <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
+            <xsl:variable name="congressMatchString" select="replace(lower-case(.), '[\W]', '')" />
+            <xsl:variable name="additionalDSV11Values" select="java-dsv11-ext:getAdditionalDSV11Values($dsv11Facade, string(110), $congressMatchString)"/>
+            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($additionalDSV11Values)"/>
+            <xsl:call-template name="createUniqueFields">
+                <xsl:with-param name="fieldname" select="'author_additional_dsv11_txt_mv'" />
+                <xsl:with-param name="fieldValues" select ="$uniqueSeqValues" />
+            </xsl:call-template>
+        </xsl:for-each>
         <!-- generic author facet-->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/navAuthor">
@@ -823,6 +868,26 @@
             <xsl:with-param name="fieldname" select="'title_alt'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+        <!-- titles variants from DSV11 -->
+        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='B'], 'IDSBB')][matches(child::subfield[@code='P'], '730')]/subfield[@code='a']">
+            <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
+            <xsl:variable name="titleMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='g'][1],
+                following-sibling::subfield[@code='k'][1],
+                following-sibling::subfield[@code='m'][1],
+                following-sibling::subfield[@code='n'][1],
+                following-sibling::subfield[@code='o'][1],
+                following-sibling::subfield[@code='p'][1],
+                following-sibling::subfield[@code='p'][2],
+                following-sibling::subfield[@code='p'][3],
+                following-sibling::subfield[@code='r'][1],
+                following-sibling::subfield[@code='s'][1])), '[\W]', '')" />
+            <xsl:variable name="additionalDSV11Values" select="java-dsv11-ext:getAdditionalDSV11Values($dsv11Facade, string(130), $titleMatchString)"/>
+            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($additionalDSV11Values)"/>
+            <xsl:call-template name="createUniqueFields">
+                <xsl:with-param name="fieldname" select="'title_additional_dsv11_txt_mv'" />
+                <xsl:with-param name="fieldValues" select ="$uniqueSeqValues" />
+            </xsl:call-template>
+        </xsl:for-each>
         <xsl:for-each select="$fragment/sorttitle">
             <field name="title_sort">
                 <xsl:value-of select="replace(., '[\W]', '')" />
@@ -1095,7 +1160,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 <field name="hierarchy_sequence">
-                    <xsl:value-of select="replace(preceding-sibling::subfield[@code='i'], '[/]', '.')" />
+                    <xsl:value-of select="replace(preceding-sibling::subfield[@code='i'][1], '[/]', '.')" />
                 </field>
             </xsl:for-each>
         </xsl:if>
@@ -1165,7 +1230,7 @@
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'itemnote_isn_mv'" />
+            <xsl:with-param name="fieldname" select="'itemnote_txt_mv'" />
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
         </xsl:call-template>
     </xsl:template>
@@ -1275,6 +1340,17 @@
             <xsl:with-param name="fieldname" select="'publplace_txt_mv'" />
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
         </xsl:call-template>
+        <!-- place variants from DSV11 -->
+        <xsl:for-each select="$fragment/datafield[@tag='752']/subfield[@code='d']">
+            <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
+            <xsl:variable name="placeMatchString" select="lower-case(.)" />
+            <xsl:variable name="additionalDSV11Values" select="java-dsv11-ext:getAdditionalDSV11Values($dsv11Facade, string(152), $placeMatchString)"/>
+            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($additionalDSV11Values)"/>
+            <xsl:call-template name="createUniqueFields">
+                <xsl:with-param name="fieldname" select="'publplace_dsv11_txt_mv'" />
+                <xsl:with-param name="fieldValues" select ="$uniqueSeqValues" />
+            </xsl:call-template>
+        </xsl:for-each>
     </xsl:template>
     
     <!-- additional content, anything not indexed somewhere else -->

@@ -55,6 +55,7 @@ public class GNDContentEnrichment implements IDocProcPlugin{
     private static String urlToSource;
     //private static ArrayList<GNDTagValues>  tagsToUse;
     private static ArrayList<String>  simpleTagsToUse;
+    private static ArrayList<String>  simpleTagsToUseForMACS;
     private static String idPatternForReplacement;
 
     //it is possible to initiaze with default values
@@ -69,7 +70,9 @@ public class GNDContentEnrichment implements IDocProcPlugin{
     private static DBCollection searchCollection = null;
     private static String searchField = "";
     private static String responseField = "";
+    private static String responseFieldMACS = null;
     private static RemoveDuplicates duplicateDetection;
+    private static boolean inProductionMode = false;
 
     //private static BufferedWriter logFile = null;
 
@@ -95,6 +98,14 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
         //in any case if the method is called the plugin will be marked as initialized
         //an error during initialization might occur - but this is another case
+
+        String className =  this.getClass().getName();
+        if (configuration.containsKey("PLUGINS.IN.PRODUCTIONMODE") && configuration.get("PLUGINS.IN.PRODUCTIONMODE").contains(className) )
+            inProductionMode = true;
+        else
+            return;
+
+
         initialized = true;
 
         try {
@@ -130,6 +141,9 @@ public class GNDContentEnrichment implements IDocProcPlugin{
     public String getReferencesConcatenated(String gndID) {
 
         String toReturn = "";
+
+        if (!inProductionMode) return toReturn;
+
         if (!initialized)  {
             initDefaultValues();
             writeLog("late initialized");
@@ -170,6 +184,31 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
                         }
 
+                        if (responseFieldMACS != null) {
+
+                            BasicDBObject  macsField =  (BasicDBObject)dbObject.get(responseFieldMACS);
+
+                            Set< Map.Entry <String,Object>> keyValuesMacs = macsField.entrySet();
+                            Iterator<Map.Entry<String,Object>>   itMacs =  keyValuesMacs.iterator();
+                            while (itMacs.hasNext()) {
+                                Map.Entry<String,Object> entry = itMacs.next();
+                                String key = entry.getKey();
+                                if (simpleTagsToUseForMACS.contains(key)) {
+
+                                    BasicDBList dbList  = (BasicDBList)entry.getValue();
+                                    Iterator<Object> macsValues = dbList.iterator();
+                                    while (macsValues.hasNext()) {
+                                        append = true;
+                                        String value = (String)macsValues.next();
+                                        String composedValue = Normalizer.normalize(value, Normalizer.Form.NFC);
+                                        //System.out.println(composedValue);
+                                        concatReferences.append(composedValue).append("##xx##");
+
+                                    }
+                                }
+
+                            }
+                        }
                     }
 
                     toReturn = concatReferences.toString();
@@ -188,6 +227,7 @@ public class GNDContentEnrichment implements IDocProcPlugin{
                     cursor.close();
                 }
             }
+            //to suppress duplicates makes sense because we collect values from GND and MACS and merge them together which might produce duplicates
             toReturn = duplicateDetection.removeDuplicatesFromMultiValuedField(toReturn);
             gndProcessing.debug("getReferencesConcatenated: gndID: " + gndID + " / references: " + toReturn);
 
@@ -370,12 +410,11 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
     private void initializeTagsToUse(HashMap<String, String> configuration) {
         String sTagsToUse = configuration.get("TAGS.TO.USE");
+        String sTagsToUseForMACS = configuration.get("TAGS.TO.USE.FOR.MACS");
 
 
         if (sTagsToUse != null && sTagsToUse.length()>0) {
-
             String[] aTagsToUse =  sTagsToUse.split("###");
-
             for (String tag: aTagsToUse) {
 
                 //I don't need this for the Mongo solution but won't throw it away so far
@@ -392,6 +431,26 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
         }
 
+        if (sTagsToUseForMACS != null && sTagsToUseForMACS.length()>0) {
+            String[] aTagsToUse =  sTagsToUseForMACS.split("###");
+            for (String tag: aTagsToUse) {
+
+                //I don't need this for the Mongo solution but won't throw it away so far
+
+                //String[] dataFieldSubField = tag.split("_");
+                //if (null != dataFieldSubField && dataFieldSubField.length == 2) {
+                //    GNDTagValues tags = new GNDTagValues(dataFieldSubField[0], dataFieldSubField[1]);
+                //    tagsToUse.add(tags);
+                //}
+
+                simpleTagsToUseForMACS.add(tag);
+
+            }
+
+        }
+
+
+
     }
 
     private void initializeMongoConnection(HashMap<String, String> configuration)
@@ -402,22 +461,40 @@ public class GNDContentEnrichment implements IDocProcPlugin{
         try {
 
             String[] mongoClient = configuration.get("MONGO.CLIENT").split("###");
-            String[] mongoAuthentication = configuration.get("MONGO.AUTHENTICATION").split("###");
+
+            String[] mongoAuthentication = null;
+
+            if (configuration.containsKey("MONGO.AUTHENTICATION")) {
+                mongoAuthentication = configuration.get("MONGO.AUTHENTICATION").split("###");
+
+            }
+            //String[] mongoAuthentication = configuration.get("MONGO.AUTHENTICATION").split("###");
             String[] mongoDB = configuration.get("MONGO.DB").split("###");
 
 
 
             mClient = new MongoClient( mongoClient[0],Integer.valueOf(mongoClient[1]));
 
-            DB db =  mClient.getDB(mongoAuthentication[0]);
+            DB db = null;
+            boolean authenticated = false;
+            if (mongoAuthentication == null) {
+                db =  mClient.getDB(mongoDB[0]);
+                authenticated = true;
+            }else {
+                db =  mClient.getDB(mongoAuthentication[0]);
+                authenticated = db.authenticate(mongoAuthentication[1],mongoAuthentication[2].toCharArray());
 
-            boolean authenticated = db.authenticate(mongoAuthentication[1],mongoAuthentication[2].toCharArray());
+            }
+
             if (authenticated) {
 
                 nativeSource = mClient.getDB(mongoDB[0]);
                 searchCollection = nativeSource.getCollection(mongoDB[1]);
                 searchField = mongoDB[2];
                 responseField = mongoDB[3];
+                if (mongoDB.length > 4) {
+                    responseFieldMACS = mongoDB[4];
+                }
 
             } else {
                 throw new Exception("authentication against database wasn't possible - no GND Processing will take place when type is called from XSLT templates");

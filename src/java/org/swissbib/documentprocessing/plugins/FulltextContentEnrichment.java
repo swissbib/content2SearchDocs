@@ -69,6 +69,7 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
     private static boolean  initialized;
     private static Pattern separator;
     private static HashMap<String, PreparedStatement> prepStats = new HashMap<String, PreparedStatement>();
+    private static boolean inProductionMode = false;
 
 
     static {
@@ -97,120 +98,122 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
 
         String content = "";
 
-            //if we couldn't fetch content from the server we (content length == 0) use Tika - if activated
-            if (execRemoteFetching){
-                boolean matched = false;
-                for (Pattern p : patternsAllowed ) {
-                    if (p.matcher(url).find())
-                    {
+        if (!inProductionMode) return content;
 
-                        matched = true;
+        //if we couldn't fetch content from the server we (content length == 0) use Tika - if activated
+        if (execRemoteFetching){
+            boolean matched = false;
+            for (Pattern p : patternsAllowed ) {
+                if (p.matcher(url).find())
+                {
 
-                        //if there was no solr content server available - try to get the content from DBMS
-                        if (this.dbmsConnectionActive()) {
-                            content = fetchContentDBMS(DocId,url);
+                    matched = true;
 
-                            if (content.length() > 0) {
+                    //if there was no solr content server available - try to get the content from DBMS
+                    if (this.dbmsConnectionActive()) {
+                        content = fetchContentDBMS(DocId,url);
+
+                        if (content.length() > 0) {
 
 
-                                tikaContentLogger.debug("got content from DBMS for DocId: " + DocId + " / url: " + url);
-                                break;
+                            tikaContentLogger.debug("got content from DBMS for DocId: " + DocId + " / url: " + url);
+                            break;
 
-                            }
                         }
-
-                        if (content.length() == 0) {
-
-                            //why this separator....??? What was the problem?
-                            //Matcher m =  separator.matcher(url);
-                            //String urlClean = m.replaceAll("");
-                            try {
-
-
-                                boolean httpFetchingAllowed = true;
-
-                                for (Pattern p1 : patternsNotAllowed ){
-                                    if (p1.matcher(url).find()) {
-
-                                        tikaContentLogger.debug("URL: xxxx" + url + "xxxx not allowed for fetching Docid: ####" + DocId + "####");
-                                        httpFetchingAllowed = false;
-
-                                    }
-                                }
-
-                                if (!httpFetchingAllowed) continue;
-
-
-                                HttpURLConnection connection = getHTTPConnection(url);
-
-                                boolean fetch = true;
-                                if (isContentTypeRestricted()) {
-                                    fetch = false;
-                                    String type = connection.getContentType();
-                                    for (String tType: allowedContentType) {
-                                        if (type.equals(tType)) {
-                                            fetch = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!fetch && null != tikaContentLogger){
-
-                                        tikaContentLogger.debug("content type not allowed: " + type);
-
-                                    }
-                                }
-
-                                if (fetch) {
-
-
-                                    //todo: testen wie sich das Fetchen mit Schliessen des InputStreams verhält - s.u.
-                                    //Problem ETH???
-                                    InputStream contentStream = (InputStream) connection.getContent();
-
-                                    content = tika.parseToString((contentStream));
-
-                                    if (null != tikaContentLogger) {
-
-
-                                        tikaContentLogger.debug("Docid fetched: " + DocId);
-                                        tikaContentLogger.debug("url fetched: " + url);
-                                        tikaContentLogger.debug("content: \n" + content);
-                                    }
-
-                                    if (null != dbmsConnection) {
-
-                                        insertContentDBMS(DocId,url,content);
-
-                                    }
-
-                                    if (null !=  contentStream) {
-                                        contentStream.close();
-                                    }
-                                }
-
-                                break;
-
-                            }catch (Throwable th) {
-                                tikaexceptionLogger.error("Error while trying to fetch the remote doc with Tika");
-                                tikaexceptionLogger.error(th.getMessage());
-                                for (StackTraceElement sE: th.getStackTrace()) {
-                                    tikaexceptionLogger.error(sE.toString());
-                                }
-                                tikaexceptionLogger.error("DocID which caused exception: " + DocId);
-                                tikaexceptionLogger.error("URL which caused exception: " + url);
-
-                            }
-                        }
-
                     }
-                }
-                if (!matched) {
-                    tikaNoContentLogger.debug("no match Docid: " + DocId);
-                    tikaNoContentLogger.debug("no match URL: " + url + "\n");
-                }
 
+                    if (content.length() == 0) {
+
+                        //why this separator....??? What was the problem?
+                        //Matcher m =  separator.matcher(url);
+                        //String urlClean = m.replaceAll("");
+                        try {
+
+
+                            boolean httpFetchingAllowed = true;
+
+                            for (Pattern p1 : patternsNotAllowed ){
+                                if (p1.matcher(url).find()) {
+
+                                    tikaContentLogger.debug("URL: xxxx" + url + "xxxx not allowed for fetching Docid: ####" + DocId + "####");
+                                    httpFetchingAllowed = false;
+
+                                }
+                            }
+
+                            if (!httpFetchingAllowed) continue;
+
+
+                            HttpURLConnection connection = getHTTPConnection(url);
+
+                            boolean fetch = true;
+                            if (isContentTypeRestricted()) {
+                                fetch = false;
+                                String type = connection.getContentType();
+                                for (String tType: allowedContentType) {
+                                    if (type.equals(tType)) {
+                                        fetch = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!fetch && null != tikaContentLogger){
+
+                                    tikaContentLogger.debug("content type not allowed: " + type);
+
+                                }
+                            }
+
+                            if (fetch) {
+
+
+                                //todo: testen wie sich das Fetchen mit Schliessen des InputStreams verhält - s.u.
+                                //Problem ETH???
+                                InputStream contentStream = (InputStream) connection.getContent();
+
+                                content = tika.parseToString((contentStream));
+
+                                if (null != tikaContentLogger) {
+
+
+                                    tikaContentLogger.debug("Docid fetched: " + DocId);
+                                    tikaContentLogger.debug("url fetched: " + url);
+                                    tikaContentLogger.debug("content: \n" + content);
+                                }
+
+                                if (null != dbmsConnection) {
+
+                                    insertContentDBMS(DocId,url,content);
+
+                                }
+
+                                if (null !=  contentStream) {
+                                    contentStream.close();
+                                }
+                            }
+
+                            break;
+
+                        }catch (Throwable th) {
+                            tikaexceptionLogger.error("Error while trying to fetch the remote doc with Tika");
+                            tikaexceptionLogger.error(th.getMessage());
+                            for (StackTraceElement sE: th.getStackTrace()) {
+                                tikaexceptionLogger.error(sE.toString());
+                            }
+                            tikaexceptionLogger.error("DocID which caused exception: " + DocId);
+                            tikaexceptionLogger.error("URL which caused exception: " + url);
+
+                        }
+                    }
+
+                }
             }
+            if (!matched) {
+                tikaNoContentLogger.debug("no match Docid: " + DocId);
+                tikaNoContentLogger.debug("no match URL: " + url + "\n");
+            }
+
+        }
 
         return content.replaceAll("\n"," ");
 
@@ -340,6 +343,12 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
 
     @Override
     public void initPlugin(HashMap<String, String> configuration) {
+
+        String className =  this.getClass().getName();
+        if (configuration.containsKey("PLUGINS.IN.PRODUCTIONMODE") && configuration.get("PLUGINS.IN.PRODUCTIONMODE").contains(className) )
+            inProductionMode = true;
+        else
+            return;
 
 
         initializeDBMS(configuration);

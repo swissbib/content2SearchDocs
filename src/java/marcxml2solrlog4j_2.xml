@@ -136,6 +136,25 @@
         </layout>
     </appender>
 
+    <appender name="dsv11Processing_appender" class="org.apache.log4j.RollingFileAppender">
+        <param name="maxFileSize" value="100MB" />
+        <param name="maxBackupIndex" value="10" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/dsv11Processing.log" />
+        <layout class="org.apache.log4j.TTCCLayout">
+            <param name="DateFormat" value="ISO8601" />
+        </layout>
+    </appender>
+
+    <appender name="dsv11ProcessingError_appender" class="org.apache.log4j.RollingFileAppender">
+        <param name="maxFileSize" value="100MB" />
+        <param name="maxBackupIndex" value="10" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/dsv11ProcessingError.log" />
+        <layout class="org.apache.log4j.TTCCLayout">
+            <param name="DateFormat" value="ISO8601" />
+        </layout>
+    </appender>
+
+
     <appender name="fetchFulltextInBatch_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
@@ -233,6 +252,15 @@
         <appender-ref ref="gndProcessingError_appender" />
     </logger>
 
+    <logger name="dsv11Processing" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="dsv11Processing_appender" />
+    </logger>
+
+    <logger name="dsv11ProcessingError" additivity="false">
+        <level value="error" />
+        <appender-ref ref="dsv11ProcessingError_appender" />
+    </logger>
 
 
     <logger name="org.swissbib.documentprocessing.plugins.ViafContentEnrichment" additivity="false">
