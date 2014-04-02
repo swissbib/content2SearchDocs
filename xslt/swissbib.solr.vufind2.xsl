@@ -623,10 +623,10 @@
         <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='B'], 'IDSBB')][matches(child::subfield[@code='P'], '100|700')]/subfield[@code='a']">
             <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
             <xsl:variable name="authorMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='D'], 
-                                                                                following-sibling::subfield[@code='b'],
+                                                                                following-sibling::subfield[@code='b'][1],
                                                                                 following-sibling::subfield[@code='c'][1],
-                                                                                following-sibling::subfield[@code='d'],
-                                                                                following-sibling::subfield[@code='q'])), '[\W]', '')" />
+                                                                                following-sibling::subfield[@code='d'][1],
+                                                                                following-sibling::subfield[@code='q'][1])), '[\W]', '')" />
             <xsl:variable name="additionalDSV11Values" select="java-dsv11-ext:getAdditionalDSV11Values($dsv11Facade, string(100), $authorMatchString)"/>
             <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($additionalDSV11Values)"/>
             <xsl:call-template name="createUniqueFields">
