@@ -49,6 +49,7 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
 
     private static Logger gndProcessing;
+    private static Logger macsProcessing;
     private static Logger gndProcessingError;
     private static Proxy proxy;
     private static Pattern idPattern;
@@ -79,9 +80,11 @@ public class GNDContentEnrichment implements IDocProcPlugin{
     static {
         GNDContentEnrichment.gndProcessing = LoggerFactory.getLogger("gndProcessing");
         GNDContentEnrichment.gndProcessingError = LoggerFactory.getLogger("gndProcessingError");
+        GNDContentEnrichment.macsProcessing = LoggerFactory.getLogger("macsProcessing");
 
         //tagsToUse = new ArrayList<GNDTagValues>();
         simpleTagsToUse = new ArrayList<String>();
+        simpleTagsToUseForMACS = new ArrayList<String>();
 
         initialized = false;
         errorInitializing = false;
@@ -154,68 +157,83 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
             StringBuilder concatReferences = new StringBuilder();
 
-            BasicDBObject query = new BasicDBObject(searchField, gndID);
-            DBCursor cursor = searchCollection.find(query);
-            boolean append = false;
-
+            BasicDBObject query = null;
+            DBCursor cursor = null;
             try {
-                    while (cursor.hasNext()) {
-                        DBObject dbObject =  cursor.next();
-                        BasicDBObject  gndFields =  (BasicDBObject)dbObject.get(responseField);
+                query = new BasicDBObject(searchField, gndID);
+                cursor = searchCollection.find(query);
+                boolean append = false;
 
-                        Set< Map.Entry <String,Object>> keyValues = gndFields.entrySet();
-                        Iterator<Map.Entry<String,Object>>   it =  keyValues.iterator();
-                        while (it.hasNext()) {
-                            Map.Entry<String,Object> entry = it.next();
+                while (cursor.hasNext()) {
+                    DBObject dbObject =  cursor.next();
+                    BasicDBObject  gndFields =  (BasicDBObject)dbObject.get(responseField);
+
+                    Set< Map.Entry <String,Object>> keyValues = gndFields.entrySet();
+                    Iterator<Map.Entry<String,Object>>   it =  keyValues.iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<String,Object> entry = it.next();
+                        String key = entry.getKey();
+                        if (simpleTagsToUse.contains(key)) {
+
+                            BasicDBList dbList  = (BasicDBList)entry.getValue();
+                            Iterator<Object> gndValues = dbList.iterator();
+                            while (gndValues.hasNext()) {
+                                append = true;
+                                String value = (String)gndValues.next();
+                                String composedValue = Normalizer.normalize(value, Normalizer.Form.NFC);
+                                //System.out.println(composedValue);
+                                concatReferences.append(composedValue).append("##xx##");
+
+                            }
+                        }
+
+                    }
+
+                    if (responseFieldMACS != null) {
+
+                        BasicDBObject  macsField =  (BasicDBObject)dbObject.get(responseFieldMACS);
+
+                        Set< Map.Entry <String,Object>> keyValuesMacs = macsField.entrySet();
+                        Iterator<Map.Entry<String,Object>>   itMacs =  keyValuesMacs.iterator();
+                        while (itMacs.hasNext()) {
+                            Map.Entry<String,Object> entry = itMacs.next();
                             String key = entry.getKey();
-                            if (simpleTagsToUse.contains(key)) {
+                            if (simpleTagsToUseForMACS.contains(key)) {
 
                                 BasicDBList dbList  = (BasicDBList)entry.getValue();
-                                Iterator<Object> gndValues = dbList.iterator();
-                                while (gndValues.hasNext()) {
+                                Iterator<Object> macsValues = dbList.iterator();
+
+                                StringBuilder macsReferences = new StringBuilder();
+                                boolean appendMACS = false;
+                                while (macsValues.hasNext()) {
                                     append = true;
-                                    String value = (String)gndValues.next();
+                                    appendMACS = true;
+                                    String value = (String)macsValues.next();
                                     String composedValue = Normalizer.normalize(value, Normalizer.Form.NFC);
                                     //System.out.println(composedValue);
+
+                                    //only for logging
+                                    macsReferences.append(composedValue).append("##xx##");
                                     concatReferences.append(composedValue).append("##xx##");
 
                                 }
-                            }
-
-                        }
-
-                        if (responseFieldMACS != null) {
-
-                            BasicDBObject  macsField =  (BasicDBObject)dbObject.get(responseFieldMACS);
-
-                            Set< Map.Entry <String,Object>> keyValuesMacs = macsField.entrySet();
-                            Iterator<Map.Entry<String,Object>>   itMacs =  keyValuesMacs.iterator();
-                            while (itMacs.hasNext()) {
-                                Map.Entry<String,Object> entry = itMacs.next();
-                                String key = entry.getKey();
-                                if (simpleTagsToUseForMACS.contains(key)) {
-
-                                    BasicDBList dbList  = (BasicDBList)entry.getValue();
-                                    Iterator<Object> macsValues = dbList.iterator();
-                                    while (macsValues.hasNext()) {
-                                        append = true;
-                                        String value = (String)macsValues.next();
-                                        String composedValue = Normalizer.normalize(value, Normalizer.Form.NFC);
-                                        //System.out.println(composedValue);
-                                        concatReferences.append(composedValue).append("##xx##");
-
-                                    }
+                                if (appendMACS) {
+                                    String macsValuesForLogging = macsReferences.toString();
+                                    macsValuesForLogging = macsValuesForLogging.substring(0,macsValuesForLogging.length()-6);
+                                    macsValuesForLogging = duplicateDetection.removeDuplicatesFromMultiValuedField(macsValuesForLogging);
+                                    macsProcessing.info("additional MACS values for GND " + gndID + " : " + macsValuesForLogging);
                                 }
-
                             }
+
                         }
                     }
+                }
 
-                    toReturn = concatReferences.toString();
-                    if (append) {
-                        toReturn = toReturn.substring(0,toReturn.length()-6);
+                toReturn = concatReferences.toString();
+                if (append) {
+                    toReturn = toReturn.substring(0,toReturn.length()-6);
 
-                    }
+                }
 
             } catch (Exception excep) {
 

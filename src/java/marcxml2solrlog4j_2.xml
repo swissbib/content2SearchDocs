@@ -139,7 +139,7 @@
     <appender name="dsv11Processing_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/dsv11Processing.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/dsv11Processing.2.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -148,11 +148,21 @@
     <appender name="dsv11ProcessingError_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/dsv11ProcessingError.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/dsv11ProcessingError.2.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
     </appender>
+
+    <appender name="macsProcessing_appender" class="org.apache.log4j.RollingFileAppender">
+        <param name="maxFileSize" value="100MB" />
+        <param name="maxBackupIndex" value="10" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/macsProcessing.2.log" />
+        <layout class="org.apache.log4j.TTCCLayout">
+            <param name="DateFormat" value="ISO8601" />
+        </layout>
+    </appender>
+
 
 
     <appender name="fetchFulltextInBatch_appender" class="org.apache.log4j.RollingFileAppender">
@@ -260,6 +270,11 @@
     <logger name="dsv11ProcessingError" additivity="false">
         <level value="error" />
         <appender-ref ref="dsv11ProcessingError_appender" />
+    </logger>
+
+    <logger name="macsProcessing" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="macsProcessing_appender" />
     </logger>
 
 
