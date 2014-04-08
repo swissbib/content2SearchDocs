@@ -304,16 +304,19 @@
     <xsl:template name="lang_country">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
+            <!-- remove undefined values (|||, und) from index -->
             <xsl:for-each select="$fragment/datafield[@tag='041']/subfield[@code='a']/text()">
-                <xsl:value-of select="concat(., '##xx##')" />
+                <xsl:choose>
+                    <xsl:when test="matches(., '\|\|\||und')" />
+                    <xsl:otherwise>
+                        <xsl:value-of select="concat(., '##xx##')" />
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:for-each>
             <xsl:for-each select="$fragment/controlfield[@tag='008']">
-				<!-- Test, if language not coded but fill characters -->
 				<xsl:variable name="lang" select="substring(text()[1],36,3)"/>
 				<xsl:choose>
-				    <xsl:when test="matches($lang, '\|\|\|')">
-						<xsl:value-of select="concat('und', '##xx##')" />
-				    </xsl:when>
+				    <xsl:when test="matches($lang, '\|\|\||und')" />
 				    <xsl:otherwise>
 				        <xsl:value-of select="concat($fragment/substring(controlfield[@tag='008'][1],36,3), '##xx##')" />
 				    </xsl:otherwise>
