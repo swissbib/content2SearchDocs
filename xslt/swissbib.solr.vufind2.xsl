@@ -427,11 +427,11 @@
                     <xsl:when test="matches(., '^[\d].*')"> <!-- Takes care of ids-dr-sys without alphabetic prefix -->
                         <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., '^[P][A|B|C][\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular Lucerne case "P# 18.0" => "18" -->
-                        <xsl:value-of select="concat(replace(., '^([P][A|B|C][\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
+                    <xsl:when test="matches(., '^[P][A|B|C|F][\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular Lucerne case "P# 18.0" => "18" -->
+                        <xsl:value-of select="concat(replace(., '^([P][A|B|C|F][\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., '^[P][A|B|C]')"> <!-- Takes care of Lucerne case "P# 18.12 de" => "18.12" -->
-                        <xsl:value-of select="concat(replace(., '^([P][A|B|C][\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
+                    <xsl:when test="matches(., '^[P][A|B|C|F]')"> <!-- Takes care of Lucerne case "P# 18.12 de" => "18.12" -->
+                        <xsl:value-of select="concat(replace(., '^([P][A|B|C|F][\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., '^[A|B|C][\D]*[\s][\d]{1,2}[.][0]{1,2}.*')"> <!-- Takes care of irregular normal case "CA/CH 37.0 fr" => "37" -->
                         <xsl:value-of select="concat(replace(., '^([\D]*[\s])([\d]{1,2})([.][0]{1,2}[\s]?.*)$', '$2'), '##xx##')" />
@@ -527,10 +527,12 @@
                                   $fragment/datafield[@tag='691'][matches(@ind2, '7')][matches(descendant::subfield[@code='2'][1], 'dr-sys', 'i')]/subfield[@code='u']">
                 <xsl:choose>
                     <xsl:when test="matches(., '^PF[\s][\d]{1,2}[.][0]{1,2}.*$')"> <!-- Takes care of irregular Lucerne case "PF 18.0" => "F 18" -->
-                        <xsl:value-of select="concat(replace(., '(^[P])([F][\s][\d]{1,2})([.][0]{1,2}[\s]?.*$)', '$2'), '##xx##')" />
+                        <!-- The PF-values are treated as PC-values because it customary for IDSLU L1 to use the A/B/C-classifiaction for PF
+                            xsl:value-of select="concat(replace(., '(^[P])([F][\s][\d]{1,2})([.][0]{1,2}[\s]?.*$)', '$2'), '##xx##')" / -->
                     </xsl:when>
                     <xsl:when test="matches(., '^PF.*$')"> <!-- Takes care of Lucerne case "PF 18.12 de" => "F 18.12" -->
-                        <xsl:value-of select="concat(replace(., '(^[P])([F][\s][\d]{1,2}[.]?[\d]{0,2})([\s]?.*$)', '$2'), '##xx##')" />
+                        <!-- The PF-values are treated as PC-values because it customary for IDSLU L1 to use the A/B/C-classifiaction for PF
+                            xsl:value-of select="concat(replace(., '(^[P])([F][\s][\d]{1,2}[.]?[\d]{0,2})([\s]?.*$)', '$2'), '##xx##')" / -->
                     </xsl:when>
                     <xsl:when test="matches(., '^F[\D][\s][\d]{1,2}[.][0]{1,2}')"> <!-- Takes care of irregular case "FA 18.0" => "F 18" -->
                         <xsl:value-of select="concat(replace(., '(^[F][A][\s])([\d]{1,2})([.][0]{1,2}[\s]?.*$)', 'F $2'), '##xx##')" />
