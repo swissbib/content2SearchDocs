@@ -62,9 +62,9 @@
             <xsl:call-template name="jus_class_E">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
-            <xsl:call-template name="jus_class_F">
+            <!--xsl:call-template name="jus_class_F">
                 <xsl:with-param name="fragment" select="record" />
-            </xsl:call-template>
+            </xsl:call-template -->
             <xsl:call-template name="format">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
