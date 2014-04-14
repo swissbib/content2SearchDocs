@@ -47,7 +47,7 @@ function preChecks()
 
     #-n: True if the length of "STRING" is non-zero.
     [ ! -n "${URLSOLRINDEXSERVER}" ] && echo "solr index server  is not set" >>$LOGFILE && exit 9
-       To
+       
 }
 
 
