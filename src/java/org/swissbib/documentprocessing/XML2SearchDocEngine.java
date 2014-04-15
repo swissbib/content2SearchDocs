@@ -202,7 +202,8 @@ public abstract class XML2SearchDocEngine {
 
             //FulltextContentEnrichment.init(confContainer);
             long filecounter = 1;
-            BufferedWriter fout = openNewOutPutFile(getBaseNameFileSolrDocs(),configuration.get("OUTPUT.DIR"), filecounter);
+            String formatCounter = String.format("%06d",filecounter);
+            BufferedWriter fout = openNewOutPutFile(getBaseNameFileSolrDocs(),configuration.get("OUTPUT.DIR"), formatCounter);
             //BufferedWriter fout = new StringWriter();
             writeFileHeader(fout);
             int lineCounter = 0;
@@ -260,8 +261,10 @@ public abstract class XML2SearchDocEngine {
                             writeFileFooter(fout);
                             fout.flush();
                             fout.close();
+
                             filecounter++;
-                            fout = openNewOutPutFile(getBaseNameFileSolrDocs(),configuration.get("OUTPUT.DIR".toUpperCase())   ,filecounter);
+                            formatCounter = String.format("%05d",filecounter);
+                            fout = openNewOutPutFile(getBaseNameFileSolrDocs(),configuration.get("OUTPUT.DIR".toUpperCase())   ,formatCounter);
                             writeFileHeader(fout);
 
                         }
@@ -571,7 +574,7 @@ public abstract class XML2SearchDocEngine {
 
     protected BufferedWriter openNewOutPutFile(String filename,
                                              String baseOutputdirectory,
-                                             long filecounter)
+                                             String filecounter)
             throws IOException {
 
         String [] partsOfName = filename.split("\\.");

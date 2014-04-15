@@ -21,6 +21,20 @@ first version dedicated to produce explicitly search docs for our new environmen
 
 
 
+ ************ Version 1.0.5  - 15.4.2014 ******
+
+  format the counter of the output files
+  Instead of solrout1.xml and solrout100.xml
+  solrout000001.xml and solrout000100.xml
+
+  as a result we will get an exact sort while pushing the messages into the search index
+
+
+
+
+
+
+
 
 
 
