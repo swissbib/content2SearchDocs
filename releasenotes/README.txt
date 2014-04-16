@@ -30,7 +30,12 @@ first version dedicated to produce explicitly search docs for our new environmen
   as a result we will get an exact sort while pushing the messages into the search index
 
 
+******** Version 1.0.5.1  - 16.4.2014 **************
+Guenter Hipler
 
+inconsitent formatation - grrr
+
+**********
 
 
 

@@ -263,7 +263,7 @@ public abstract class XML2SearchDocEngine {
                             fout.close();
 
                             filecounter++;
-                            formatCounter = String.format("%05d",filecounter);
+                            formatCounter = String.format("%06d",filecounter);
                             fout = openNewOutPutFile(getBaseNameFileSolrDocs(),configuration.get("OUTPUT.DIR".toUpperCase())   ,formatCounter);
                             writeFileHeader(fout);
 
