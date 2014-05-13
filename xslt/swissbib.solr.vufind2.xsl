@@ -629,10 +629,10 @@
         <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='B'], 'IDSBB')][matches(child::subfield[@code='P'], '100|700')]/subfield[@code='a']">
             <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
             <xsl:variable name="authorMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='D'], 
-                                                                                following-sibling::subfield[@code='b'][1],
-                                                                                following-sibling::subfield[@code='c'][1],
-                                                                                following-sibling::subfield[@code='d'][1],
-                                                                                following-sibling::subfield[@code='q'][1])), '[\W]', '')" />
+                                                                                        following-sibling::subfield[@code='b'][1],
+                                                                                        following-sibling::subfield[@code='c'][1],
+                                                                                        following-sibling::subfield[@code='d'][1],
+                                                                                        following-sibling::subfield[@code='q'][1])), '[\W]', '')" />
             <xsl:variable name="additionalDSV11Values" select="java-dsv11-ext:getAdditionalDSV11Values($dsv11Facade, string(100), $authorMatchString)"/>
             <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($additionalDSV11Values)"/>
             <xsl:call-template name="createUniqueFields">
@@ -662,6 +662,25 @@
                 <xsl:with-param name="fieldValues" select ="$uniqueSeqValues" />
             </xsl:call-template>
         </xsl:for-each>
+        <!-- relator specific search fields -->
+        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '100|700|110|710')]/subfield[@code='4']">
+            <xsl:variable name="relatorcode" select="." />
+            <xsl:variable name="forDeduplication">
+                <xsl:for-each select="preceding-sibling::subfield[@code='a']">
+                <xsl:value-of select="." />
+                    <xsl:for-each select="following-sibling::subfield[matches(@code, '[Db-su-z]')]">
+                        <xsl:value-of select="concat(', ', .)" />
+                    </xsl:for-each>
+                <xsl:text>##xx##</xsl:text>
+                </xsl:for-each>
+            </xsl:variable>
+            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+            <xsl:call-template name="createUniqueFields">
+                <xsl:with-param name="fieldname" select="concat('author_', $relatorcode, '_txt_mv')" />
+                <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+            </xsl:call-template>
+            </xsl:for-each>
+        
         <!-- generic author facet-->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/navAuthor">

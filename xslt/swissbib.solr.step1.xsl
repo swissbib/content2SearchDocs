@@ -402,6 +402,10 @@
          Namensansetzungen, inkl. Lebensdaten, Titel, Zaehlung 
     -->
     <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')]">
+    <!-- Beispiele fuer Ausschlusskriterien von Relatoren (spezifische Liste, oder alle) (15.05.2014 / osc)
+    <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')][not(matches(child::subfield[@code='4'], 'fmo|ths'))]">
+    <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')][not(exists(child::subfield[@code='4']))]">
+    -->
         <xsl:copy-of select="current()" /> 
         <!-- this is a random MARC tag for transport use only (13.08.2013/osc) -->
         <datafield tag="979">

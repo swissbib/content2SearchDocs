@@ -156,7 +156,7 @@ class ProcessSrwMessages:
         #</delete>
 
 
-        numberOfFiles = len(glob.glob(self.DELETEDIRLOAD + os.sep + "REQ_*.xml"))
+        numberOfFiles = len(glob.glob(self.DELETEDIRLOAD + os.sep + "*REQ_*.xml"))
         if numberOfFiles > 0:
 
             self.writeLogMessage("{0} messages to delete search docs".format(numberOfFiles))
@@ -171,11 +171,14 @@ class ProcessSrwMessages:
             hDelete_File.write("<delete>" + os.linesep)
 
 
-            pPattern = re.compile("REQ_(.*?)\.xml")
+            pPattern = re.compile(".*?REQ_(.*?)\.xml")
             #Pattern of File REQ_123456.xml
-            for fname in os.listdir(self.DELETEDIRLOAD):
+            self.writeLogMessage("files with delete messages:")
+
+            for fname in sorted(os.listdir(self.DELETEDIRLOAD)):
                 mFilePattern = pPattern.search(fname)
                 if mFilePattern:
+                    self.writeLogMessage("delete file {0} ".format(fname))
                     docId = mFilePattern.group(1)
                     hDelete_File.write("<id>" + docId + "</id>" + os.linesep)
                     #os.remove(self.DELETEDIRLOAD + os.sep + fname)
@@ -209,13 +212,13 @@ class ProcessSrwMessages:
 
         os.system("cd " + self.UPDATEDIRLOAD)
 
-        numberOfFiles = len(glob.glob(self.UPDATEDIRLOAD + os.sep + "REQ_*.xml"))
+        numberOfFiles = len(glob.glob(self.UPDATEDIRLOAD + os.sep + "*REQ_*.xml"))
         self.writeLogMessage("{0} messages to update search docs".format(numberOfFiles))
 
         self.writeLogMessage("files with update messages:")
 
 
-        for fname in os.listdir(self.UPDATEDIRLOAD):
+        for fname in sorted(os.listdir(self.UPDATEDIRLOAD)):
 
             self.writeLogMessage("update file {0} ".format(fname))
 
@@ -313,7 +316,10 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     srwMessages = None
+
+
     try:
+
         srwMessages = ProcessSrwMessages()
 
         srwMessages.checkRequiredArguments(options,parser)
@@ -334,6 +340,8 @@ if __name__ == '__main__':
     except Exception as argsError:
         if not srwMessages is None:
             srwMessages.writeLogMessage("Exception occured in control script: {0} ".format(argsError))
+        else:
+            print "Exception occured in control script: {0} ".format(argsError)
 
     finally:
         if not srwMessages is None:

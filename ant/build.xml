@@ -113,7 +113,9 @@
         <include name="sb_post2solr_Frequent.sh"/>
         <include name="sb_post2solr_initialloading.sh"/>
         <include name="sb_post2solr_ead_initialloading.sh"/>
-       <!-- <include name="sb_viaf2solr_initialloading.sh"/> -->
+        <include  name="post2SolrFrequent.py"/>
+        <include name="sb_erm2solr_initialloading.sh"/>
+        <include name="sb_ermpost2solr_initialloading.sh"/>
 
     </fileset>
 
@@ -123,7 +125,6 @@
             <include  name="BulkMarcRecordModifierSOLR.pl"/>
             <include  name="MarcRecordModifierSOLR.pl"/>
             <include  name="sb_bulkformatSOLR.sh"/>
-            <!--<include  name="sb_UpdateFeedSOLR.sh"/> -->
             <include name="processSRWMessages.py" />
 
             <!--<include  name="sb_UpdateFeedSOLRBasel.sh"/> -->
