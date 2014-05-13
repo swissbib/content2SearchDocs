@@ -308,6 +308,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='041']/subfield[@code='a']/text()">
                 <xsl:choose>
                     <xsl:when test="matches(., '\|\|\||und')" />
+                    <xsl:when test="string-length(.) &gt; 3" />
                     <xsl:otherwise>
                         <xsl:value-of select="concat(., '##xx##')" />
                     </xsl:otherwise>
