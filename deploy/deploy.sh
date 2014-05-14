@@ -11,7 +11,7 @@ LOCAL_DELETE=${LOCAL_BASE}/DeleteDocs/dist
 
 
 #for host in sb-s2.swissbib.unibas.ch sb-s8.swissbib.unibas.ch
-for host in sb-s1.swissbib.unibas.ch
+for host in sb-s2.swissbib.unibas.ch sb-s12.swissbib.unibas.ch sb-s13.swissbib.unibas.ch
 
 do
 
