@@ -1537,7 +1537,7 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
-    
+
     <xsl:template name="localcode">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
@@ -1549,7 +1549,7 @@
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)" />
         <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'localcode_txt_mv'" />
+            <xsl:with-param name="fieldname" select="'localcode_isn_mv'" />
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
         </xsl:call-template>
     </xsl:template>
