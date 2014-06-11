@@ -479,44 +479,41 @@ public class GNDContentEnrichment implements IDocProcPlugin{
         try {
 
             String[] mongoClient = configuration.get("MONGO.CLIENT").split("###");
-
             String[] mongoAuthentication = null;
 
             if (configuration.containsKey("MONGO.AUTHENTICATION")) {
-                mongoAuthentication = configuration.get("MONGO.AUTHENTICATION").split("###");
-
+             mongoAuthentication = configuration.get("MONGO.AUTHENTICATION").split("###");
             }
-            //String[] mongoAuthentication = configuration.get("MONGO.AUTHENTICATION").split("###");
+
+            ServerAddress server = new ServerAddress(mongoClient[0], Integer.valueOf(mongoClient[1]));
             String[] mongoDB = configuration.get("MONGO.DB").split("###");
 
-
-
-            mClient = new MongoClient( mongoClient[0],Integer.valueOf(mongoClient[1]));
-
             DB db = null;
-            boolean authenticated = false;
-            if (mongoAuthentication == null) {
-                db =  mClient.getDB(mongoDB[0]);
-                authenticated = true;
-            }else {
+            if (mongoAuthentication != null ) {
+                MongoCredential credential = MongoCredential.createMongoCRCredential(mongoAuthentication[1], mongoAuthentication[0], mongoAuthentication[2].toCharArray());
+                mClient = new MongoClient(server, Arrays.asList(credential));
                 db =  mClient.getDB(mongoAuthentication[0]);
-                authenticated = db.authenticate(mongoAuthentication[1],mongoAuthentication[2].toCharArray());
-
+            }
+            else {
+                mClient = new MongoClient(server);
+                db =  mClient.getDB(mongoDB[0]);
             }
 
-            if (authenticated) {
 
-                nativeSource = mClient.getDB(mongoDB[0]);
-                searchCollection = nativeSource.getCollection(mongoDB[1]);
-                searchField = mongoDB[2];
-                responseField = mongoDB[3];
-                if (mongoDB.length > 4) {
-                    responseFieldMACS = mongoDB[4];
-                }
+            //simple test if authentication was successfull
+            CommandResult cR = db.getStats();
 
-            } else {
+            if (cR != null && !cR.ok()) {
                 throw new Exception("authentication against database wasn't possible - no GND Processing will take place when type is called from XSLT templates");
+            }
 
+
+            nativeSource = mClient.getDB(mongoDB[0]);
+            searchCollection = nativeSource.getCollection(mongoDB[1]);
+            searchField = mongoDB[2];
+            responseField = mongoDB[3];
+            if (mongoDB.length > 4) {
+                responseFieldMACS = mongoDB[4];
             }
 
 
