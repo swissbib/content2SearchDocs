@@ -857,6 +857,9 @@
             <xsl:for-each select="$fragment/datafield[@tag='710']/subfield[@code='t']">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='730']/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='740']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
@@ -1151,44 +1154,20 @@
     <!-- for use in vufind hierarchy driver -->
     <xsl:template name="series_hierarchy">
         <xsl:param name="fragment" />
-        <xsl:if test="exists($fragment//datafield[@tag='490']/subfield[@code='9'])">
-            <field name="hierarchytype">series</field>
-            <field name="is_hierarchy_id">
-                <xsl:value-of select="$fragment/myDocID" />
+        <xsl:for-each select="$fragment/hierarchytype |
+                              $fragment/is_hierarchy_id |
+                              $fragment/is_hierarchy_title |
+                              $fragment/hierarchy_top_id |
+                              $fragment/hierarchy_top_title |
+                              $fragment/hierarchy_parent_id |
+                              $fragment/hierarchy_parent_title |
+                              $fragment/title_in_hierarchy |
+                              $fragment/hierarchy_sequence">
+            <xsl:variable name="fieldname" select="name()" />
+            <field name="{$fieldname}">
+                <xsl:copy-of select="text()" />
             </field>
-            <field name="is_hierarchy_title">
-                <xsl:value-of select="$fragment/datafield[@tag='245']/subfield[@code='a'][1]"></xsl:value-of>
-            </field>
-            <xsl:for-each select="$fragment/datafield[@tag='490']/subfield[@code='9']">
-                <field name="hierarchy_top_id">
-                    <xsl:value-of select="." />
-                </field>
-                <field name="hierarchy_top_title">
-                    <xsl:value-of select="preceding-sibling::subfield[@code='a'][1]"></xsl:value-of>
-                </field>
-                <field name="hierarchy_parent_id">
-                    <xsl:value-of select="." />
-                </field>
-                <field name="hierarchy_parent_title">
-                    <xsl:value-of select="preceding-sibling::subfield[@code='a'][1]"></xsl:value-of>
-                </field>
-                <xsl:choose>
-                    <xsl:when test="exists(preceding-sibling::subfield[@code='v'])">
-                        <field name="title_in_hierarchy">
-                            <xsl:value-of select="concat(preceding-sibling::subfield[@code='v'][1], ' : ', $fragment/datafield[@tag='245']/subfield[@code='a'][1], ' (', $fragment/sortyear, ')')" />
-                        </field>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <field name="title_in_hierarchy">
-                            <xsl:value-of select="concat($fragment/datafield[@tag='245']/subfield[@code='a'][1], ' (', $fragment/sortyear, ')')" />
-                        </field>
-                    </xsl:otherwise>
-                </xsl:choose>
-                <field name="hierarchy_sequence">
-                    <xsl:value-of select="replace(preceding-sibling::subfield[@code='i'][1], '[/]', '.')" />
-                </field>
-            </xsl:for-each>
-        </xsl:if>
+        </xsl:for-each>
     </xsl:template>
     
     <xsl:template name="callnumber">
