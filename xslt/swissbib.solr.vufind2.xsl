@@ -800,7 +800,7 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <field name="title">
-                        <xsl:value-of select="concat(., ' : ', following-sibling::subfield[@code='b'])" />
+                        <xsl:value-of select="concat(., ' : ', following-sibling::subfield[@code='b'][1])" />
                     </field>
                     <field name="title_short">
                         <xsl:value-of select="." />
