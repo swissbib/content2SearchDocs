@@ -86,6 +86,9 @@
             <xsl:call-template name="institution">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
+            <xsl:call-template name="e_institution">
+                <xsl:with-param name="fragment" select="record"/>
+            </xsl:call-template>
             <xsl:call-template name="union">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
@@ -1226,7 +1229,23 @@
             <xsl:with-param name="fieldname" select="'institution'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-    </xsl:template>        
+    </xsl:template> 
+    
+    <xsl:template name="e_institution">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/branchlib">
+                <xsl:if test="matches(., 'A145|B405')">
+                    <xsl:value-of select="concat(., '##xx##')" />
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'e_institution_str_mv'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
 
     <xsl:template name="itemnote">
         <xsl:param name="fragment" />
