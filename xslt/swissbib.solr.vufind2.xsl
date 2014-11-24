@@ -6,8 +6,9 @@
     xmlns:java-viaf-ext="java:org.swissbib.documentprocessing.plugins.ViafContentEnrichment"
     xmlns:java-dsv11-ext="java:org.swissbib.documentprocessing.plugins.DSV11ContentEnrichment"
     xmlns:java-nodouble-ext="java:org.swissbib.documentprocessing.plugins.RemoveDuplicates"
+    xmlns:java-isbn-ext="java:org.swissbib.documentprocessing.plugins.CreateSecondISBN"
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
-    xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib">
+    xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib java-isbn-ext">
     <!--xmlns:fn="http://www.w3.org/2005/xpath-functions"> -->
     
     <xsl:output method="xml"
@@ -1077,10 +1078,28 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
+
+
+
+        <xsl:variable name="createISBNFacade" select="java-isbn-ext:new()" />
+
+
         <xsl:for-each select="$fragment/datafield[@tag='020']/subfield[@code='a']">
             <field name="isbn">
                 <xsl:value-of select="." />
             </field>
+
+            <xsl:variable name="currentISBN" select="." />
+
+            <xsl:variable name="vISBNVariation" select="java-isbn-ext:getAlternativeISBN($createISBNFacade, $currentISBN)"/>
+
+
+            <xsl:call-template name="createUniqueFields">
+                <xsl:with-param name="fieldname" select="'isbn_variation'" />
+                <xsl:with-param name="fieldValues" select="$vISBNVariation"/>
+            </xsl:call-template>
+
+
         </xsl:for-each>        
         <xsl:for-each select="$fragment/datafield[@tag='020']/subfield[@code='z']">
             <field name="cancisbn_isn_mv">
