@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.text.Normalizer;
 
 
 
@@ -51,48 +50,67 @@ public class CreateSecondISBN implements IDocProcPlugin {
     private final static Pattern ISBNPattern = Pattern.compile("^.*?(?:\\A|\\D)(\\d{9})[\\dXx](?:\\Z|\\D).*$");
     private final static Pattern LongISBNPattern = Pattern.compile("^.*?(?:\\A|\\D)(\\d{13})(?:\\Z|\\D).*$");
 
+
+    private static Logger isbnCreatorLog;
+
     //Muster wie folgt sollen ausgefiltert werden
     //978-3-89602-841-9  super Euro Preis  => 978-3-89602-841-9
     private final static Pattern normalizePattern = Pattern.compile("(^[0-9Xx-]+)( .*$)?");
+
+
+    static {
+        isbnCreatorLog = LoggerFactory.getLogger(CreateSecondISBN.class);
+    }
 
 
 
     @Override
     public void initPlugin(HashMap<String, String> configuration) {
 
-        //nothing to do
+        isbnCreatorLog.info("initialization of CreateSecondISBN Plugin");
 
     }
 
     @Override
     public void finalizePlugIn() {
 
-        //nothing to do
+        isbnCreatorLog.info("finalize CreateSecondISBN Plugin");
     }
 
 
     public String getAlternativeISBN(String isbnToModify) {
 
+        String isbnToReturn = isbnToModify;
 
-        if (!this.isNormalizable(isbnToModify)) {
-            return isbnToModify;
+        try {
+            if (!this.isNormalizable(isbnToModify)) {
+                return isbnToModify;
+            }
+
+            String tIsbnToModify = this.normalizeISBN(isbnToModify);
+
+            if (this.isValidISBN10(tIsbnToModify)) {
+
+                //String isbnToReturn1  = this.isbnShortToLong(tIsbnToModify);
+                //String isbnTorReturn2 = this.isbnShortToLongVuFind(tIsbnToModify);
+                //assert isbnToReturn1.equalsIgnoreCase(isbnTorReturn2);
+
+                isbnToReturn = this.isbnShortToLongVuFind(tIsbnToModify);
+
+            } else if (this.isValidISBN13(tIsbnToModify)) {
+
+                isbnToReturn = this.isbnLongToShort(tIsbnToModify);
+
+            }
+        } catch (Throwable ex ) {
+
+            //todo: activate logging
+            System.out.println(ex.getMessage());
+            //isbnToReturn = isbnToModify;
+
         }
 
-        isbnToModify = this.normalizeISBN(isbnToModify);
-
-        if (this.isValidISBN10(isbnToModify)) {
-
-            return this.isbnShortToLong(isbnToModify);
-
-        } else if (this.isValidISBN13(isbnToModify)) {
-
-            //noch zu machen
-            return this.isbnLongToShort(isbnToModify);
-
-        } else {
-            return isbnToModify;
-        }
-
+        return isbnToReturn;
 
     }
 
@@ -155,13 +173,25 @@ public class CreateSecondISBN implements IDocProcPlugin {
     }
 
 
+    /*
+    similar to VuFind implemantation short to long
+    VuFindCode\ISBN::get13()
+    probably a litlle bit faster although not tested so far
+     */
+    private String isbnShortToLongVuFind (String isbn) {
+
+        String start = "978" +  isbn.substring(0,9);
+        return start + this.getISBN13CheckDigit(start);
+    }
+
+
     private String isbnLongToShort(String isbn13) {
 
         isbn13 = isbn13.replaceAll(ISBNDelimiiterPattern, "");
 
         String modifiedISBN = isbn13;
         if ((isbn13.length()  == 13) && isbn13.substring(0,3).equals("978") ) {
-            String start = isbn13.substring(3,9);
+            String start = isbn13.substring(3,12);
             start += this.getISBN10CheckDigit(start);
             modifiedISBN = start;
         }
@@ -172,7 +202,7 @@ public class CreateSecondISBN implements IDocProcPlugin {
 
 
 
-    public String normalizeISBN(String raw) {
+    private String normalizeISBN(String raw) {
 
         String normalizedValue = null;
         if (this.isNormalizable(raw)) {
@@ -191,12 +221,12 @@ public class CreateSecondISBN implements IDocProcPlugin {
 
 
     private boolean isValidISBN10 (String isbn) {
-        return  isbn.length() == 10 && this.getISBN10CheckDigit(isbn.substring(0,9)).equalsIgnoreCase(isbn.substring(9,1));
+        return  isbn.length() == 10 && this.getISBN10CheckDigit(isbn.substring(0,9)).equalsIgnoreCase(isbn.substring(9,10));
     }
 
 
     private boolean isValidISBN13 (String isbn) {
-        return isbn.length() == 13 && this.getISBN13CheckDigit(isbn.substring(0, 12)).equalsIgnoreCase(isbn.substring(12,1));
+        return isbn.length() == 13 && this.getISBN13CheckDigit(isbn.substring(0, 12)).equalsIgnoreCase(isbn.substring(12,13));
     }
 
 
@@ -205,7 +235,7 @@ public class CreateSecondISBN implements IDocProcPlugin {
 
         int sum = 0;
         for (int x = 0; x < isbnToCheck.length(); x++) {
-            sum += Integer.parseInt(isbnToCheck.substring( x, 1)) * (1 + x);
+            sum += Integer.parseInt(isbnToCheck.substring( x, x + 1)) * (1 + x);
         }
         int checkdigit = sum % 11;
         return checkdigit == 10 ? "X" : String.valueOf(checkdigit);
@@ -216,7 +246,7 @@ public class CreateSecondISBN implements IDocProcPlugin {
         int sum = 0;
         int weight = 1;
         for (int x = 0; x < isbn.length(); x++) {
-            sum +=  Integer.valueOf(isbn.substring( x, 1)) * weight;
+            sum +=  Integer.valueOf(isbn.substring( x, x + 1)) * weight;
             weight = weight == 1 ? 3 : 1;
         }
         int retval = 10 - (sum % 10);
