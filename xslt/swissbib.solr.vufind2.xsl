@@ -1095,7 +1095,7 @@
 
 
             <xsl:call-template name="createUniqueFields">
-                <xsl:with-param name="fieldname" select="'isbn_variation'" />
+                <xsl:with-param name="fieldname" select="'variant_isbn_isn_mv'" />
                 <xsl:with-param name="fieldValues" select="$vISBNVariation"/>
             </xsl:call-template>
 
