@@ -897,6 +897,9 @@
             <xsl:for-each select="$fragment/datafield[@tag='880'][starts-with(descendant::subfield[@code='6'],'505')]/subfield[@code='t']">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '240')]/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
