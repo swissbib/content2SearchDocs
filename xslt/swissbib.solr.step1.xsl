@@ -238,7 +238,7 @@
     <xsl:template match="controlfield[@tag='008']">
         <xsl:variable name="datetype" select="substring(text(),7,1)"/>
         <xsl:variable name="year1" select="substring(text()[1],8,4)" />
-        <xsl:variable name="year2" select="replace(substring(text()[1],12,4), '9999', '2014')" />
+        <xsl:variable name="year2" select="replace(substring(text()[1],12,4), '9999', '2015')" />
         <xsl:choose>
             <xsl:when test="matches($datetype, '[espt]') and matches($year1, '[\d]{4}')">
                 <year>
@@ -274,7 +274,7 @@
                     <xsl:otherwise />
                 </xsl:choose>
             </xsl:when>
-            <xsl:when test="matches($datetype, '[cdikqu]')">
+            <xsl:when test="matches($datetype, '[cdiku]')">
                 <xsl:choose>
                     <xsl:when test="matches($year1, '[\d]{4}') and matches($year2, '[012][\d]{3}')">
                         <xsl:if test="$year1 &gt; $year2">
@@ -296,6 +296,48 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="matches($year1, '[\d]{4}') and not(matches($year2, '[\d]{4}'))">
+                        <year>
+                            <xsl:value-of select="$year1" />
+                        </year>
+                        <freshness>
+                            <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
+                        </freshness>
+                        <sortyear>
+                            <xsl:value-of select="$year1" />
+                        </sortyear>
+                    </xsl:when>
+                    <xsl:when test="matches($year2, '[\d]{4}') and not(matches($year1, '[\d]{4}'))">
+                        <year>
+                            <xsl:value-of select="$year2" />
+                        </year>
+                        <freshness>
+                            <xsl:value-of select="concat($year2, '-01-01T00:00:00Z')" />
+                        </freshness>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="matches($datetype, 'q')">
+                <xsl:choose>
+                    <xsl:when test="matches($year1, '[\d]{4}') and not(matches($year2, '2015'))">
+                        <xsl:if test="$year1 &gt; $year2">
+                            <freshness>
+                                <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
+                            </freshness>
+                        </xsl:if>
+                        <xsl:if test="$year2 &gt; $year1">
+                            <freshness>
+                                <xsl:value-of select="concat($year2, '-01-01T00:00:00Z')" />
+                            </freshness>
+                        </xsl:if>
+                        <sortyear>
+                            <xsl:value-of select="$year1" />
+                        </sortyear>
+                        <xsl:call-template name="yearranges">
+                            <xsl:with-param name="year1" as="xs:integer" select="xs:integer($year1)" />
+                            <xsl:with-param name="year2" as="xs:integer" select="xs:integer($year2)" />
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="matches($year1, '[\d]{4}') and matches($year2, '2015')">
                         <year>
                             <xsl:value-of select="$year1" />
                         </year>
