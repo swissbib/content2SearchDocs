@@ -339,7 +339,7 @@
                     </xsl:when>
                     <xsl:when test="matches($year1, '[\d]{4}') and (matches($year2, '2015') or not(matches($year2, '[012][\d]{3}')))">
                         <year>
-                            <xsl:value-of select="concat($year1, 'test')" />
+                            <xsl:value-of select="$year1" />
                         </year>
                         <freshness>
                             <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
