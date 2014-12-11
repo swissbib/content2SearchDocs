@@ -3,41 +3,41 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 version="2.0">
 
-    <xsl:output 
-        method="xml" 
-        encoding="UTF-8" 
-        indent="yes"
-        omit-xml-declaration="yes"
-        /> 
+    <xsl:output
+            method="xml"
+            encoding="UTF-8"
+            indent="yes"
+            omit-xml-declaration="yes"
+            />
 
     <doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
         <desc>
-            Dieses Skript ist die erste Stufe (Step1) der Verarbeitung im Document-Processing zur Aufbereitung 
+            Dieses Skript ist die erste Stufe (Step1) der Verarbeitung im Document-Processing zur Aufbereitung
             der Daten vor der eigentlich Indexierung.
-            
+
             Stages
             ------
             1) Kopie der kompletten urspruenglichen Struktur in ein eigenes Feld
-            2) Erweiterung der urspruenglichen MARC-Struktur mit Feldern und Daten, die fuer das Indexieren 
+            2) Erweiterung der urspruenglichen MARC-Struktur mit Feldern und Daten, die fuer das Indexieren
             benoetigt werden
             3) Mappen der erstellten und erweiterten Struktur auf die Indexfelder (primaer in Step2)
-            
-            Die Anreicherungen mit XSLT-Verarbeitungen genuegen nicht. Deshalb werden in Java geschriebene 
+
+            Die Anreicherungen mit XSLT-Verarbeitungen genuegen nicht. Deshalb werden in Java geschriebene
             XSLT-Extensions eingesetzt (alle eingebunden in Step2)
             * Dedublierung Inhalte
             * Anreicherung von TOC / Volltexte (Apache TIKA)
             * Anreicherung GND-Nebenvarianten
             * Anreicherung VIAF-Nebenvarianten
-            
+
             ************************
             www.swissbib.org
             guenter.hipler@unibas.ch
             oliver.schihin@unibas.ch
             ************************
-            
+
             Versionen
             =========
-            
+
             01.10.2010 : Guenter : erstellt
             ***********************************
             23.09.2011 : Oliver : ueberarbeitet
@@ -59,28 +59,28 @@
 
     <xsl:template match="/">
         <xsl:variable name="originalMarc" >
-            <xsl:copy-of select="/"/>            
+            <xsl:copy-of select="/"/>
         </xsl:variable>
-        <record> 
+        <record>
             <xsl:call-template name="orgRecord" >
                 <xsl:with-param name="original" select="$originalMarc"/>
-            </xsl:call-template>         
+            </xsl:call-template>
             <xsl:apply-templates />
         </record>
     </xsl:template>
-    
+
 
     <xsl:template name="orgRecord">
         <xsl:param name="original"/>
-            <fsource>
-                <xsl:copy-of select="$original/record"/>
-            </fsource>    
+        <fsource>
+            <xsl:copy-of select="$original/record"/>
+        </fsource>
     </xsl:template>
-    
+
     <xsl:template match="record">
         <xsl:apply-templates/>
     </xsl:template>
-    
+
     <!-- =====
          DocID
          sortfields
@@ -88,7 +88,7 @@
          URIs for TIKA
          ==================================
     -->
-    
+
     <xsl:template match="controlfield[@tag='001']">
         <myDocID>
             <xsl:value-of select="."/>
@@ -131,7 +131,7 @@
                 </xsl:when>
             </xsl:choose>
         </sortauthor>
-        
+
         <sorttitle>
             <xsl:choose>
                 <xsl:when test="following-sibling::datafield[@tag='245']/subfield[@code='a'] != '@'">
@@ -156,48 +156,48 @@
                 </xsl:when>
             </xsl:choose>
         </sorttitle>
-        
+
         <!-- =========
              Preparing fields institution and network
              =========
         -->
-        
-        <xsl:for-each select="following-sibling::datafield[@tag='852']">   
+
+        <xsl:for-each select="following-sibling::datafield[@tag='852']">
             <xsl:call-template name="UnionAndBranchlib">
                 <xsl:with-param name="union" select="child::subfield[@code='B']" />
                 <xsl:with-param name="branchlib" select="child::subfield[@code='F']" />
             </xsl:call-template>
-        </xsl:for-each> 
-        <xsl:for-each select="following-sibling::datafield[@tag='856']">   
-            <xsl:call-template name="UnionAndBranchlib">           
-                <xsl:with-param name="union" select="child::subfield[@code='B']" />                
+        </xsl:for-each>
+        <xsl:for-each select="following-sibling::datafield[@tag='856']">
+            <xsl:call-template name="UnionAndBranchlib">
+                <xsl:with-param name="union" select="child::subfield[@code='B']" />
             </xsl:call-template>
             <uri856>
                 <xsl:value-of select="child::subfield[@code='u'][1]"/>
             </uri856>
             <xsl:copy-of select="current()"/>
         </xsl:for-each>
-        <xsl:for-each select="following-sibling::datafield[@tag='949']">   
+        <xsl:for-each select="following-sibling::datafield[@tag='949']">
             <xsl:call-template name="UnionAndBranchlib">
                 <xsl:with-param name="union" select="child::subfield[@code='B']" />
                 <xsl:with-param name="branchlib" select="child::subfield[@code='F']" />
             </xsl:call-template>
         </xsl:for-each>
         <xsl:for-each select="following-sibling::datafield[@tag='956']">
-<!--            <xsl:call-template name="UnionAndBranchlib">
-                <xsl:with-param name="union" select="child::subfield[@code='B']" />
-                <xsl:with-param name="branchlib" select="child::subfield[@code='a']" />
-            </xsl:call-template>-->
+            <!--            <xsl:call-template name="UnionAndBranchlib">
+                            <xsl:with-param name="union" select="child::subfield[@code='B']" />
+                            <xsl:with-param name="branchlib" select="child::subfield[@code='a']" />
+                        </xsl:call-template>-->
             <uri956>
-                <xsl:value-of select="./subfield[@code='u'][1]"/>   
+                <xsl:value-of select="./subfield[@code='u'][1]"/>
             </uri956>
             <xsl:copy-of select="current()"/>
         </xsl:for-each>
     </xsl:template>
-    
+
     <!-- IDS Unions get an additional union 'IDS', rest without changes -->
     <xsl:template name="UnionAndBranchlib" >
-        <xsl:param name="union" />        
+        <xsl:param name="union" />
         <xsl:param name="branchlib" />
         <xsl:choose>
             <xsl:when test="matches($union, '^IDS|^NEBIS')">
@@ -232,9 +232,9 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
     <!-- Dates / Years -->
-    
+
     <xsl:template match="controlfield[@tag='008']">
         <xsl:variable name="datetype" select="substring(text(),7,1)"/>
         <xsl:variable name="year1" select="substring(text()[1],8,4)" />
@@ -318,7 +318,7 @@
             </xsl:when>
             <xsl:when test="matches($datetype, 'q')">
                 <xsl:choose>
-                    <xsl:when test="matches($year1, '[\d]{4}') and not(matches($year2, '2015'))">
+                    <xsl:when test="matches($year1, '[\d]{4}') and not(matches($year2, '2015')) and matches($year2, '[012][\d]{3}')">
                         <xsl:if test="$year1 &gt; $year2">
                             <freshness>
                                 <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
@@ -337,9 +337,9 @@
                             <xsl:with-param name="year2" as="xs:integer" select="xs:integer($year2)" />
                         </xsl:call-template>
                     </xsl:when>
-                    <xsl:when test="matches($year1, '[\d]{4}') and matches($year2, '2015')">
+                    <xsl:when test="matches($year1, '[\d]{4}') and (matches($year2, '2015') or not(matches($year2, '[012][\d]{3}')))">
                         <year>
-                            <xsl:value-of select="$year1" />
+                            <xsl:value-of select="concat($year1, 'test')" />
                         </year>
                         <freshness>
                             <xsl:value-of select="concat($year1, '-01-01T00:00:00Z')" />
@@ -356,13 +356,14 @@
                             <xsl:value-of select="concat($year2, '-01-01T00:00:00Z')" />
                         </freshness>
                     </xsl:when>
+                    <xsl:otherwise />
                 </xsl:choose>
             </xsl:when>
             <xsl:otherwise />
         </xsl:choose>
         <xsl:copy-of select="current()"> </xsl:copy-of>
     </xsl:template>
-    
+
     <xsl:template name="yearranges">
         <xsl:param name="year1" />
         <xsl:param name="year2" />
@@ -372,7 +373,7 @@
             </year>
         </xsl:for-each>
     </xsl:template>
-    
+
     <!-- ===========================
          Autorenfelder (1xx/7xx/8xx) : Aufbereitung der Facetten
          ===========================
@@ -380,11 +381,11 @@
     <xsl:template match="datafield[@tag='100']">
         <xsl:call-template name="pers_facet" />
     </xsl:template>
-    
+
     <xsl:template match="datafield[@tag='700'][not(matches(child::subfield[@code='l'][1], 'eng|fre'))]">
         <xsl:call-template name="pers_facet" />
     </xsl:template>
-    
+
     <xsl:template match="datafield[@tag='800']">
         <xsl:call-template name="pers_facet" />
     </xsl:template>
@@ -394,7 +395,7 @@
                          datafield[@tag='810']">
         <xsl:call-template name="corp_facet" />
     </xsl:template>
-    
+
     <xsl:template name="pers_facet">
         <xsl:copy-of select="." />
         <!-- Autorenfacette generisch
@@ -422,7 +423,7 @@
             </xsl:choose>
         </navAuthor>
     </xsl:template>
-    
+
     <xsl:template name="corp_facet">
         <xsl:copy-of select="." />
         <!-- Autorenfacette generisch
@@ -433,7 +434,7 @@
             <xsl:value-of select="child::subfield[@code='a']"/>
             <xsl:if test="exists(child::subfield[@code='b']/text())">
                 <xsl:for-each select="child::subfield[@code='b']">
-                    <xsl:value-of select="concat(', ', .)"/>    
+                    <xsl:value-of select="concat(', ', .)"/>
                 </xsl:for-each>
             </xsl:if>
         </navAuthor>
@@ -444,11 +445,11 @@
          Namensansetzungen, inkl. Lebensdaten, Titel, Zaehlung 
     -->
     <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')]">
-    <!-- Beispiele fuer Ausschlusskriterien von Relatoren (spezifische Liste, oder alle) (15.05.2014 / osc)
-    <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')][not(matches(child::subfield[@code='4'], 'fmo|ths'))]">
-    <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')][not(exists(child::subfield[@code='4']))]">
-    -->
-        <xsl:copy-of select="current()" /> 
+        <!-- Beispiele fuer Ausschlusskriterien von Relatoren (spezifische Liste, oder alle) (15.05.2014 / osc)
+        <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')][not(matches(child::subfield[@code='4'], 'fmo|ths'))]">
+        <xsl:template match="datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111|700|710|711')][not(exists(child::subfield[@code='4']))]">
+        -->
+        <xsl:copy-of select="current()" />
         <!-- this is a random MARC tag for transport use only (13.08.2013/osc) -->
         <datafield tag="979">
             <subfield code="a">
@@ -474,7 +475,7 @@
                         <xsl:value-of select="child::subfield[@code='a']"/>
                         <xsl:if test="exists(child::subfield[@code='b']/text())">
                             <xsl:for-each select="child::subfield[@code='b']">
-                                <xsl:value-of select="concat(', ', .)"/>    
+                                <xsl:value-of select="concat(', ', .)"/>
                             </xsl:for-each>
                         </xsl:if>
                     </xsl:when>
