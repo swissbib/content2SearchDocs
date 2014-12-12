@@ -27,6 +27,7 @@
     <xsl:variable name="sublibs">
         <library>E30</library><!-- Bibliothek Exakte Wissenschaften, Universität Bern -->
         <library>E44</library><!-- Fachhochschule Nordwestschweiz, Hochschulbibliothek Muttenz -->
+        <library>E71</library><!-- BFH Bern - Agrar-, Forst- und Lebensmittelwiss., Zollikofen -->
         <library>E75</library><!-- FHNW – Gestaltung und Kunst, Basel -->
         <library>E96</library><!-- Schweizerische Nationalbank, Bibliothek Bern -->
         <library>N01</library><!-- FHNW Pädagogik Basel  -->
