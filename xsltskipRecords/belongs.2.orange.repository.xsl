@@ -32,6 +32,10 @@
         <library>N01</library><!-- FHNW Pädagogik Basel  -->
         <library>N02</library><!-- FHNW Pädagogik ISP, Basel --> 
         <library>N03</library><!-- FHNW PH, Liestal -->
+        <library>N04</library><!-- BFH Bern - Gesundheit -->
+        <library>N05</library><!-- BFH Bern - HKB Mediothek -->
+        <library>N06</library><!-- BFH Bern - Soziale Arbeit -->
+        <library>N07</library><!-- BFH Bern - Wirtschaft -->
     </xsl:variable>
     
     <xsl:template match="/">
