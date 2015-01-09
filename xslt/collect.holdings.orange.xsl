@@ -3,7 +3,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     exclude-result-prefixes="xs"
     version="2.0">
-    
+
     <!--
     Kommentar
     =========
@@ -22,26 +22,25 @@
     <xsl:template match="@*|node()">
             <xsl:apply-templates select="@*|node()"/>
     </xsl:template>
-   
+
     <xsl:template match="record">
        <record>
            <xsl:apply-templates/>
        </record>
     </xsl:template>
-   
+
     <xsl:template match="datafield[@tag='852']">
-        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E71|E75|E96|N01|N02|N03|N04|N05|N06|N07')">
+        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], '^E30$|^E44$|^E71$|^E75$|^E96$|^N01$|^N02$|^N03$|^N04$|^N05$|^N06$|^N07$')">
             <xsl:copy-of select="."/>
             <xsl:apply-templates/>
         </xsl:if>
     </xsl:template>
-    
+
     <xsl:template match="datafield[@tag='949']">
-        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], 'E30|E44|E71|E75|E96|N01|N02|N03|N04|N05|N06|N07|RETROS')">
+        <xsl:if test="matches(subfield[@code='B'], 'IDSBB|SNL|RETROS') or matches(subfield[@code='F'], '^E30$|^E44$|^E71$|^E75$|^E96$|^N01$|^N02$|^N03$|^N04$|^N05$|^N06$|^N07$')">
             <xsl:copy-of select="."/>
             <xsl:apply-templates/>
         </xsl:if>
     </xsl:template>
-    
-    
+
 </xsl:stylesheet>
