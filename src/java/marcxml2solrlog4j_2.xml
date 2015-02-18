@@ -197,7 +197,16 @@
     <appender name="isbnCreator_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/isbnCreator.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/isbnCreator.2.log" />
+        <layout class="org.apache.log4j.TTCCLayout">
+            <param name="DateFormat" value="ISO8601" />
+        </layout>
+    </appender>
+
+    <appender name="timeDifference_appender" class="org.apache.log4j.RollingFileAppender">
+        <param name="maxFileSize" value="10MB" />
+        <param name="maxBackupIndex" value="1" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/timeDifference.2.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -242,6 +251,12 @@
     <logger name="tikaContentNoMatch" additivity="false">
         <level value="DEBUG" />
         <appender-ref ref="tikaContentNoMatch_appender" />
+    </logger>
+
+
+    <logger name="timeDifference" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="timeDifference_appender" />
     </logger>
 
     <logger name="tikaException" additivity="false">

@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.*;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 
@@ -55,6 +56,8 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
     private static Logger tikaContentLogger;
     private static Logger tikaNoContentLogger;
     private static Logger tikaContentProcessing;
+    private static Logger timeDifference;
+
 
     private static Connection dbmsConnection = null;
     private static ArrayList<Pattern> patternsAllowed;
@@ -78,6 +81,7 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
         FulltextContentEnrichment.tikaNoContentLogger = LoggerFactory.getLogger("tikaContentNoMatch");
         FulltextContentEnrichment.tikaexceptionLogger = LoggerFactory.getLogger("tikaException");
         FulltextContentEnrichment.tikaContentProcessing = LoggerFactory.getLogger("contentProcessing");
+        FulltextContentEnrichment.timeDifference = LoggerFactory.getLogger("timeDifference");
 
         patternsAllowed = new ArrayList<Pattern>();
         patternsNotAllowed = new ArrayList<Pattern>();
@@ -97,6 +101,12 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
     public String readURLContent(String url, String DocId) {
 
         String content = "";
+        long startTime;
+        long endTime;
+        long dateDiff;
+
+        long startTimeForException = new Date().getTime();
+
 
         if (!inProductionMode) return content;
 
@@ -122,7 +132,7 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
                         }
                     }
 
-                    if (content.length() == 0) {
+                    if (content != null && content.length() == 0) {
 
                         //why this separator....??? What was the problem?
                         //Matcher m =  separator.matcher(url);
@@ -144,7 +154,13 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
                             if (!httpFetchingAllowed) continue;
 
 
+                            timeDifference.debug("document: " + url);
+                            startTime = new Date().getTime();
                             HttpURLConnection connection = getHTTPConnection(url);
+                            endTime = new Date().getTime();
+                            dateDiff = endTime - startTime;
+
+                            timeDifference.debug("getConnection: " + dateDiff);
 
                             boolean fetch = true;
                             if (isContentTypeRestricted()) {
@@ -169,22 +185,48 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
 
                                 //todo: testen wie sich das Fetchen mit Schliessen des InputStreams verhält - s.u.
                                 //Problem ETH???
+                                startTime = new Date().getTime();
                                 InputStream contentStream = (InputStream) connection.getContent();
+                                endTime = new Date().getTime();
+                                dateDiff = endTime - startTime;
 
+                                timeDifference.debug("getContent: " + dateDiff );
+
+                                startTime = new Date().getTime();
                                 content = tika.parseToString((contentStream));
+                                endTime = new Date().getTime();
+                                dateDiff = endTime - startTime;
+
+                                timeDifference.debug("parseTika: " + dateDiff);
 
                                 if (null != tikaContentLogger) {
 
 
                                     tikaContentLogger.debug("Docid fetched: " + DocId);
                                     tikaContentLogger.debug("url fetched: " + url);
-                                    tikaContentLogger.debug("content: \n" + content);
+                                    if (content == null) {
+                                        tikaContentLogger.debug("content: \n" + "variable wasn't initialized - reason not clear");
+                                    } else if(content.length() > 100) {
+                                        tikaContentLogger.debug("content: \n" + content);
+                                    } else {
+                                        tikaContentLogger.debug("content: content length less than 100 - won't be serialized in DB");
+                                    }
+
+
                                 }
 
-                                if (null != dbmsConnection) {
+                                if (null != dbmsConnection && content != null && content.length() > 100) {
 
                                     insertContentDBMS(DocId,url,content);
 
+                                }
+
+                                if (content == null) {
+                                    content = "";
+                                }
+
+                                if (content.length() < 100 ) {
+                                    content = "";
                                 }
 
                                 if (null !=  contentStream) {
@@ -195,6 +237,11 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
                             break;
 
                         }catch (Throwable th) {
+
+                            long endTimeInException = new Date().getTime();
+                            dateDiff = endTimeInException - startTimeForException;
+                            timeDifference.debug("in Throwable: " + dateDiff);
+
                             tikaexceptionLogger.error("Error while trying to fetch the remote doc with Tika");
                             tikaexceptionLogger.error(th.getMessage());
                             for (StackTraceElement sE: th.getStackTrace()) {
@@ -215,7 +262,7 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
 
         }
 
-        return content.replaceAll("\n"," ");
+        return content != null ? content.replaceAll("\n"," ") : "";
 
 
     }
@@ -282,25 +329,7 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
             sqlExc.printStackTrace();
         }
 
-
-
-
     }
-
-
-
-    //public static void init (ConfigContainer configContainer) {
-
-        //FulltextContentEnrichment.configContainer = configContainer;
-
-    //    FulltextContentEnrichment.tikaContentLogger = LoggerFactory.getLogger("tikaContent");
-    //    FulltextContentEnrichment.tikaNoContentLogger = LoggerFactory.getLogger("tikaContentNoMatch");
-    //    FulltextContentEnrichment.tikaexceptionLogger = LoggerFactory.getLogger("tikaException");
-
-    //}
-
-
-
 
 
 
@@ -321,11 +350,13 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
             URL u = new URL(url);
             if (proxy != null) {
                 uc = (HttpURLConnection)u.openConnection(proxy);
+                uc.setReadTimeout(2000);
                 uc.connect();
 
             } else {
 
                 uc = (HttpURLConnection)u.openConnection();
+                uc.setReadTimeout(2000);
                 uc.connect();
             }
         }
@@ -362,10 +393,6 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
         initializeActivateRemoteFetching(configuration);
 
         initialized = true;
-
-        //To change body of implemented methods use File | Settings | File Templates.
-
-
 
     }
 
@@ -579,7 +606,6 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
 
         tika = new Tika();
         tika.setMaxStringLength(maxLength);
-
 
     }
 
