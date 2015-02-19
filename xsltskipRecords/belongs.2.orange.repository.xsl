@@ -3,8 +3,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
     xmlns:swissbib="www.swissbib.org/solr/documentprocessing"
-    
-    exclude-result-prefixes="xs"
+    xmlns:java-delete-id-ext="java:org.swissbib.documentprocessing.plugins.DeleteWeededDocuments"
+    exclude-result-prefixes="xs java-delete-id-ext"
     version="2.0">
     
     <xsl:output omit-xml-declaration="yes" method="text"/>
@@ -22,7 +22,8 @@
         <database>SNL</database><!-- Nationalbibliothek, Bern -->
         <database>RETROS</database><!-- retro.seals -->
     </xsl:variable>
-    
+
+
     <!-- Check Zweigstellen gegen Items und Holdings -->
     <xsl:variable name="sublibs">
         <library>E30</library><!-- Bibliothek Exakte Wissenschaften, Universität Bern -->
@@ -63,11 +64,29 @@
                     <xsl:value-of select="'true'" />                    
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="'false'" />    
+                    <xsl:value-of select="'false'" />
+                    <!-- look for the id and call the plugin responsible for items to be deleted if still available on the index-->
+                    <xsl:variable name="vcurrentId"  select="/record/controlfield[@tag='001']"/>
+                    <xsl:variable name="deleteFacade" select="java-delete-id-ext:new()" />
+                    <xsl:variable name="vVoid" select="java-delete-id-ext:checkDocumentForDeletion($deleteFacade, $vcurrentId)"/>
+                    <!--
+                      this is a little bit tricky. We need the dummy call of a template otherwise the template-compiler (at least the one delivered by saxxon) recognizes
+                      we are setting a variable vVoid which isn't used later and optimizes the code by throwing away the call to java-delete-id-ext:checkDocumentForDeletion.
+                      Not what we want....
+                    -->
+                    <xsl:call-template name="dummy">
+                        <xsl:with-param name="dummyVar" select="$vVoid"/>
+                    </xsl:call-template>
+
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:value-of select="$belongsToRepository" />            
+        <xsl:value-of select="$belongsToRepository" />
     </xsl:template>
+
+    <xsl:template name="dummy">
+        <xsl:param name="dummyVar" />
+    </xsl:template>
+
     
 </xsl:stylesheet>

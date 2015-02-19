@@ -207,7 +207,7 @@
             <manifest>
                 <attribute name="Main-Class" value="${start.class}"/>
 
-                <attribute name="Class-Path" value=".  ../libs/mysql.jar ../libs/saxon9.jar ../libs/tika-app.jar  ../libs/slf4j-api.jar ../libs/mongo.jar ../libs/solrj.jar ../libs/commons-io.jar ../libs/httpclient.jar ../libs/httpcore.jar ../libs/httpmime.jar" />
+                <attribute name="Class-Path" value=".  ../libs/tika-app.jar ../libs/saxon9.jar ../libs/mysql.jar  ../libs/mongo.jar ../libs/commons-io.jar ../libs/httpclient.jar ../libs/httpcore.jar ../libs/httpmime.jar  ../libs/noggit.jar  ../libs/slf4j-api.jar ../libs/solr-solrj.jar  ../libs/wstx-asl.jar  ../libs/zookeeper.jar " />
 
 
                 <attribute name="Implementation-Vendor" value="project swissbib, UB Basel, Switzerland"/>
@@ -224,10 +224,10 @@
         <copy todir="${deploy.base}/libs">
             <fileset refid="fs.tika.app"/>
             <fileset refid="fs.saxon"/>
-            <fileset refid="fs.solrj"/>
-            <fileset refid="fs.mongo"/>
             <fileset refid="fs.mysql"/>
+            <fileset refid="fs.mongo"/>
             <fileset refid="fs.marc4j" />
+            <fileset refid="fs.solrj"/>
         </copy>
 
 
