@@ -142,7 +142,7 @@ public class DeleteWeededDocuments implements  IDocProcPlugin{
                 bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                 bw.write(ls);
                 bw.write(ls);
-                bw.write("<add>");
+                bw.write("<delete>");
                 bw.write(ls);
                 bw.write(ls);
                 bw.flush();
@@ -152,7 +152,7 @@ public class DeleteWeededDocuments implements  IDocProcPlugin{
                 }
 
                 bw.write(ls);
-                bw.write("</add>");
+                bw.write("</delete>");
                 bw.flush();
                 bw.close();
 
