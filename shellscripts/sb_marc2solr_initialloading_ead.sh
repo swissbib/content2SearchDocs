@@ -4,6 +4,7 @@
 
 #
 PROJECTDIR_DOCPROCESSING=/swissbib_index/solrDocumentProcessing/MarcToSolr
+PROJECTDIR_FREQUENT=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
 
 #ulimit -v unlimited
 
@@ -26,12 +27,14 @@ function marc2solrAndPost ()
         #in marcxml2solrlog4j org.swissbib.documentprocessing.plugins.RemoveDuplicates auch auf INFO setzen!
 
         java -Xms2048m -Xmx2048m                        \
-            -Dlog4j.configuration=marcxml2solrlog4j.xml \
+            -Dlog4j.configuration=marcxml2solrlog4j_1.xml \
             -DLOGDEDUPLICATION=false                    \
-            -DINPUT.FILE=${datei}                       \
+            -DINPUT.FILE=${datei/.gz/}                  \
             -DCONF.ADDITIONAL.PROPS.FILE=${confFile}    \
             -DOUTPUT.DIR=${outputsubdirdetail}          \
             -DXPATH.DIR=${xsltPath}                     \
+            -DTARGET.SEARCHENGINE=org.swissbib.documentprocessing.solr.XML2SOLRDocEngine  \
+            -DSKIPRECORDS=false                         \
             -jar ${marc2Solrjar}
 
 
@@ -56,18 +59,18 @@ function marc2solrAndPost ()
 
 
 xsltPath=${PROJECTDIR_DOCPROCESSING}/xslt
-inputpath=${PROJECTDIR_DOCPROCESSING}/data/inputfiles.nbead
+inputpath=${PROJECTDIR_FREQUENT}/data/formatead
 confFile=${PROJECTDIR_DOCPROCESSING}/dist/config.properties
 outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles.nbead
 postjar=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
 marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/xml2SearchEngineDoc.jar
 logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR.log
-logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_initialloading.log
-indexingMasterUrl=http://sb-s6.swissbib.unibas.ch:8080/solr/update
+logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_ead_initialloading.log
+indexingMasterUrl=http://sb-s15.swissbib.unibas.ch:8080/solr/update
 
 
 TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
-echo "sb_marc2solr_initialloading.sh started: "${TIMESTAMP}"\n" >> ${logscriptflow}
+echo "sb_marc2solr_initialloading_ead.sh started: "${TIMESTAMP}"\n" >> ${logscriptflow}
 
 
 marc2solrAndPost

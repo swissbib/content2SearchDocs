@@ -117,6 +117,7 @@
         <include name="sb_erm2solr_initialloading.sh"/>
         <include name="sb_ermpost2solr_initialloading.sh"/>
         <include name="post2SolrWeedings.py"/>
+        <include name="sb_ead_marc2solr_initialloading.sh"/>
 
 
     </fileset>

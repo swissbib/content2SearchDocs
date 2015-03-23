@@ -141,7 +141,7 @@ class Post2SolrFrequent:
 
     def archiveAndZip(self):
         self.writeLogMessage(" documents are now archived...")
-        os.system("tar zcf " + self.ARCHIVE_DIR + os.sep + "PostedSolrDocuments" + self.currentDateTime() + "tar.gz " + self.POSTDIRBASE_TO + os.sep + "* --remove-files")
+        os.system("tar zcf " + self.ARCHIVE_DIR + os.sep + "PostedWeededSolrDocuments" + self.currentDateTime() + "tar.gz " + self.POSTDIRBASE_TO + os.sep + "* --remove-files")
 
 
 
