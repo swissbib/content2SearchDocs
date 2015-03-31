@@ -1257,7 +1257,7 @@
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/branchlib">
-                <xsl:if test="matches(., 'A145|B405')">
+                <xsl:if test="matches(., 'A145|B405|B406|B407|FREE')">
                     <xsl:value-of select="concat(., '##xx##')" />
                 </xsl:if>
             </xsl:for-each>
