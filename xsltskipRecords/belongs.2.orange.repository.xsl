@@ -21,6 +21,7 @@
         <database>IDSBB</database><!-- IDS Basel Bern, DSV01 -->
         <database>SNL</database><!-- Nationalbibliothek, Bern -->
         <database>RETROS</database><!-- retro.seals -->
+        <database>BORIS</database><!-- Bern Open Repository and Information System, Open Access Publikationen -->
     </xsl:variable>
 
 
