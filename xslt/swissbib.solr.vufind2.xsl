@@ -1262,7 +1262,7 @@
                         <xsl:value-of select="concat(., '##xx##')" />
                     </xsl:when>
                     <xsl:when test="matches(., 'FREE|BORIS|RETROS')">
-                        <xsl:value-of select="concat('FREE', '##xx##')" />
+                        <xsl:text>FREE##xx##</xsl:text>
                     </xsl:when>
                 </xsl:choose>
             </xsl:for-each>
