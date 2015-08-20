@@ -1251,15 +1251,20 @@
             <xsl:with-param name="fieldname" select="'institution'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-    </xsl:template> 
-    
+    </xsl:template>
+
     <xsl:template name="e_institution">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/branchlib">
-                <xsl:if test="matches(., 'A145|B405|B406|B407|FREE')">
-                    <xsl:value-of select="concat(., '##xx##')" />
-                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="matches(., 'A145|B405|B406|B407')">
+                        <xsl:value-of select="concat(., '##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., 'FREE|BORIS|RETROS')">
+                        <xsl:text>FREE##xx##</xsl:text>
+                    </xsl:when>
+                </xsl:choose>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
