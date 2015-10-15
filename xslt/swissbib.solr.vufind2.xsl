@@ -450,6 +450,9 @@
                     <xsl:when test="matches(., '^[A|B|C][\D][\W][\D].*')"> <!-- Takes care of normal case "CA/CH 37.5 fr" => "37.5" -->
                         <xsl:value-of select="concat(replace(., '^([A|B|C][\D]*[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
                     </xsl:when>
+                    <xsl:when test="matches(., '^A[\s][\d]{1,2}.*')"> <!-- Takes care of irregular case of Bundesverwaltungsgericht "A 7.3 h" => "7.3" -->
+                        <xsl:value-of select="concat(replace(., '^(A[\s])([\d]{1,2}[.]?[\d]{0,2})([\s]?.*)$', '$2'), '##xx##')" />
+                    </xsl:when>
                 </xsl:choose>
             </xsl:for-each>
         </xsl:variable>
