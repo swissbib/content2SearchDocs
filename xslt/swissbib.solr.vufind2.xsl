@@ -1516,6 +1516,9 @@
             <xsl:for-each select="$fragment/datafield[@tag='509']/subfield[@code='r']">
                 <xsl:value-of select="concat(., '##xx##')" />  
             </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='510']/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='511']/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" />  
             </xsl:for-each>
