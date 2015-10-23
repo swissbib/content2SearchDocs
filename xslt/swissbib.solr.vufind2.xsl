@@ -1053,6 +1053,25 @@
             <xsl:with-param name="fieldname" select="'format_str_mv'" />
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
         </xsl:call-template>
+        <!-- format field for hierarchical facet (898c) -->
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='898']/subfield[@code='c']">
+                <xsl:choose>
+                    <xsl:when test="matches(., '^X[KL]010000')">
+                        <xsl:value-of select="concat('0/', substring(., 1,4), '/', '##xx##')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="concat('0/', substring(., 1,4), '/', '##xx##')" />
+                        <xsl:value-of select="concat('1/', substring(., 1,4), '/', substring(., 5,4), '/', '##xx##')" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'format_hierarchy_str_mv'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+        </xsl:call-template>
         <!-- IDS specific codes (source: 906/907 or 9013) -->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='908']/subfield">
