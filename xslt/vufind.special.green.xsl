@@ -14,12 +14,13 @@
         indent="yes"
         omit-xml-declaration="yes"
     />
-    
+
     <xsl:template match="record">
         <xsl:choose>
-            <xsl:when test="exists(datafield[@tag='490']/subfield[@code='9'])">
+            <xsl:when test="exists(datafield[@tag='490']/subfield[@code='9'])
+                or exists(datafield[@tag='986'][matches(subfield[@code='a']/text(), '^SWISSBIB')])">
                 <xsl:copy>
-                    <xsl:call-template name="series_hierarchy">
+                    <xsl:call-template name="green_special">
                         <xsl:with-param name="record" select="." />
                     </xsl:call-template>
                 </xsl:copy>
@@ -31,15 +32,17 @@
     </xsl:template>
 
     <!-- fields for use in vufind hierarchy driver (standard linking fields 490) -->
-    <xsl:template name="series_hierarchy">
+    <xsl:template name="green_special">
         <xsl:param name="record" />
-        <hierarchytype>series</hierarchytype>
-        <is_hierarchy_id>
-            <xsl:value-of select="$record/myDocID" />
-        </is_hierarchy_id>
-        <is_hierarchy_title>
-            <xsl:value-of select="$record/datafield[@tag='245']/subfield[@code='a'][1]" />
-        </is_hierarchy_title>
+        <xsl:if test="exists(datafield[@tag='490']/subfield[@code='9'])">
+            <hierarchytype>series</hierarchytype>
+            <is_hierarchy_id>
+                <xsl:value-of select="$record/myDocID" />
+            </is_hierarchy_id>
+            <is_hierarchy_title>
+                <xsl:value-of select="$record/datafield[@tag='245']/subfield[@code='a'][1]" />
+            </is_hierarchy_title>
+        </xsl:if>
         <xsl:for-each select="datafield[@tag='490']/subfield[@code='9']">
             <hierarchy_top_id>
                 <xsl:value-of select="."></xsl:value-of>
@@ -68,6 +71,11 @@
             <hierarchy_sequence>
                 <xsl:value-of select="replace(preceding-sibling::subfield[@code='i'][1], '[/]', '.')" />
             </hierarchy_sequence>
+        </xsl:for-each>
+        <xsl:for-each select="datafield[@tag='986'][matches(subfield[@code='a']/text(), '^SWISSBIB')]/subfield[@code='b']">
+            <groupid_isn_mv>
+                <xsl:value-of select="." />
+            </groupid_isn_mv>
         </xsl:for-each>
         <xsl:copy-of select="$record/node()" />
     </xsl:template>
