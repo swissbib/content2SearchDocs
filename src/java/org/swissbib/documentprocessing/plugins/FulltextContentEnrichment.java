@@ -157,10 +157,32 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
                             timeDifference.debug("document: " + url);
                             startTime = new Date().getTime();
                             HttpURLConnection connection = getHTTPConnection(url);
+                            //for me the behaviour is a little bit strange. It is said, that connection follows redirects automatically
+                            //if the property in question on the connection type is not set explicitly to false
+                            //but I get errors if I try to fetch the content (InputStream) without setting it to false
+                            //It seems to be better to look up the ResponseCode manually and process it in case it's moved
+                            connection.setInstanceFollowRedirects(false);
                             endTime = new Date().getTime();
                             dateDiff = endTime - startTime;
 
                             timeDifference.debug("getConnection: " + dateDiff);
+
+                            int status = connection.getResponseCode();
+                            // we need to check if the document is e.g. permanently moved
+                            //https://github.com/swissbib/searchconf/issues/20
+                            if (status != HttpURLConnection.HTTP_OK) {
+                                if (status == HttpURLConnection.HTTP_MOVED_TEMP
+                                        || status == HttpURLConnection.HTTP_MOVED_PERM
+                                        || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                                    // get redirect url from "location" header field
+                                    String newUrl = connection.getHeaderField("Location");
+                                    connection.disconnect();
+                                    // open the new connnection again
+                                    connection = getHTTPConnection(newUrl);
+                                }
+                            }
+
+
 
                             boolean fetch = true;
                             if (isContentTypeRestricted()) {
@@ -181,7 +203,6 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
                             }
 
                             if (fetch) {
-
 
                                 //todo: testen wie sich das Fetchen mit Schliessen des InputStreams verhält - s.u.
                                 //Problem ETH???
