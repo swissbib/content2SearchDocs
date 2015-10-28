@@ -39,6 +39,8 @@
         <library>N05</library><!-- BFH Bern - HKB Mediothek -->
         <library>N06</library><!-- BFH Bern - Soziale Arbeit -->
         <library>N07</library><!-- BFH Bern - Wirtschaft -->
+        <library>RE71020</library><!--EHB, Standort IFFP Lausanne -->
+        <library>IUFFP</library><!--EHB, Standort IUFFP Lugano -->
     </xsl:variable>
     
     <xsl:template match="/">
