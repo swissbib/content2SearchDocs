@@ -118,6 +118,8 @@
         <include name="sb_ermpost2solr_initialloading.sh"/>
         <include name="post2SolrWeedings.py"/>
         <include name="sb_ead_marc2solr_initialloading.sh"/>
+        <include name="sb_marc2solr_archivaldata.sh"/>
+        <include name="sb_post2solr_archivaldata.sh"/>
 
 
     </fileset>
