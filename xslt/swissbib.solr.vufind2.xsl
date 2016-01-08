@@ -406,6 +406,28 @@
                 </field>
             </xsl:if>
         </xsl:for-each>
+        <!-- OCM / OWC classification-->
+        <xsl:for-each select="$fragment/datafield[@tag='691'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb FG', 'i')]/subfield[@code='u'] ">
+            <field name="classif_ocm">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='691'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb FH', 'i')]/subfield[@code='u'] ">
+            <field name="classif_owc">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
+        <!-- selected local classifications idsbb with source code)-->
+        <xsl:for-each select="$fragment/datafield[@tag='691'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb FA', 'i')]/subfield[@code='u'] |
+                              $fragment/datafield[@tag='691'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb GA', 'i')]/subfield[@code='u'] |
+                              $fragment/datafield[@tag='691'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb GC', 'i')]/subfield[@code='u'] |
+                              $fragment/datafield[@tag='691'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb GM', 'i')]/subfield[@code='u'] |
+                              $fragment/datafield[@tag='691'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb GQ', 'i')]/subfield[@code='u'] ">
+            <xsl:variable name="source" select="replace(following-sibling::subfield[@code='2']/text(),' ', '')" />
+            <field name="{concat('classif_', $source)}">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
         <!-- local classifications (without source code) -->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='691']/subfield[@code='u']">
@@ -2796,11 +2818,30 @@
     </xsl:template>
 
     <!-- Lokalbeschlagwortung (690 / 691 / 695)
-         * enthält auch Text aus Klassifikationsfelder (fuer Notation s. Template subclassif)
-         * ohne eigene Indexe (bei Bedarf wieder einbauen)
+         * enthält auch Text aus Klassifikationsfelder (fuer Notation s. Template classif)
+         * eigene Indexe für ausgewählte 690 IDSBB (bei Bedarf ausbauen)
     -->
     <xsl:template name="sublocal">
         <xsl:param name="fragment" />
+        <xsl:for-each select="$fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb A2', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb A8', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb AC', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb AM', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb BB', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb BC', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb BD', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb BE', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb BF', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb BW', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb FC', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb G8', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb G9', 'i')]/subfield[matches(@code, '[a-z]')] |
+                              $fragment/datafield[@tag='690'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb GC', 'i')]/subfield[matches(@code, '[a-z]')] ">
+            <xsl:variable name="source" select="replace(following-sibling::subfield[@code='2']/text(),' ', '')" />
+            <field name="{concat('sublocal_', $source, '_txt_mv')}">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/datafield[@tag='690']/subfield |
                                   $fragment/datafield[@tag='691']/subfield |
