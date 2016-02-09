@@ -361,6 +361,12 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
+        <!-- local category codes Basel/Bern (MARC field 912) -->
+        <xsl:for-each select="$fragment/datafield[@tag='912'] [@ind2='7'][matches(descendant::subfield[@code='2'][1], '^SzZuIDS BS/BE', 'i')]/subfield[@code='a']">
+            <field name="classif_912_BSBE">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
         <!-- UDC fields, standard and non-standard (11.10.2012 / osc) -->
         <xsl:for-each select="$fragment/datafield[@tag='080']/subfield[@code='a']">
             <field name="classif_udc">
