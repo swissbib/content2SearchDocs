@@ -41,6 +41,7 @@
         <library>N07</library><!-- BFH Bern - Wirtschaft -->
         <library>RE71020</library><!--EHB, Standort IFFP Lausanne -->
         <library>IUFFP</library><!--EHB, Standort IUFFP Lugano -->
+        <library>CHSBK</library><!--Speicherbibliothek, Kollektivbestand-->
     </xsl:variable>
     
     <xsl:template match="/">
