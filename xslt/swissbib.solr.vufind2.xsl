@@ -1505,7 +1505,8 @@
     </xsl:template>
 
     <!-- additional content, anything not indexed somewhere else: -->
-    <!-- 245, 250, 255, 260, 264, 300, 500, 501, 502, 504, 505, 506, 507, 508, 509, 510, 511, 513, 516, 518, 520, 521, 522, 524, 536, 538, 545, 546, 590, 800, 810, 811, 830, 852, 856, 880, 949-->
+    <!-- 245, 250, 255, 260, 264, 300, 500, 501, 502, 504, 505, 506, 507, 508, 509, 510, 511, 513, 516, 518, 520, 521,
+         522, 524, 536, 538, 545, 546, 561, 562, 563, 581, 585, 590, 800, 810, 811, 830, 852, 856, 880, 949-->
     <xsl:template name="add_fields">
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
@@ -1577,6 +1578,12 @@
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[matches(@tag, '54[56]')]/subfield[matches(@code, 'a|b')]">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '56[1-3]')]/subfield[matches(@code, 'a|b|c|d|e')]">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '58[15]')]/subfield[matches(@code, 'a')]">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='590']/subfield[@code='a']">
