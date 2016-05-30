@@ -1559,7 +1559,7 @@
             <xsl:for-each select="$fragment/datafield[@tag='502']/subfield[matches(@code, 'a|b|c|g')]">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='505']/subfield[matches(@code, 'a|g')]">
+            <xsl:for-each select="$fragment/datafield[@tag='505']/subfield[matches(@code, 'a|g|r')]">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='509']/subfield[@code='r']">
