@@ -1245,6 +1245,21 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='773']/subfield[@code='o']">
+            <field name="hostotherID_str_mv">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='773']/subfield[@code='x']">
+            <field name="hostissn_isn_mv">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='773']/subfield[@code='y']">
+            <field name="hostisbn_isn_mv">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
     </xsl:template>
 
     <!-- formerly 'slinkarticle', indexed to link articles from journal 
@@ -1400,6 +1415,14 @@
                 <xsl:choose>
                     <xsl:when test="matches(., '53$')">
                         <xsl:text>ONL##xx##</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise />
+                </xsl:choose>
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='900']/subfield[@code='a']">
+                <xsl:choose>
+                    <xsl:when test="matches(., 'Metadata rights reserved')">
+                        <xsl:text>MDRR##xx##</xsl:text>
                     </xsl:when>
                     <xsl:otherwise />
                 </xsl:choose>
