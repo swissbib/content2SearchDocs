@@ -1,4 +1,6 @@
 !.gitignore
 .idea
 config/config.properties
-
+data
+lib
+target

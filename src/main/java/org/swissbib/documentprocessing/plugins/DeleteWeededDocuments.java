@@ -1,11 +1,13 @@
 package org.swissbib.documentprocessing.plugins;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
+//import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.BinaryResponseParser;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+//import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,8 @@ public class DeleteWeededDocuments implements  IDocProcPlugin{
 
     private static int maxNumbers;
     private static ArrayList<String> docIdsToDelete;
-    private static SolrServer searchServerServerWeeding = null;
+    //private static SolrServer searchServerServerWeeding = null;
+    private static SolrClient solrClient = null;
     private static boolean inProductionMode;
     private static String basePathWeedingDocuments;
     private static Logger logWeedingDocsToDelete;
@@ -73,8 +76,13 @@ public class DeleteWeededDocuments implements  IDocProcPlugin{
     public void finalizePlugIn() {
 
         writeDocuments();
-        if (searchServerServerWeeding != null) {
-            searchServerServerWeeding.shutdown();
+        if (solrClient != null) {
+            try {
+                solrClient.close();
+            } catch (IOException ioEx) {
+                //Todo: make better Exception Handling
+                ioEx.printStackTrace();
+            }
         }
     }
 
@@ -89,7 +97,7 @@ public class DeleteWeededDocuments implements  IDocProcPlugin{
             parameters.set("q", "id:" + docId);
 
             try {
-                QueryResponse qResponse = searchServerServerWeeding.query(parameters);
+                QueryResponse qResponse = solrClient.query(parameters);
 
                 if (qResponse.getResults().getNumFound() > 1) {
                     logWeedingDocsToDelete.info(String.format("numbers of documents found with a unique id '%1$s': '%2$s' ",docId,
@@ -177,10 +185,15 @@ public class DeleteWeededDocuments implements  IDocProcPlugin{
 
         String searchserver_weeding = configuration.get("SEARCHSERVER_WEEDING");
 
-        HttpSolrServer searchServer =  new HttpSolrServer(searchserver_weeding);
-        searchServer.setParser(new BinaryResponseParser());
-        searchServer.setRequestWriter(new BinaryRequestWriter());
-        searchServerServerWeeding = searchServer;
+        //HttpSolrClient searchServer =  newl HttpSolrClient(nameAndURL[0]);
+        //todo: should be changed with cloud mode
+        //HttpSolrClient searchServer = new HttpSolrClient.Builder(searchserver_weeding).build();
+        //SolrClient client = new HttpSolrClient.Builder(searchserver_weeding).build();
+
+        //HttpSolrServer searchServer =  new HttpSolrServer(searchserver_weeding);
+        //searchServer.setParser(new BinaryResponseParser());
+        //searchServer.setRequestWriter(new BinaryRequestWriter());
+        solrClient = new HttpSolrClient.Builder(searchserver_weeding).build();
 
     }
 

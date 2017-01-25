@@ -1,7 +1,7 @@
 package org.swissbib.documentprocessing.plugins;
 
 import org.apache.solr.client.solrj.*;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -9,6 +9,7 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,7 +51,7 @@ public class ViafContentEnrichment implements IDocProcPlugin {
     private static Logger viafProcessing;
     private static Logger viafProcessingError;
 
-    private static HttpSolrServer solrServer;
+    private static SolrClient solrClient;
 
     private static String searchField;
     private static String valuesField;
@@ -111,7 +112,7 @@ public class ViafContentEnrichment implements IDocProcPlugin {
         try {
             //solrServer.request(qR) ;
 
-            QueryResponse qR = solrServer.query(sq);
+            QueryResponse qR = solrClient.query(sq);
 
             if (qR.getResults().getNumFound() > 0) {
 
@@ -136,8 +137,8 @@ public class ViafContentEnrichment implements IDocProcPlugin {
             }
 
 
-        }  catch (SolrServerException solrServerExc) {
-            solrServerExc.printStackTrace();
+        }  catch (SolrServerException | IOException exc) {
+            exc.printStackTrace();
         }
 
 
@@ -150,7 +151,14 @@ public class ViafContentEnrichment implements IDocProcPlugin {
 
     @Override
     public void finalizePlugIn() {
-        ViafContentEnrichment.solrServer = null;
+
+        if (ViafContentEnrichment.solrClient != null) {
+            try {
+                ViafContentEnrichment.solrClient.close();
+            } catch (IOException ioE) {
+                ioE.printStackTrace();
+            }
+        }
     }
 
 
@@ -164,7 +172,7 @@ public class ViafContentEnrichment implements IDocProcPlugin {
 
             String test = configuration.get("VIAFINDEXBASE");
 
-            ViafContentEnrichment.solrServer = new HttpSolrServer(configuration.get("VIAFINDEXBASE"));
+            ViafContentEnrichment.solrClient = new HttpSolrClient.Builder(configuration.get("VIAFINDEXBASE")).build();
 
             /*
             marcXMLlogger.info("\n\n => Start to load the properties of configuration File: " + confContainer.getCONFFILE());
@@ -210,7 +218,7 @@ public class ViafContentEnrichment implements IDocProcPlugin {
 
     public boolean solrServerInitialized () {
 
-        return null != ViafContentEnrichment.solrServer;
+        return null != ViafContentEnrichment.solrClient;
     }
 
 }
