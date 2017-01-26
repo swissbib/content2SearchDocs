@@ -41,7 +41,7 @@ public class NavFieldFormAnalyzer extends Analyzer {
         HashMap<String,String> sFM = new HashMap<>();
         sFM.put("synonyms","formsynonyms.txt");
         sFM.put("ignoreCase","true");
-        sFM.put("expand","true");
+        sFM.put("expand","false");
         sFM.put("tokenizerFactory","org.apache.lucene.analysis.core.KeywordTokenizerFactory");
 
         //Todo: configuration for the directory
