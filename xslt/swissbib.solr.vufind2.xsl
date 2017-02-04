@@ -7,8 +7,9 @@
     xmlns:java-dsv11-ext="java:org.swissbib.documentprocessing.plugins.DSV11ContentEnrichment"
     xmlns:java-nodouble-ext="java:org.swissbib.documentprocessing.plugins.RemoveDuplicates"
     xmlns:java-isbn-ext="java:org.swissbib.documentprocessing.plugins.CreateSecondISBN"
+    xmlns:java-analyzeValue="java:org.swissbib.documentprocessing.plugins.SolrStringTypePreprocessor"
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
-    xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib java-isbn-ext">
+    xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib java-isbn-ext java-analyzeValue">
     <!--xmlns:fn="http://www.w3.org/2005/xpath-functions"> -->
 
     <xsl:output method="xml"
@@ -747,16 +748,19 @@
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
-        <xsl:call-template name="createUniqueFields">
+        <xsl:call-template name="createNavFieldCombined">
             <xsl:with-param name="fieldname" select="'navAuthor_full'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <!-- source specific author facet -->
         <xsl:for-each select="$fragment/datafield[@tag='979']/subfield[@code='a']">
             <xsl:variable name="source" select="following-sibling::subfield[@code='2']" />
-            <field name="{concat('navAuthor_', $source)}">
-                <xsl:value-of select="." />
-            </field>
+
+            <xsl:call-template name="createNavFieldCombinedSingleValue">
+                <xsl:with-param name="fieldname" select="concat('navAuthor_', $source)"/>
+                <xsl:with-param name="fieldValue" select="."/>
+            </xsl:call-template>
+
         </xsl:for-each>
         <xsl:for-each select="$fragment/sortauthor">
             <field name="author_sort">
@@ -1740,6 +1744,12 @@
             <xsl:with-param name="fieldname" select="'subpers_lcsh'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+        <xsl:call-template name="createNavFieldCombined">
+            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+
+
     </xsl:template>
 
     <xsl:template name="subtitle_lcsh">
@@ -1760,7 +1770,14 @@
             <xsl:with-param name="fieldname" select="'subtitle_lcsh'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+        <xsl:call-template name="createNavFieldCombined">
+            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+
+
     </xsl:template>
+
 
     <xsl:template name="subtime_lcsh">
         <xsl:param name="fragment"/>
@@ -1777,6 +1794,10 @@
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
             <xsl:with-param name="fieldname" select="'subtime_lcsh'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+        <xsl:call-template name="createNavFieldCombined">
+            <xsl:with-param name="fieldname" select="'navSubtime'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -2021,6 +2042,15 @@
             <xsl:with-param name="fieldname" select="'subpers_gnd'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+
+        <xsl:call-template name="createNavFieldCombined">
+            <xsl:with-param name="fieldname" select="'navSub_orange'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+
+
+
+
     </xsl:template>
 
     <xsl:template name="subtitle_gnd">
@@ -2990,5 +3020,68 @@
         </xsl:if>
         <!--<xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']"> -->
     </xsl:template>
+
+
+    <xsl:template name="createNavFieldCombined">
+        <xsl:param name="fieldname"/>
+        <xsl:param name="fieldValues"/>
+        <xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']">
+            <xsl:variable name="analyzeTokens" select="java-analyzeValue:new()" />
+                <xsl:for-each select="$fieldValues">
+                    <xsl:variable name="currentValue" select="." />
+                    <xsl:variable name="analyzedValue" select="java-analyzeValue:getNavFieldCombined($analyzeTokens, string($currentValue))"/>
+                    <xsl:if test="$analyzedValue ne ''">
+                        <xsl:element name="field">
+                            <xsl:attribute name="name">
+                                <xsl:value-of select="$fieldname"/>
+                            </xsl:attribute>
+                            <xsl:value-of select="$analyzedValue"/>
+                        </xsl:element>
+                    </xsl:if>
+                </xsl:for-each>
+        </xsl:if>
+        <!--<xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']"> -->
+    </xsl:template>
+
+
+    <xsl:template name="createNavFieldCombinedSingleValue">
+        <xsl:param name="fieldname"/>
+        <xsl:param name="fieldValue"/>
+            <xsl:variable name="analyzeTokens" select="java-analyzeValue:new()" />
+            <xsl:variable name="analyzedValue" select="java-analyzeValue:getNavFieldCombined($analyzeTokens, string($fieldValue))"/>
+            <xsl:if test="$analyzedValue ne ''">
+                <xsl:element name="field">
+                    <xsl:attribute name="name">
+                        <xsl:value-of select="$fieldname"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="$analyzedValue"/>
+                </xsl:element>
+            </xsl:if>
+        <!--<xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']"> -->
+    </xsl:template>
+
+
+
+    <xsl:template name="createNavFieldForm">
+        <xsl:param name="fieldname"/>
+        <xsl:param name="fieldValues"/>
+        <xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']">
+            <xsl:variable name="analyzeTokens" select="java-analyzeValue:new()" />
+            <xsl:for-each select="$fieldValues">
+                <xsl:variable name="currentValue" select="." />
+                <xsl:variable name="analyzedValue" select="java-analyzeValue:getNavFieldForm($analyzeTokens, string($currentValue))"/>
+                <xsl:if test="$analyzedValue ne ''">
+                    <xsl:element name="field">
+                        <xsl:attribute name="name">
+                            <xsl:value-of select="$fieldname"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="$analyzedValue"/>
+                    </xsl:element>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:if>
+        <!--<xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']"> -->
+    </xsl:template>
+
 
 </xsl:stylesheet>
