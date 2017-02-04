@@ -53,9 +53,9 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
         }
 
         String retValue = "";
-        if (list.size() == 1) {
+        if (list.size() > 1) {
             //todo: we need LogType
-            System.out.println("Analyzer produces more than on term - should not happen");
+            System.out.println("Analyzer produces more than one term - should not happen");
             retValue = String.join("",list);
         }
 
