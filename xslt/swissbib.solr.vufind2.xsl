@@ -981,7 +981,7 @@
         </xsl:for-each>
         <xsl:for-each select="$fragment/sorttitle">
             <field name="title_sort">
-                <xsl:value-of select="replace(., '[\W]', '')" />
+                <xsl:value-of select="substring(replace(., '[\W]', ''), 1,25)" />
             </field>
         </xsl:for-each>
      </xsl:template>
