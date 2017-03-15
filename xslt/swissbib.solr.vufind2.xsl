@@ -1839,8 +1839,8 @@
             <xsl:with-param name="fieldname" select="'subgeo_lcsh'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_geofull'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -1859,10 +1859,6 @@
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
             <xsl:with-param name="fieldname" select="'subform_lcsh'"/>
-            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-        </xsl:call-template>
-        <xsl:call-template name="createNavFieldForm">
-            <xsl:with-param name="fieldname" select="'navSubform'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -1994,7 +1990,7 @@
         </xsl:call-template>
 
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_geofull'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2411,8 +2407,8 @@
             <xsl:with-param name="fieldname" select="'subgeo_rero'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_geofull'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -3035,11 +3031,6 @@
             <xsl:with-param name="fieldname" select="'subform_jurivoc'" />
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldForm">
-            <xsl:with-param name="fieldname" select="'navSubform'"/>
-            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-        </xsl:call-template>
-
     </xsl:template>
 
 
