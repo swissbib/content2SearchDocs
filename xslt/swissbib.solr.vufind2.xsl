@@ -760,8 +760,19 @@
                 <xsl:with-param name="fieldname" select="concat('navAuthor_', $source)"/>
                 <xsl:with-param name="fieldValue" select="."/>
             </xsl:call-template>
-
         </xsl:for-each>
+        <!-- author facette for orange -->
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='979']/subfield[@code='a'][matches(following-sibling::subfield[@code='2'], 'IDSBB|SNL|HAN')]">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createNavFieldCombined">
+            <xsl:with-param name="fieldname" select="'navAuthor_orange'"/>
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+
         <xsl:for-each select="$fragment/sortauthor">
             <field name="author_sort">
                 <xsl:value-of select="." />
