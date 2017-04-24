@@ -26,9 +26,13 @@ public class NavFieldCombinedAnalyzer extends Analyzer {
         TrimFilterFactory tff =  new TrimFilterFactory(new HashMap<String,String>());
 
         HashMap<String,String> patternMap = new HashMap<>();
-        String pattern = "[S s]\\.[Nn]\\.|[Aa]nonym|[\\[\\]*]|\\[.*\\]|" +
+        //String pattern = "[S s]\\.[Nn]\\.|\\b[Aa]nonym\\b|\\b[Aa]nonym$|[\\[\\]*]|\\[.*\\]|" +
+        //        "\\u0022|\\u003C|\\u003E|\\u003F|^\\d{4}-\\d{4}$|, \\d{4}-\\d{4}|" +
+        //        "Formschlagwort|Aufsatzsammlung";
+        String pattern = "[Ss]\\.[Nn]\\.|[\\[\\]*]|\\[.*\\]|" +
                 "\\u0022|\\u003C|\\u003E|\\u003F|^\\d{4}-\\d{4}$|, \\d{4}-\\d{4}|" +
                 "Formschlagwort|Aufsatzsammlung";
+
 
         patternMap.put("pattern", pattern);
         patternMap.put("replacement","");

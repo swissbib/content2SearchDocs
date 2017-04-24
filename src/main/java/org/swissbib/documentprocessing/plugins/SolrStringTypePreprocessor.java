@@ -30,11 +30,7 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
 
 
     public String getNavFieldForm(String rawToken) {
-         NavFieldFormAnalyzer formAnalyzer =  (NavFieldFormAnalyzer) SolrStringTypePreprocessor.analyzerMap.get("navFieldFormAnalyzer");
-
-         //String testToken = "Quellenverzeichnis";
-        //String testToken = "répertoire";
-        //String testToken = "verzeichnis";
+        NavFieldFormAnalyzer formAnalyzer =  (NavFieldFormAnalyzer) SolrStringTypePreprocessor.analyzerMap.get("navFieldFormAnalyzer");
 
         TokenStream ts =  formAnalyzer.tokenStream("fieldNotNeeded",rawToken );
 
@@ -70,12 +66,7 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
     public String getNavFieldCombined(String rawToken) {
         Analyzer combinedAnalyzer =  SolrStringTypePreprocessor.analyzerMap.get("navFieldCombinedAnalyzer");
 
-        //String testToken = "Quellenverzeichnis";
-        //String testToken = "répertoire";
-        //String testToken = "verzeichnis";
-
         TokenStream ts =  combinedAnalyzer.tokenStream("fieldNotNeeded",rawToken );
-
 
         String analyzedToken = "";
         try {
