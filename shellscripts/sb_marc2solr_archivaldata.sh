@@ -23,7 +23,7 @@ inputpath=${PROJECTDIR_FREQUENT}/data/format_archivaldata
 confFile=${PROJECTDIR_DOCPROCESSING}/dist/configArchivaldata.properties
 outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles_archivaldata
 postjar=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
-marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/xml2SearchEngineDoc.jar
+marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/content2SearchDocs-0.8-SNAPSHOT.jar
 logSendToSolr=${PROJECTDIR_DOCPROCESSING}/data/log/post2SOLR.log
 logscriptflow=${PROJECTDIR_DOCPROCESSING}/data/log/sb_marc2solr_archivaldata.log
 
