@@ -1,8 +1,11 @@
 package org.swissbib.documentprocessing.plugins;
 
+import com.sun.tools.hat.internal.model.StackTrace;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.swissbib.documentprocessing.solr.analyzer.NavFieldCombinedAnalyzer;
 import org.swissbib.documentprocessing.solr.analyzer.NavFieldFormAnalyzer;
 
@@ -22,10 +25,20 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
     private static HashMap<String,Analyzer> analyzerMap;
     private static HashMap<String,TokenStream> tokenStreams;
 
+    private static Logger navFieldForm;
+    private static Logger navFieldCombined;
+    private static Logger stringPreprocessorError;
+
+
 
     static {
         analyzerMap = new HashMap<>();
         tokenStreams = new HashMap<>();
+
+        SolrStringTypePreprocessor.navFieldForm = LoggerFactory.getLogger("navFieldFormLogger");
+        SolrStringTypePreprocessor.navFieldCombined = LoggerFactory.getLogger("navFieldCombinedLogger");
+        SolrStringTypePreprocessor.stringPreprocessorError = LoggerFactory.getLogger("stringPreprocessorError");
+
     }
 
 
@@ -45,7 +58,11 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
             ts.close();
             //ts.end();
         } catch (IOException io){
-            io.printStackTrace();
+            stringPreprocessorError.error("error in getNavFieldForm");
+            for (StackTraceElement se : io.getStackTrace()) {
+                stringPreprocessorError.error(String.format("stacktraceelement: %s", se.toString()));
+            }
+
         }
 
         String retValue = "";
@@ -57,6 +74,7 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
             retValue = list.get(0);
         }
 
+        navFieldForm.debug( String.format("navFieldForm: got \"%s\" returned \"%s\"", rawToken, retValue)  );
         return retValue;
 
 
@@ -79,11 +97,14 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
             ts.close();
             //ts.end();
         } catch (IOException io){
-            //todo: better handling
-            io.printStackTrace();
+            stringPreprocessorError.error("error in getNavFieldCombined");
+            for (StackTraceElement se : io.getStackTrace()) {
+                stringPreprocessorError.error(String.format("stacktraceelement: %s", se.toString()));
+            }
         }
 
 
+        navFieldCombined.debug( String.format("navFieldCombined: got \"%s\" returned \"%s\"", rawToken, analyzedToken)  );
         return analyzedToken;
 
 

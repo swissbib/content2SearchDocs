@@ -4,3 +4,4 @@ config/config.properties
 data
 lib
 target
+src/main/resources/saxon-license.lic

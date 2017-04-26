@@ -6,7 +6,7 @@
     <appender name="all_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/all.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/all.1.log" />
         <param name="Threshold" value="ERROR" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
@@ -16,17 +16,28 @@
     <appender name="pdfboxorgXref_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/pdfboxorgXref.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/pdfboxorgXref.1.log" />
         <param name="Threshold" value="ERROR" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
     </appender>
 
+    <appender name="xml2solrdocengine_appender" class="org.apache.log4j.RollingFileAppender">
+        <param name="maxFileSize" value="10MB" />
+        <param name="maxBackupIndex" value="1" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/xml2solrdocengine.1.log" />
+        <param name="Threshold" value="INFO" />
+        <layout class="org.apache.log4j.TTCCLayout">
+            <param name="DateFormat" value="ISO8601" />
+        </layout>
+    </appender>
+
+
     <appender name="marc2solr_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/marc2solr.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/marc2solr.1.log" />
         <param name="Threshold" value="INFO" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
@@ -37,7 +48,7 @@
     <appender name="viaf2solr_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/viaf2solr.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/viaf2solr.1.log" />
         <param name="Threshold" value="INFO" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
@@ -49,7 +60,7 @@
     <appender name="marc2solrexception_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/marc2solrexception.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/marc2solrexception.1.log" />
         <param name="Threshold" value="DEBUG" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
@@ -59,7 +70,7 @@
     <appender name="marc2solrInitexception_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/marc2solrInitexception.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/marc2solrInitexception.1.log" />
         <param name="Threshold" value="DEBUG" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
@@ -69,7 +80,7 @@
     <appender name="tikaContent_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/TikaContent.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/TikaContent.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -79,7 +90,7 @@
     <appender name="tikaContentNoMatch_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/tikaContentNoMatch.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/tikaContentNoMatch.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -88,7 +99,7 @@
     <appender name="tikaContentException_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/tikaContentException.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/tikaContentException.1.log" />
         <param name="Threshold" value="DEBUG" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
@@ -99,7 +110,7 @@
     <appender name="deduplication_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/deduplication.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/deduplication.1.log" />
         <param name="Threshold" value="INFO" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
@@ -110,7 +121,7 @@
     <appender name="xsltIntermediate_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/xsltIntermediate.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/xsltIntermediate.1.log" />
         <param name="Threshold" value="INFO" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
@@ -121,7 +132,7 @@
     <appender name="gndProcessing_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/gndProcessing.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/gndProcessing.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -130,7 +141,7 @@
     <appender name="gndProcessingError_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/gndProcessingError.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/gndProcessingError.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -169,7 +180,7 @@
     <appender name="fetchFulltextInBatch_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/fetchFulltextInBatchInfo.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/fetchFulltextInBatchInfo.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -178,7 +189,7 @@
     <appender name="VIAFProcessing_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/VIAFProcessing.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/VIAFProcessing.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -189,7 +200,7 @@
     <appender name="VIAFProcessingError_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="100MB" />
         <param name="maxBackupIndex" value="10" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/VIAFProcessingError.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/VIAFProcessingError.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -198,7 +209,7 @@
     <appender name="isbnCreator_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/isbnCreator.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/isbnCreator.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -207,7 +218,7 @@
     <appender name="timeDifference_appender" class="org.apache.log4j.RollingFileAppender">
         <param name="maxFileSize" value="10MB" />
         <param name="maxBackupIndex" value="1" />
-        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/timeDifference.log" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/timeDifference.1.log" />
         <layout class="org.apache.log4j.TTCCLayout">
             <param name="DateFormat" value="ISO8601" />
         </layout>
@@ -221,6 +232,34 @@
             <param name="DateFormat" value="ISO8601" />
         </layout>
     </appender>
+
+    <appender name="navFieldFormLogger_appender" class="org.apache.log4j.RollingFileAppender">
+        <param name="maxFileSize" value="10MB" />
+        <param name="maxBackupIndex" value="1" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/navFieldFormLogger.1.log" />
+        <layout class="org.apache.log4j.TTCCLayout">
+            <param name="DateFormat" value="ISO8601" />
+        </layout>
+    </appender>
+
+    <appender name="navFieldCombinedLogger_appender" class="org.apache.log4j.RollingFileAppender">
+        <param name="maxFileSize" value="10MB" />
+        <param name="maxBackupIndex" value="1" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/navFieldCombinedLogger.1.log" />
+        <layout class="org.apache.log4j.TTCCLayout">
+            <param name="DateFormat" value="ISO8601" />
+        </layout>
+    </appender>
+
+    <appender name="stringPreprocessorError_appender" class="org.apache.log4j.RollingFileAppender">
+        <param name="maxFileSize" value="10MB" />
+        <param name="maxBackupIndex" value="1" />
+        <param name="File" value="/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log/StringPreprocessorError.1.log" />
+        <layout class="org.apache.log4j.TTCCLayout">
+            <param name="DateFormat" value="ISO8601" />
+        </layout>
+    </appender>
+
 
 
     <logger name="org.swissbib.documentprocessing.solr.XML2SOLRDocEngine" additivity="false">
@@ -340,6 +379,20 @@
         <appender-ref ref="isbnCreator_appender" />
     </logger>
 
+    <logger name="navFieldFormLogger" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="navFieldFormLogger_appender" />
+    </logger>
+
+    <logger name="navFieldCombinedLogger" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="navFieldCombinedLogger_appender" />
+    </logger>
+
+    <logger name="stringPreprocessorError" additivity="false">
+        <level value="ERROR" />
+        <appender-ref ref="stringPreprocessorError_appender" />
+    </logger>
 
  <root>
   <priority value="ERROR"/>
