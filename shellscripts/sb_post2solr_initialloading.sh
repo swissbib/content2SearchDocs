@@ -74,21 +74,13 @@ function post2solr ()
 
        java -Xms1024m -Xmx1024m \
         -Durl=${URLSOLRINDEXSERVER} \
-        -Dcommit=no   \
+        -Dcommit=yes   \
         -jar ${POSTJAR} ${POSTDIR} >> ${LOGFILE}
 
-
-         printf "now send the commit to ${URLSOLRINDEXSERVER} ...\n"  >> ${LOGFILE}
-            java  \
-                -Durl=${URLSOLRINDEXSERVER} \
-                -Dcommit=yes   \
-                -jar ${POSTJAR}  >> ${LOGFILE}
 
        printf "now zip the posted files again" >> ${LOGFILE}
        gzip ${POSTDIRBASE}/$dir/*.xml
 
-
-#        rm -r $file
 
     done
 
