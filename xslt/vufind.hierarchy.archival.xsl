@@ -24,6 +24,14 @@
                     </xsl:call-template>
                 </xsl:copy>
             </xsl:when>
+            <xsl:when test="exists(datafield[@tag='351'][matches(descendant::subfield[@code='c'],'Bestand', 'i')])">
+                <xsl:copy>
+                    <xsl:call-template name="hierarchytype">
+                        <xsl:with-param name="record" select="." />
+                    </xsl:call-template>
+                </xsl:copy>
+                <xsl:copy-of select="record/node()" />
+            </xsl:when>
             <xsl:otherwise>
                 <xsl:copy-of select="." />
             </xsl:otherwise>
@@ -43,10 +51,10 @@
         </is_hierarchy_title>
         <xsl:for-each select="datafield[@tag='499']/subfield[@code='w']">
             <hierarchy_top_id>
-                <xsl:value-of select="."/>
+                <xsl:value-of select="following-sibling::subfield[@code='y'][1]" />
             </hierarchy_top_id>
             <hierarchy_top_title>
-                <xsl:value-of select="preceding-sibling::subfield[@code='a'][1]" />
+                <xsl:value-of select="preceding-sibling::subfield[@code='x'][1]" />
             </hierarchy_top_title>
             <hierarchy_parent_id>
                 <xsl:value-of select="." />
@@ -71,6 +79,12 @@
             </hierarchy_sequence>
         </xsl:for-each>
         <xsl:copy-of select="$record/node()" />
+    </xsl:template>
+
+    <xsl:template name="hierarchytype">
+        <xsl:param name="record" />
+            <hierarchytype>archival</hierarchytype>
+            <xsl:copy-of select="$record/node()" />
     </xsl:template>
     
 </xsl:stylesheet>
