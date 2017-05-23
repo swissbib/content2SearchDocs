@@ -219,8 +219,8 @@ public class GNDContentEnrichment implements IDocProcPlugin{
                         //Source gndRecord = new StreamSource(new StringReader(testRecord()));
                         Source gndRecord = new StreamSource(new StringReader(unzippedRecord.get()));
                         StringWriter result = new StringWriter();
-                        Result xsltResultHoldings = new StreamResult(result);
-                        gndTransformer.transform(gndRecord,xsltResultHoldings);
+                        Result xsltGndResult = new StreamResult(result);
+                        gndTransformer.transform(gndRecord,xsltGndResult);
                         String extractedGNDValues = result.toString();
                         if (!extractedGNDValues.isEmpty()) {
 
@@ -287,7 +287,7 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
         String toReturn = "";
 
-        if (checkReadyForProcessing()) return toReturn;
+        if (!checkReadyForProcessing()) return toReturn;
 
 
         if (!errorInitializing) {
