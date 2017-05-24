@@ -187,6 +187,9 @@
             <xsl:call-template name="subenrichment_gnd">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="subenrichment_gnd_5xx">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
             <xsl:call-template name="subpers_rero">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
@@ -677,7 +680,7 @@
         <!-- authors -->
         <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='B'], 'IDSBB')][matches(child::subfield[@code='P'], '100|700')]/subfield[@code='a']">
             <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
-            <xsl:variable name="authorMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='D'], 
+            <xsl:variable name="authorMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='D'],
                                                                                         following-sibling::subfield[@code='b'][1],
                                                                                         following-sibling::subfield[@code='c'][1],
                                                                                         following-sibling::subfield[@code='d'][1],
@@ -849,7 +852,7 @@
                 <xsl:when test="matches(text(), '^@$') and exists($fragment/datafield[@tag='773']/subfield[@code='t']/text())">
                     <field name="title">
                         <xsl:value-of select="concat($fragment/datafield[@tag='773'][1]/subfield[@code='t'][1],
-                                                    ', ', 
+                                                    ', ',
                                                     $fragment/datafield[@tag='773'][1]/subfield[@code='g'][1])" />
                     </field>
                     <field name="title_short">
@@ -861,8 +864,8 @@
                 </xsl:when>
                 <xsl:when test="matches(text(), '^@$') and exists($fragment/datafield[@tag='490']/subfield[@code='a']/text())">
                     <field name="title">
-                        <xsl:value-of select="concat($fragment/datafield[@tag='490'][1]/subfield[@code='a'][1], 
-                                                    ', ', 
+                        <xsl:value-of select="concat($fragment/datafield[@tag='490'][1]/subfield[@code='a'][1],
+                                                    ', ',
                                                     $fragment/datafield[@tag='490'][1]/subfield[@code='v'][1])" />
                     </field>
                     <field name="title_short">
@@ -1277,7 +1280,7 @@
         </xsl:for-each>
     </xsl:template>
 
-    <!-- formerly 'slinkarticle', indexed to link articles from journal 
+    <!-- formerly 'slinkarticle', indexed to link articles from journal
           @todo necessary in VuFind? -->
     <xsl:template name="container_id">
         <xsl:param name="fragment"/>
@@ -1580,10 +1583,10 @@
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='300']/subfield[@code='a']">
-                <xsl:value-of select="concat(replace(., 
-                                             '[\d]+|bd|vol|band|volume|tome', 
-                                             '', 
-                                             'i'), 
+                <xsl:value-of select="concat(replace(.,
+                                             '[\d]+|bd|vol|band|volume|tome',
+                                             '',
+                                             'i'),
                                              '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[matches(@tag, '8[01][01]')]/subfield[matches(@code, 't|v')]">
@@ -2206,7 +2209,7 @@
 
     </xsl:template>
 
-    <!-- Anreicherung des Index mit GND-Nebenvarianten, Feld wird vorläufig lediglich 
+    <!-- Anreicherung des Index mit GND-Nebenvarianten, Feld wird vorläufig lediglich
          in 'subfull' indexiert (siehe copyField-Direktiven im Schema) (15.01.2013) -->
     <xsl:template name="subenrichment_gnd">
         <xsl:param name="fragment" />
@@ -2217,6 +2220,20 @@
             <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
             <xsl:call-template name="createUniqueFields">
                 <xsl:with-param name="fieldname" select="'subgnd_enriched'"/>
+                <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </xsl:template>
+
+    <xsl:template name="subenrichment_gnd_5xx">
+        <xsl:param name="fragment" />
+        <xsl:for-each select="$fragment/datafield[matches(@tag, '^[6][0-5]\d')][@ind2='7'][matches(descendant::subfield[@code='2'][1], '^gnd', 'i')]/subfield[@code='0']">
+            <xsl:variable name="gndFacade" select="java-gnd-ext:new()" />
+            <xsl:variable name="gndnumber" select="text()" />
+            <xsl:variable name="forDeduplication" select="java-gnd-ext:getReferences5xxConcatenated($gndFacade, string($gndnumber))"></xsl:variable>
+            <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+            <xsl:call-template name="createUniqueFields">
+                <xsl:with-param name="fieldname" select="'subgnd_enriched_5xx'"/>
                 <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
             </xsl:call-template>
         </xsl:for-each>
