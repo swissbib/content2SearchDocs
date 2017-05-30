@@ -83,7 +83,7 @@
     <xsl:template name="test550">
         <xsl:for-each select="/record/datafield[@tag='550']">
             <xsl:for-each select="./subfield[@code='9']">
-                <xsl:if test="matches(./text(),'4:obal|4:obin|4:obpa|4:obge')">
+                <xsl:if test="matches(./text(),'4:obal')">
                     <xsl:variable name="values">
                         <xsl:text>550XLIMITERX</xsl:text>
                         <xsl:if test="exists(../subfield[@code='a'])">
