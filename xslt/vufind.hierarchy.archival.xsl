@@ -32,6 +32,13 @@
                 </xsl:copy>
                 <xsl:copy-of select="record/node()" />
             </xsl:when>
+            <xsl:when test="exists(datafield[@tag='499']/subfield[@code='a'])">
+                <xsl:copy>
+                    <xsl:call-template name="hierarchytype">
+                        <xsl:with-param name="record" select="." />
+                    </xsl:call-template>
+                </xsl:copy>
+            </xsl:when>
             <xsl:otherwise>
                 <xsl:copy-of select="." />
             </xsl:otherwise>
