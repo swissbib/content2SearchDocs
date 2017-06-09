@@ -1994,7 +1994,7 @@
                     </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='g']/text()">
-                    <xsl:value-of select="concat(' (', following-sibling::subfield[@code='g'][1]), ')'" />
+                    <xsl:value-of select="concat(' (', following-sibling::subfield[@code='g'][1], ')')" />
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
                     <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
