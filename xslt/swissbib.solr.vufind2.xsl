@@ -187,7 +187,7 @@
             <xsl:call-template name="subenrichment_gnd">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
-            <xsl:call-template name="subenrichment_gnd_5xx">
+            <xsl:call-template name="subenrichment_gnd_related">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
             <xsl:call-template name="subpers_rero">
@@ -2225,15 +2225,17 @@
         </xsl:for-each>
     </xsl:template>
 
-    <xsl:template name="subenrichment_gnd_5xx">
+    <!-- Anreicherung des Index mit ausgewählten in Beziehung stehenden Entitäten, siehe gnd500.xsl -->
+    <xsl:template name="subenrichment_gnd_related">
         <xsl:param name="fragment" />
-        <xsl:for-each select="$fragment/datafield[matches(@tag, '^[6][0-5]\d')][@ind2='7'][matches(descendant::subfield[@code='2'][1], '^gnd', 'i')]/subfield[@code='0']">
+        <xsl:for-each select="$fragment/datafield[matches(@tag, '^[6][015][0]')][@ind2='7'][matches(descendant::subfield[@code='2'][1], '^gnd', 'i')]/subfield[@code='0'] |
+                              $fragment/datafield[matches(@tag, '^651')][@ind2='7'][matches(descendant::subfield[@code='2'][1], '^gnd', 'i')]/subfield[@code='0']">
             <xsl:variable name="gndFacade" select="java-gnd-ext:new()" />
             <xsl:variable name="gndnumber" select="text()" />
             <xsl:variable name="forDeduplication" select="java-gnd-ext:getReferences5xxConcatenated($gndFacade, string($gndnumber))"></xsl:variable>
             <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
             <xsl:call-template name="createUniqueFields">
-                <xsl:with-param name="fieldname" select="'subgnd_enriched_5xx'"/>
+                <xsl:with-param name="fieldname" select="'related_gnd_txt_mv'"/>
                 <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
             </xsl:call-template>
         </xsl:for-each>
