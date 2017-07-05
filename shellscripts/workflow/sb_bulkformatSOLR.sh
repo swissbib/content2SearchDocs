@@ -4,7 +4,7 @@
 
 #source ${HOME}/DOCPREPROCESSING_ENVIRONMENT.sh
 
-PROJECTDIR_DOCPREPROCESSING=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
+PROJECTDIR_DOCPREPROCESSING=/swissbib_index/performancetest
 
 SOURCEDIR=$PROJECTDIR_DOCPREPROCESSING/data/raw
 FORMATDIR=$PROJECTDIR_DOCPREPROCESSING/data/format
@@ -31,15 +31,18 @@ TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
 
 printf "Start of the process formatting bulkload at  <%s> ...\n" $TIMESTAMP
 
-for FILE in $SOURCEDIR/*.raw.xml
+for FILE in $SOURCEDIR/*.raw.xml.gz
 do
-FORMATFILE=`basename $FILE .raw.xml`
-FORMATFILE=$FORMATFILE.format.xml
+gunzip $FILE
+RAWFILE=`basename $FILE .raw.xml.gz`
+
+FORMATFILE=$RAWFILE.format.xml
 printf "Formatting load file <%s> ...\n" $FORMATFILE
-perl BulkMarcRecordModifierSOLR.pl $FILE $FORMATFILE
+perl BulkMarcRecordModifierSOLR.pl $SOURCEDIR/$RAWFILE.raw.xml $FORMATFILE
 printf "Zip and move load file <%s> ...\n" $FORMATFILE
 gzip $FORMATFILE
 mv $FORMATFILE.gz $FORMATDIR
+gzip $SOURCEDIR/$RAWFILE.raw.xml
 done
 
 TIMESTAMP=`date +%Y%m%d%H%M%S`	# seconds
