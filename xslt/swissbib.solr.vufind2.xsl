@@ -97,6 +97,9 @@
             <xsl:call-template name="itemid">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="location">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
             <xsl:call-template name="filter">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -425,6 +428,11 @@
             </xsl:if>
             <xsl:if test="matches(following-sibling::subfield[@code='2'], 'zdbs', 'i')">
                 <field name="classif_zdbs">
+                    <xsl:value-of select="." />
+                </field>
+            </xsl:if>
+            <xsl:if test="matches(following-sibling::subfield[@code='2'], 'sdnb', 'i')">
+                <field name="sdnb_str_mv">
                     <xsl:value-of select="." />
                 </field>
             </xsl:if>
@@ -896,6 +904,15 @@
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[matches(@tag, '240|242|243|246|247')]/subfield[@code='a']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '240|242|243|246|247')]/subfield[@code='b']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '240|242|243|246|247')]/subfield[@code='n']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '240|242|243|246|247')]/subfield[@code='p']">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='245']/subfield[@code='n']">
@@ -1420,6 +1437,23 @@
         <xsl:call-template name="createUniqueFields">
             <xsl:with-param name="fieldname" select="'itemid_isn_mv'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="location">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='852']/subfield[@code='c']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='949']/subfield[@code='c']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'location_str_mv'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
         </xsl:call-template>
     </xsl:template>
 
@@ -2063,7 +2097,7 @@
                     </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='g']/text()">
-                    <xsl:value-of select="concat(' (', following-sibling::subfield[@code='g'][1]), ')'" />
+                    <xsl:value-of select="concat(' (', following-sibling::subfield[@code='g'][1], ')')" />
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
                     <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
