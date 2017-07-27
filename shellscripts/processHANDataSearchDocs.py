@@ -40,8 +40,8 @@ class ProcessHANForSearchDocs:
 
     def __init__(self, args):
 
-        self.SF = "/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing"
-        self.M2S = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
+        self.SF = args.solrfrequent
+        self.M2S = args.marc2solr
 
 
         self.urlGreen = args.green
@@ -280,7 +280,7 @@ class ProcessHANForSearchDocs:
         if os.path.isfile(self.SFrawFromHAN + os.sep + "orange_marcxml.format.xml"):
             subroutine(
                 ["mv",
-                 self.SFrawFromHAN + os.sep + "gruen_marcxml.format.xml",
+                 self.SFrawFromHAN + os.sep + "orange_marcxml.format.xml",
                  self.SFrawFromHANProcess]
             )
 
@@ -295,7 +295,7 @@ class ProcessHANForSearchDocs:
         if os.path.isfile(self.SFrawFromHANProcess + os.sep + "orange_marcxml.format.xml"):
             subroutine(
                 ["mv",
-                 self.SFrawFromHANProcess + os.sep + "gruen_marcxml.format.xml",
+                 self.SFrawFromHANProcess + os.sep + "orange_marcxml.format.xml",
                  self.SFarchiveFilesFrequent]
             )
 
@@ -328,9 +328,14 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(usage=usage)
     parser.add_argument('-g', '--green', help='url for index www.swissbib.ch', type=str,
-                        default='http://localhost:8080/solr/sb-biblio/update')
+                        default='http://sb-us3.swissbib.unibas.ch:8080/solr/sb-biblio/update')
     parser.add_argument('-o', '--orange', help='Path to logging directory', type=str,
-                        default='http://localhost:8080/solr/sb-biblio/update')
+                        default='http://sb-us6.swissbib.unibas.ch:8080/solr/sb-biblio/update')
+    parser.add_argument('-f', '--solrfrequent', help='Path to directory structure where frequent updates are processed', type=str,
+                        default='/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing')
+    parser.add_argument('-m', '--marc2solr', help='Path to directory structure where software and data is located', type=str,
+                        default='/swissbib_index/solrDocumentProcessing/MarcToSolr')
+
 
     parser.parse_args()
     args = parser.parse_args()
@@ -344,9 +349,9 @@ if __name__ == '__main__':
         processHANdata.moveContentFromProcessDirToArchive()
         processHANdata.deleteHANDocsOnIndices()
         processHANdata.sendToSearchServer()
-        processHANdata.closeResources()
-    processHANdata.writeLog("processing is finished at {0}".format(processHANdata.currentDateTime()))
 
+    processHANdata.writeLog("processing is finished at {0}".format(processHANdata.currentDateTime()))
+    processHANdata.closeResources()
 
 
 
