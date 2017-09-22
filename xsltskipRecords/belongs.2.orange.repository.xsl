@@ -22,6 +22,7 @@
         <database>SNL</database><!-- Nationalbibliothek, Bern -->
         <database>RETROS</database><!-- retro.seals -->
         <database>BORIS</database><!-- Bern Open Repository and Information System, Open Access Publikationen -->
+        <database>EDOC</database><!-- edoc Repository Uni Basel -->
     </xsl:variable>
 
 

@@ -1381,7 +1381,7 @@
                     <xsl:when test="matches(., 'A145|B405|B406|B407')">
                         <xsl:value-of select="concat(., '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., 'FREE|BORIS|RETROS')">
+                    <xsl:when test="matches(., 'FREE|BORIS|RETROS|EDOC')">
                         <xsl:text>FREE##xx##</xsl:text>
                     </xsl:when>
                 </xsl:choose>
