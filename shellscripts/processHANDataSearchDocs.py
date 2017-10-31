@@ -62,7 +62,7 @@ class ProcessHANForSearchDocs:
         #self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
         self.JAVA_PROGRAM_CREATING_SEARCHDOCS = "xml2SearchEngineDoc.jar"
         self.LOGCONFIGmarc2SOLR = "marcxml2solrlog4j_1.xml"
-        self.CONFFILE=self.binDir + "/config.properties"
+        self.CONFFILE=self.binDir + "/configArchivaldata.properties"
         self.XSLTPATH = self.M2S  + "/xslt" + "###" + self.M2S + "/xsltskipRecords"
         self.MARC2SOLRJAR = self.binDir + os.sep +  self.JAVA_PROGRAM_CREATING_SEARCHDOCS
 
