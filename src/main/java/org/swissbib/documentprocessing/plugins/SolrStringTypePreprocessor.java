@@ -43,8 +43,10 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
 
 
     public String getNavFieldForm(String rawToken) {
-        NavFieldFormAnalyzer formAnalyzer =  (NavFieldFormAnalyzer) SolrStringTypePreprocessor.analyzerMap.get("navFieldFormAnalyzer");
 
+
+        String retValue = "";
+        NavFieldFormAnalyzer formAnalyzer =  (NavFieldFormAnalyzer) SolrStringTypePreprocessor.analyzerMap.get("navFieldFormAnalyzer");
         TokenStream ts =  formAnalyzer.tokenStream("fieldNotNeeded",rawToken );
 
         ArrayList<String> list = new ArrayList<>(1);
@@ -63,16 +65,29 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
                 stringPreprocessorError.error(String.format("stacktraceelement: %s", se.toString()));
             }
 
+        } catch (Throwable th) {
+            for (StackTraceElement se : th.getStackTrace()) {
+                stringPreprocessorError.error(String.format("stacktraceelement: %s", se.toString()));
+            }
         }
 
-        String retValue = "";
-        if (list.size() > 1) {
-            //todo: we need LogType
-            System.out.println("Analyzer produces more than one term - should not happen");
-            retValue = String.join("",list);
-        } else {
-            retValue = list.get(0);
+
+
+        try {
+
+            if (list.size() > 1) {
+                //todo: we need LogType
+                System.out.println("Analyzer produces more than one term - should not happen");
+                retValue = String.join("",list);
+            } else {
+                retValue = list.size() == 1 ? list.get(0) : "";
+            }
+        } catch (Throwable th) {
+            for (StackTraceElement se : th.getStackTrace()) {
+                stringPreprocessorError.error(String.format("stacktraceelement: %s", se.toString()));
+            }
         }
+
 
         navFieldForm.debug( String.format("navFieldForm: got \"%s\" returned \"%s\"", rawToken, retValue)  );
         return retValue;
@@ -99,6 +114,10 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
         } catch (IOException io){
             stringPreprocessorError.error("error in getNavFieldCombined");
             for (StackTraceElement se : io.getStackTrace()) {
+                stringPreprocessorError.error(String.format("stacktraceelement: %s", se.toString()));
+            }
+        } catch (Throwable th) {
+            for (StackTraceElement se : th.getStackTrace()) {
                 stringPreprocessorError.error(String.format("stacktraceelement: %s", se.toString()));
             }
         }
