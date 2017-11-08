@@ -4,7 +4,7 @@
 
 #source ${HOME}/DOCPREPROCESSING_ENVIRONMENT.sh
 
-PROJECTDIR_DOCPREPROCESSING=/swissbib_index/performancetest
+PROJECTDIR_DOCPREPROCESSING=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
 
 SOURCEDIR=$PROJECTDIR_DOCPREPROCESSING/data/raw
 FORMATDIR=$PROJECTDIR_DOCPREPROCESSING/data/format
