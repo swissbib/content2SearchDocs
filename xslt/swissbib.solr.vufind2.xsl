@@ -1396,7 +1396,7 @@
                     <xsl:when test="matches(., 'A145|B405|B406|B407')">
                         <xsl:value-of select="concat(., '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., 'FREE|BORIS|RETROS')">
+                    <xsl:when test="matches(., 'FREE|BORIS|RETROS|EDOC')">
                         <xsl:text>FREE##xx##</xsl:text>
                     </xsl:when>
                 </xsl:choose>
@@ -1539,7 +1539,7 @@
     <xsl:template name="publplace">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='752'] | $fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '751')]">
+            <xsl:for-each select="$fragment/datafield[@tag='752'] | $fragment/datafield[@tag='751']">
                 <xsl:for-each select="child::subfield[@code='a']">
                     <xsl:value-of select="concat(., '##xx##')" />
                 </xsl:for-each>
@@ -1565,7 +1565,7 @@
             </xsl:call-template>
         </xsl:for-each>
         <!-- added entries from GND -->
-        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '751')][matches(descendant::subfield[@code='0'][1], '^\(DE-588\)', 'i')]/subfield[@code='0']">
+        <xsl:for-each select="$fragment/datafield[@tag='751'][matches(descendant::subfield[@code='0'][1], '^\(DE-588\)', 'i')]/subfield[@code='0']">
             <xsl:variable name="gndFacade" select="java-gnd-ext:new()" />
             <xsl:variable name="gndnumber" select="text()" />
             <xsl:variable name="forDeduplication" select="java-gnd-ext:getReferencesConcatenated($gndFacade, string($gndnumber))"></xsl:variable>
@@ -1576,7 +1576,7 @@
             </xsl:call-template>
         </xsl:for-each>
         <!-- relator specific search fields -->
-        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '751')]/subfield[@code='4']">
+        <xsl:for-each select="$fragment/datafield[@tag='751']/subfield[@code='4']">
             <xsl:variable name="relatorcode" select="." />
             <xsl:variable name="forDeduplication">
                 <xsl:for-each select="preceding-sibling::subfield[@code='a']">
