@@ -60,7 +60,7 @@ class ProcessHANForSearchDocs:
         self.logfileName = "".join([self.logDir,"han2solr.log"])
         self.LOGFILE = open(self.logDir + os.sep +  "han2Solr.log", "a")
         #self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
-        self.JAVA_PROGRAM_CREATING_SEARCHDOCS = "xml2SearchEngineDoc.jar"
+        self.JAVA_PROGRAM_CREATING_SEARCHDOCS = "content2SearchDocs-0.8-SNAPSHOT.jar"
         self.LOGCONFIGmarc2SOLR = "marcxml2solrlog4j_1.xml"
         self.CONFFILE=self.binDir + "/configArchivaldata.properties"
         self.XSLTPATH = self.M2S  + "/xslt" + "###" + self.M2S + "/xsltskipRecords"
