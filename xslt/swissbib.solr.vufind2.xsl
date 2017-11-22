@@ -133,6 +133,9 @@
             <xsl:call-template name="journals">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="descriptionlevel">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
             <xsl:call-template name="add_fields">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -1607,6 +1610,42 @@
             </xsl:call-template>
         </xsl:for-each>
     </xsl:template>
+
+    <!-- HAN Description Level as number for sorting in Archives online -->
+    <xsl:template name="descriptionlevel">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='351']">
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Bestand')">
+                    <xsl:value-of select="7" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Teilbestand')">
+                    <xsl:value-of select="6" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Serie')">
+                    <xsl:value-of select="5" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Teilserie')">
+                    <xsl:value-of select="4" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Dossier')">
+                    <xsl:value-of select="3" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Teildossier')">
+                    <xsl:value-of select="2" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Dokument')">
+                    <xsl:value-of select="1" />
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)" />
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'description_level_str_mv'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+        </xsl:call-template>
+    </xsl:template>
+
 
     <!-- additional content, anything not indexed somewhere else: -->
     <!-- 245, 250, 255, 260, 264, 300, 500, 501, 502, 504, 505, 506, 507, 508, 509, 510, 511, 513, 516, 518, 520, 521,
