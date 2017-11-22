@@ -1296,6 +1296,11 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='024'][@ind1='8']/subfield[@code='a']">
+            <field name="other_id_isn_mv">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
         <xsl:for-each select="$fragment/datafield[@tag='773']/subfield[@code='o']">
             <field name="hostotherID_str_mv">
                 <xsl:value-of select="." />
