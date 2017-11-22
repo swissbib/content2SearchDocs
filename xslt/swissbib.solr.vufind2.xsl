@@ -419,6 +419,22 @@
                 <xsl:value-of select="concat('ddc', substring(., 1,1))" />
             </field>
         </xsl:for-each>
+        <!-- DDC degree of determinancy 3, standard and non-standard fields -->
+        <xsl:for-each select="$fragment/datafield[@tag='082']/subfield[@code='a']">
+            <field name="classif_ddc_3">
+                <xsl:value-of select="substring(., 1,3)" />
+            </field>
+        </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'sb_2001', 'i')]/subfield[@code='c']">)">
+            <field name="classif_ddc_3">
+                <xsl:value-of select="substring(., 1,3)" />
+            </field>
+        </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'ehelv', 'i')]/subfield[@code='d']">)">
+            <field name="classif_ddc_3">
+                <xsl:value-of select="substring(., 1,3)" />
+            </field>
+        </xsl:for-each>
         <!-- RVK / ZDBS classifications  -->
         <xsl:for-each select="$fragment/datafield[@tag='084']/subfield[@code='a']">
             <xsl:if test="matches(following-sibling::subfield[@code='2'], 'rvk', 'i')">
