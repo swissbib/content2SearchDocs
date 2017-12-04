@@ -20,7 +20,7 @@ class ProcessSrwMessages:
 
     def __init__(self):
 
-        self.JAVA_PROGRAM_CREATING_SEARCHDOCS = "xml2SearchEngineDoc.jar"
+        self.JAVA_PROGRAM_CREATING_SEARCHDOCS = "content2SearchDocs-0.8-SNAPSHOT.jar"
 
 
         self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
