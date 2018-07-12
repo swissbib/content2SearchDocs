@@ -1,0 +1,99 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+apply plugin: 'distribution'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+
+
+group = 'org.swissbib.docproc'
+version = '0.8-SNAPSHOT'
+
+description = """content2SearchDocs"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+    dependencies {
+        //http://imperceptiblethoughts.com/shadow/
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
+
+repositories {
+
+    maven { url "http://repo.maven.apache.org/maven2" }
+    mavenLocal()
+    //ich benoetige jcenter damit die dependency auf diese Komponente aufgelöst werden kann
+    //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet/2.3.0/org.restlet-2.3.0.pom
+    //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet.ext.servlet/2.3.0/org.restlet.ext.servlet-2.3.0.pom
+    //Required by:
+    //project : > org.apache.solr:solr-analysis-extras:7.3.0
+    //todo: was ist der Unterschied zwischen jcenter und maven
+    // kann es sein, dass das servlet auf https://mvnrepository.com/artifact/org.restlet.jee abrufbar ist?
+    //möglicherweise maven repository oben ohne Adresse angeben
+    //ich habe immer noch das Problem, dass ich die saxon Komponente lokal bereitstellen muss, Finde ich hier noch einen besseren
+    //Weg - provates remote respotory? - für Externe besser dokumentieren
+    jcenter()
+}
+
+
+
+dependencies {
+    compile(group: 'org.apache.solr', name: 'solr-analysis-extras', version:'7.3.1') {
+        exclude(module: 'slf4j-log4j12')
+    }
+    compile group: 'org.apache.solr', name: 'solr-solrj', version:'7.3.1'
+    compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.4.1'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version:'1.5.7'
+    compile(group: 'org.apache.tika', name: 'tika-app', version:'1.14') {
+        exclude(module: 'slf4j-log4j12')
+    }
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version:'1.7.16'
+    compile group: 'net.sf.saxon', name: 'Saxon-PE', version:'9.5.1.4J'
+    testCompile group: 'junit', name: 'junit', version:'4.12'
+}
+
+
+
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs/lib"
+    from configurations.runtime
+}
+
+distTar {
+
+    compression = Compression.GZIP
+    classifier = 'dist'
+    extension = 'tar.gz'
+}
+
+distZip {
+    classifier = 'dist'
+}
+
+shadowJar {
+    zip64 true
+}
+
+def jarDir="./lib"
+jar {
+    manifest {
+        //attributes "Class-Path": configurations.compile.collect { it.absolutePath }.join(" ")
+        attributes "Class-Path": configurations.runtime.files.collect { jarDir+"/$it.name" }.join(' ')
+        attributes "Main-Class": 'org.swissbib.documentprocessing.XML2SearchDocEngine'
+
+        //attributes 'Class-Path': configurations.compile.collect{it.toURI().toString()}.join(' ')
+    }
+}
