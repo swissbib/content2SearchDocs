@@ -1,6 +1,5 @@
 package org.swissbib.documentprocessing.plugins;
 
-import com.sun.tools.hat.internal.model.StackTrace;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
