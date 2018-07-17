@@ -1,5 +1,0 @@
-#frequent document processing w=weedingMode is SHORT -> records will be skipped (swissbib orange)
-00 1,3,5,7,9,11,13,15,17,19,21,23 * * * /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/bin/sb_UpdateFeedOnlyHoldingsDB.sh -wLONG -d/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/data/update/request -bsy1  >> /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/log/update/frequentUpdateDBOnlyShell.log 2>&1
-
-#threshold for MARC - Update messages got from CBS
-5,10,15,20,25,30,35,40,50,55 * * * * [ `ls -U /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/data/update/request | wc -l` -gt 25000 ] && /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/catcher/tomcat/bin/shutdown.sh -force > /dev/null 2>&1
