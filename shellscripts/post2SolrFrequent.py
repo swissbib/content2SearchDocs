@@ -46,6 +46,9 @@ class Post2SolrFrequent:
         self.POSTDIRBASE_FROM = self.PROJECTDIR_DOCPROCESSING + "/data/outputfilesFrequent"
         self.POSTDIRBASE_TO = self.PROJECTDIR_DOCPROCESSING + "/data/outputfilesFrequentProcess"
         self.ARCHIVE_DIR = self.PROJECTDIR_DOCPROCESSING + "/data/archiveFilesFrequent"
+        self.SOLR7_CLIENT_DIR = self.PROJECTDIR_DOCPROCESSING + "/distsolr7"
+        self.SOLR7_INDEX_LOGPATH = self.SOLR7_CLIENT_DIR + "/indexerlogs"
+        self.SOLR7_PROPERTIES = self.SOLR7_CLIENT_DIR + "/app.properties"
         #self.POST_URL = 'curl http://sb-s7.swissbib.unibas.ch:8080/solr/sb-biblio/update?commit=false -H "Content-Type: text/xml" --data-binary @{0}'
         self.POST_URL = 'curl {0}?commit=false -H "Content-Type: text/xml" --data-binary @{1}'
         #self.POST_URL_SUBPROCESS = 'http://sb-s7.swissbib.unibas.ch:8080/solr/sb-biblio/update?commit=false'
@@ -56,6 +59,8 @@ class Post2SolrFrequent:
         #self.DEFAULT_STDERR = sys.stderr
         #sys.stdout = self.LOGFILE
         #sys.stderr = self.LOGFILE
+        self.METAFACTURE_HOME = self.SOLR7_CLIENT_DIR
+
 
 
 
@@ -147,6 +152,42 @@ class Post2SolrFrequent:
             rc = pipe.close()
             if rc is not None and rc >> 8:
                 self.writeLogMessage("errors while committing posts")
+
+
+
+
+    def post2SOLR7(self):
+        self.writeLogMessage(self.currentDateTime() + " documents are now posted to SOLR 7 cluster...")
+
+        os.system("cd " + self.SOLR7_CLIENT_DIR)
+
+        runIndexerclient = 'java -jar -Dlog4j.configurationFile={LOG4J}   -Dlog.path.clientIndexer={LOGPATH} -Dapp.properties={APPPROPS}   {JARFILE}'.format(
+            LOG4J='log4j.xml',
+            LOGPATH=self.SOLR7_INDEX_LOGPATH,
+            APPPROPS=self.SOLR7_PROPERTIES,
+            JARFILE=self.SOLR7_CLIENT_DIR + '/indexerSolrClient-1.0-SNAPSHOT-plugin.jar'
+            )
+
+
+
+        self.writeLogMessage("call for indexerclient: " + runIndexerclient)
+
+        os.system(runIndexerclient)
+
+        self.writeLogMessage(self.currentDateTime() + " finished posting documents  to SOLR 7 cluster...")
+
+
+    def post2SOLR7MF(self):
+        self.writeLogMessage(self.currentDateTime() + " documents are now posted to SOLR 7 cluster...")
+
+
+        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {MF_HOME}/flux.sh {MF_HOME}/flux/indexsolr.flux ".format(
+            MF_HOME=self.METAFACTURE_HOME,
+        )
+
+        self.writeLogMessage("call for indexerclient: " + runIndexerClientMF)
+        os.system(runIndexerClientMF)
+        self.writeLogMessage(self.currentDateTime() + " finished posting documents  to SOLR 7 cluster...")
 
 
 
@@ -271,9 +312,15 @@ if __name__ == '__main__':
     try:
 
         frequentPost = Post2SolrFrequent()
+        frequentPost.writeLogMessage("call prechecks: " + frequentPost.currentDateTime())
         frequentPost.preChecks(options)
+        frequentPost.writeLogMessage("move documents: " + frequentPost.currentDateTime())
         frequentPost.moveDocuments()
+        frequentPost.writeLogMessage("post 2 SOLR4: " + frequentPost.currentDateTime())
         frequentPost.post2SOLR()
+        frequentPost.writeLogMessage("post 2 SOLR7: " + frequentPost.currentDateTime())
+        frequentPost.post2SOLR7MF()
+        frequentPost.writeLogMessage("now archiving starts: " + frequentPost.currentDateTime())
         frequentPost.archiveAndZip()
 
         frequentPost.writeLogMessage("post to SOLR has finished: " + frequentPost.currentDateTime())
