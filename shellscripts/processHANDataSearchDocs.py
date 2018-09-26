@@ -44,10 +44,11 @@ class ProcessHANForSearchDocs:
         self.M2S = args.marc2solr
 
 
-        self.urlGreen = args.green
-        self.urlOrange = args.orange
-        self.urlGreenCommit = self.urlGreen + "?commit=true"
-        self.urlOrangeCommit = self.urlOrange + "?commit=true"
+        #self.urlGreen = args.green
+        #self.urlOrange = args.orange
+        self.urlGreenCommit = []
+        self.urlOrangeCommit = []
+        self.__createClusterURL(args)
         self.M2SarchiveFilesArchivaldata =  self.M2S + '/data/archivaldata_archive'
         self.M2SoutfilesArchivalData = self.M2S + '/data/outputfiles_archivaldata'
         self.SFarchiveFilesFrequent = self.SF +  '/data/archivaldata_archive'
@@ -90,6 +91,17 @@ class ProcessHANForSearchDocs:
         #                    filemode='a')
 
 
+    def __createClusterURL(self,args):
+        self.urlGreen = args.green.split("###")
+        self.urlOrange = args.orange.split("###")
+
+        for url in self.urlGreen:
+            self.urlGreenCommit.append( url + "?commit=true")
+
+        for url in self.urlOrange:
+            self.urlOrangeCommit.append(url + "?commit=true")
+
+
 
     def checkfileexists(self,filelist):
         """
@@ -128,22 +140,22 @@ class ProcessHANForSearchDocs:
                         self.M2SarchiveFilesArchivaldata])
 
     def deleteHANDocsOnIndices(self):
-        subroutine(["curl",
-                    "-H",
-                    'Content-Type: text/xml',
-                    "-d",
-                    '<delete><query>ctrlnum:HAN*</query></delete>',
-                    self.urlGreenCommit],self)
 
-        subroutine(["curl",
-                    "-H",
-                    'Content-Type: text/xml',
-                    "-d",
-                    '<delete><query>ctrlnum:HAN*</query></delete>',
-                    self.urlOrangeCommit],self)
-        #arguments = "-H 'Content-Type: text/xml' " + "-d '<delete><query>ctrlnum:HAN*</query></delete>' " + ' ' + self.urlGreen
-        #response = os.system("curl " + arguments)
+        for clusterURL in self.urlGreenCommit:
+            subroutine(["curl",
+                        "-H",
+                        'Content-Type: text/xml',
+                        "-d",
+                        '<delete><query>ctrlnum:HAN*</query></delete>',
+                        clusterURL],self)
 
+        for clusterURL in self.urlOrangeCommit:
+            subroutine(["curl",
+                        "-H",
+                        'Content-Type: text/xml',
+                        "-d",
+                        '<delete><query>ctrlnum:HAN*</query></delete>',
+                        clusterURL],self)
 
 
     def processDocuments(self):
@@ -156,10 +168,14 @@ class ProcessHANForSearchDocs:
 
     def sendToSearchServer(self):
 
-        self.post2SOLR(self.urlGreen,"gruen_marcxml")
-        self.post2SOLR(self.urlGreen,"orange_marcxml")
+        for url in self.urlGreen:
+            self.post2SOLR(url,"gruen_marcxml")
+            self.post2SOLR(url,"orange_marcxml")
 
-        self.post2SOLR(self.urlOrange,"orange_marcxml")
+        for url in self.urlOrange:
+            self.post2SOLR(url,"orange_marcxml")
+
+
 
 
 
@@ -325,12 +341,15 @@ def subroutine(arglist, instance = None, cwd='.', ):
 if __name__ == '__main__':
 
     usage = "usage: %prog -g [index green] -o [index orange]  "
+    #in case you want to update more than one cluster use the syntax:
+    #default='http://sb-us15.swissbib.unibas.ch:8080/solr/green/update###http://sb-whatover:8080/solr/green/update')
+
 
     parser = ArgumentParser(usage=usage)
     parser.add_argument('-g', '--green', help='url for index www.swissbib.ch', type=str,
-                        default='http://sb-us3.swissbib.unibas.ch:8080/solr/sb-biblio/update')
+                        default='http://sb-us15.swissbib.unibas.ch:8080/solr/green/update')
     parser.add_argument('-o', '--orange', help='Path to logging directory', type=str,
-                        default='http://sb-us6.swissbib.unibas.ch:8080/solr/sb-biblio/update')
+                        default='http://sb-us11.swissbib.unibas.ch:8080/solr/bb/update')
     parser.add_argument('-f', '--solrfrequent', help='Path to directory structure where frequent updates are processed', type=str,
                         default='/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing')
     parser.add_argument('-m', '--marc2solr', help='Path to directory structure where software and data is located', type=str,
