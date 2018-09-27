@@ -38,6 +38,9 @@ class Post2SolrFrequent:
     def __init__(self):
 
         self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
+        self.PROJECTDIR_DOCPROCESSING_MF = "/swissbib_index/solrDocumentProcessing/MarcToSolrTest"
+        self.POSTCLIENTDIR = self.PROJECTDIR_DOCPROCESSING_MF +  "/dist/postclient"
+
         self.PROJECTDIR_DOCPREPROCESSING = "/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing"
         self.LOGDIR = self.PROJECTDIR_DOCPREPROCESSING + "/log/update"
         self.POSTJAR = self.PROJECTDIR_DOCPROCESSING + "/dist/post.jar"
@@ -59,7 +62,8 @@ class Post2SolrFrequent:
         #self.DEFAULT_STDERR = sys.stderr
         #sys.stdout = self.LOGFILE
         #sys.stderr = self.LOGFILE
-        self.METAFACTURE_HOME = self.SOLR7_CLIENT_DIR
+        self.METAFACTURE_HOME = self.POSTCLIENTDIR
+        self.SOLR7_INDEX_LOGPATH = self.POSTCLIENTDIR + "/log"
 
 
 
@@ -77,14 +81,18 @@ class Post2SolrFrequent:
 
         if options.indexingURL is None:
             self.writeLogMessage("no indexer URL given..")
-            print "URL for indexer host is missing"
-            print "<usage(e.g.): python post2SolrFrequent.py -shttp://sb-s7.swissbib.unibas.ch:8080/solr/sb-biblio/update  > "
+            print ("URL for indexer host is missing")
+            print ("<usage(e.g.): python post2SolrFrequent.py -shttp://sb-us3.swissbib.unibas.ch:8080/solr/sb-biblio/update  > ")
             sys.exit(0)
         else:
             self.INDEXING_MASTER_URL = options.indexingURL
             #self.POST_URL = self.POST_URL.format(self.INDEXING_MASTER_URL)
             #self.POST_URL_SUBPROCESS = self.POST_URL_SUBPROCESS.format(self.INDEXING_MASTER_URL)
             #self.POST_COMMIT = self.POST_COMMIT.format(self.INDEXING_MASTER_URL)
+
+        self.INPUT_DIR = options.inputDir
+        self.writeLogMessage("base input directory: " + self.INPUT_DIR)
+
 
         if not os.path.exists(self.POSTDIRBASE_TO):
             os.system("mkdir -p " +  self.POSTDIRBASE_TO)
@@ -181,8 +189,8 @@ class Post2SolrFrequent:
         self.writeLogMessage(self.currentDateTime() + " documents are now posted to SOLR 7 cluster...")
 
 
-        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {MF_HOME}/flux.sh {MF_HOME}/flux/indexsolr.flux ".format(
-            MF_HOME=self.METAFACTURE_HOME,
+        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {MF_HOME}/sb_post2solr.sh -i {INPUT_DIR} ".format(
+            MF_HOME=self.METAFACTURE_HOME,INPUT_DIR=self.INPUT_DIR
         )
 
         self.writeLogMessage("call for indexerclient: " + runIndexerClientMF)
@@ -296,6 +304,11 @@ if __name__ == '__main__':
     parser = OptionParser(usage=usage)
     parser.add_option("-s", "--indexerURL", dest="indexingURL",
                       help="[REQUIRED] url of the indexer host ")
+
+    parser.add_option("-i", "--inputDir", dest="inputDir",
+                      help="[optional] base input dir which contains documents to be indexed ",
+                      default='/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfilesFrequentProcess')
+
 
     (options, args) = parser.parse_args()
 

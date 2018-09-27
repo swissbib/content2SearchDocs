@@ -52,6 +52,14 @@ class Post2SolrFrequent:
         self.POST_URL_SUBPROCESS = '{0}?commit=false'
         self.POST_COMMIT = 'curl {0}?stream.body=%3Ccommit/%3E'
 
+        self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
+        self.PROJECTDIR_DOCPROCESSING_MF = "/swissbib_index/solrDocumentProcessing/MarcToSolrTest"
+        self.POSTCLIENTDIR = self.PROJECTDIR_DOCPROCESSING_MF +  "/dist/postclient"
+
+        self.METAFACTURE_HOME = self.POSTCLIENTDIR
+        self.SOLR7_INDEX_LOGPATH = self.POSTCLIENTDIR + "/log"
+
+
 
     def preChecks(self,options):
         self.writeLogMessage("in preChecks..")
@@ -72,6 +80,11 @@ class Post2SolrFrequent:
             #self.POST_URL = self.POST_URL.format(self.INDEXING_MASTER_URL)
             #self.POST_URL_SUBPROCESS = self.POST_URL_SUBPROCESS.format(self.INDEXING_MASTER_URL)
             #self.POST_COMMIT = self.POST_COMMIT.format(self.INDEXING_MASTER_URL)
+
+        self.INPUT_DIR = options.inputDir
+        self.writeLogMessage("base input directory: " + self.INPUT_DIR)
+
+
 
         if not os.path.exists(self.POSTDIRBASE_TO):
             os.system("mkdir -p " +  self.POSTDIRBASE_TO)
@@ -137,6 +150,17 @@ class Post2SolrFrequent:
             self.writeLogMessage("errors while committing posts")
 
 
+    def post2SOLR7MF(self):
+        self.writeLogMessage(self.currentDateTime() + " documents are now posted to SOLR 7 cluster...")
+
+
+        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {MF_HOME}/sb_post2solr.sh -i {INPUT_DIR} ".format(
+            MF_HOME=self.METAFACTURE_HOME,INPUT_DIR=self.INPUT_DIR
+        )
+
+        self.writeLogMessage("call for indexerclient: " + runIndexerClientMF)
+        os.system(runIndexerClientMF)
+        self.writeLogMessage(self.currentDateTime() + " finished posting documents  to SOLR 7 cluster...")
 
 
     def archiveAndZip(self):
@@ -244,6 +268,11 @@ if __name__ == '__main__':
     parser.add_option("-s", "--indexerURL", dest="indexingURL",
                       help="[REQUIRED] url of the indexer host ")
 
+    parser.add_option("-i", "--inputDir", dest="inputDir",
+                      help="[optional] base input dir which contains documents to be indexed ",
+                      default='/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfilesWeededProcess')
+
+
     (options, args) = parser.parse_args()
 
     frequentPost = None
@@ -259,9 +288,16 @@ if __name__ == '__main__':
     try:
 
         frequentPost = Post2SolrFrequent()
+        frequentPost.writeLogMessage("pre checks: " + frequentPost.currentDateTime())
         frequentPost.preChecks(options)
+        frequentPost.writeLogMessage("moving documents " + frequentPost.currentDateTime())
         frequentPost.moveDocuments()
+        frequentPost.writeLogMessage("post 2 SOLR4: " + frequentPost.currentDateTime())
         frequentPost.post2SOLR()
+        frequentPost.writeLogMessage("post 2 SOLR7: " + frequentPost.currentDateTime())
+        frequentPost.post2SOLR7MF()
+
+        frequentPost.writeLogMessage("archiving documents: " + frequentPost.currentDateTime())
         frequentPost.archiveAndZip()
 
         frequentPost.writeLogMessage("post to SOLR for weeded documents has finished: " + frequentPost.currentDateTime())
