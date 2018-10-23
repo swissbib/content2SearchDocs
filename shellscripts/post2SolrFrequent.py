@@ -38,7 +38,7 @@ class Post2SolrFrequent:
     def __init__(self):
 
         self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
-        self.PROJECTDIR_DOCPROCESSING_MF = "/swissbib_index/solrDocumentProcessing/MarcToSolrTest"
+        self.PROJECTDIR_DOCPROCESSING_MF = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
         self.POSTCLIENTDIR = self.PROJECTDIR_DOCPROCESSING_MF +  "/dist/postclient"
 
         self.PROJECTDIR_DOCPREPROCESSING = "/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing"
@@ -329,8 +329,8 @@ if __name__ == '__main__':
         frequentPost.preChecks(options)
         frequentPost.writeLogMessage("move documents: " + frequentPost.currentDateTime())
         frequentPost.moveDocuments()
-        frequentPost.writeLogMessage("post 2 SOLR4: " + frequentPost.currentDateTime())
-        frequentPost.post2SOLR()
+        frequentPost.writeLogMessage("post 2 SOLR4 is skipped: " + frequentPost.currentDateTime())
+        #frequentPost.post2SOLR()
         frequentPost.writeLogMessage("post 2 SOLR7: " + frequentPost.currentDateTime())
         frequentPost.post2SOLR7MF()
         frequentPost.writeLogMessage("now archiving starts: " + frequentPost.currentDateTime())

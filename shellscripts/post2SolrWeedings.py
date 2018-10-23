@@ -53,7 +53,7 @@ class Post2SolrFrequent:
         self.POST_COMMIT = 'curl {0}?stream.body=%3Ccommit/%3E'
 
         self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
-        self.PROJECTDIR_DOCPROCESSING_MF = "/swissbib_index/solrDocumentProcessing/MarcToSolrTest"
+        self.PROJECTDIR_DOCPROCESSING_MF = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
         self.POSTCLIENTDIR = self.PROJECTDIR_DOCPROCESSING_MF +  "/dist/postclient"
 
         self.METAFACTURE_HOME = self.POSTCLIENTDIR
