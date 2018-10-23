@@ -70,16 +70,6 @@ class Post2SolrFrequent:
         if not os.path.exists(self.PROJECTDIR_DOCPREPROCESSING):
             raise Exception("directory " + self.PROJECTDIR_DOCPREPROCESSING  + " is missing")
 
-        if options.indexingURL is None:
-            self.writeLogMessage("no indexer URL given..")
-            print "URL for indexer host is missing"
-            print "<usage(e.g.): python post2SolrWeedings.py -shttp://[host]:8080/solr/sb-biblio/update  > "
-            sys.exit(0)
-        else:
-            self.INDEXING_MASTER_URL = options.indexingURL
-            #self.POST_URL = self.POST_URL.format(self.INDEXING_MASTER_URL)
-            #self.POST_URL_SUBPROCESS = self.POST_URL_SUBPROCESS.format(self.INDEXING_MASTER_URL)
-            #self.POST_COMMIT = self.POST_COMMIT.format(self.INDEXING_MASTER_URL)
 
         self.INPUT_DIR = options.inputDir
         self.writeLogMessage("base input directory: " + self.INPUT_DIR)
@@ -134,21 +124,6 @@ class Post2SolrFrequent:
         self.writeLogMessage("moving documents...")
         os.system("mv " + self.POSTDIRBASE_FROM + os.sep  + "*" +  " " + self.POSTDIRBASE_TO)
 
-    def post2SOLR(self):
-        self.writeLogMessage("weeded documents are now posted to SOLR...")
-
-        for singleFile in sorted(os.listdir(self.POSTDIRBASE_TO)):
-
-            self.__sendUseProc(self.POSTDIRBASE_TO,singleFile)
-            #would be better - more evaluation necessary
-            #self.__sendUseSubProc(patternAbsolutePathSubDir,singleFile)
-            self.writeLogMessage("weeded documents in file: " + singleFile + " were posted to master index")
-        self.writeLogMessage("now commit the changes for weeded documents")
-        pipe = os.popen(self.POST_COMMIT.format(self.INDEXING_MASTER_URL))
-        rc = pipe.close()
-        if rc is not None and rc >> 8:
-            self.writeLogMessage("errors while committing posts")
-
 
     def post2SOLR7MF(self):
         self.writeLogMessage(self.currentDateTime() + " documents are now posted to SOLR 7 cluster...")
@@ -172,65 +147,6 @@ class Post2SolrFrequent:
 
     def __initialize(self):
         pass
-
-    def __sendUseSubProc(self,path=None ,file=None):
-        if (path is not None and file is not None):
-            #proc = subprocess.Popen(['curl','http://sb-s7.swissbib.unibas.ch:8080/solr/sb-biblio/update?commit=false'
-            #                        '-H "Content-Type: text/xml',
-            #                         '--data-binary',
-            #                         '@/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfilesFrequentProcess/123/solrout5.xml'],
-            #                        stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-            #doesn't work - why??
-            #see also: https://docs.python.org/2/library/subprocess.html#replacing-os-popen-os-popen2-os-popen3
-            #!!!
-            #use pycurl: http://pycurl.sourceforge.net/doc/install.html#easy-install-pip
-            #example: https://github.com/pycurl/pycurl/blob/master/examples/file_upload.py
-            #!!!
-            url = self.POST_URL_SUBPROCESS.format(self.INDEXING_MASTER_URL)
-            filename = path + os.sep + file
-            request = 'curl ' + url +' -H "Content-Type: text/xml" --data-binary \@' + filename
-            #proc = subprocess.Popen(request,
-            #                        stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-            proc = subprocess.Popen(request, stdout=subprocess.PIPE).communicate()[0]
-            #proc = subprocess.Popen(['curl',url,
-            #                        '-H "Content-Type: text/xml',
-            #                         '--data-binary',
-            #                         '@' + filename],
-            #                        stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-
-            output = proc.stdout.read()
-            err = proc.stderr.read()
-            self.writeLogMessage(">committed file: " + file + "< ")
-            self.writeLogMessage(">stdout / stderr" )
-            self.writeLogMessage(output)
-            self.writeLogMessage(err)
-
-    def __sendUseProc(self,path=None ,file=None):
-
-        if (path is not None and file is not None):
-            cmdline = self.POST_URL.format(self.INDEXING_MASTER_URL, path + os.sep + file)
-            self.writeLogMessage(">>sending file: " + file + " <<")
-            pipe =  os.popen(cmdline)
-            rc = pipe.close()
-            if rc is not None and rc >> 8:
-                self.writeLogMessage("errors while sending content to SearchServer")
-
-
-    def __sendUseJava(self,path=None, file=None):
-        pass
-        #don't use this
-        #cmdline =  "java -Xms2048m -Xmx2048m"                               \
-        #    + " -Durl=" + self.INDEXING_MASTER_URL                          \
-        #    + " -Dcommit=no"                                                \
-        #    + " -jar " + self.POSTJAR + " " + patternAbsolutePathSubDir
-
-        #cmdline =  "java -Xms2048m -Xmx2048m"                               \
-        #    + " -Durl=" + self.INDEXING_MASTER_URL                          \
-        #    + " -Dcommit=yes"                                                \
-        #    + " -jar " + self.POSTJAR
-
-
-
 
 
     def currentDateTime(self,onlyDate = False, wait = False):
@@ -261,12 +177,10 @@ class Post2SolrFrequent:
 
 if __name__ == '__main__':
 
-    usage = "usage: %prog -s [INDEXINGMASTERURL]  "
+    usage = "usage: %prog -i [INPUTDIR]  "
 
     #parser = OptionParser(usage=usage)
     parser = OptionParser(usage=usage)
-    parser.add_option("-s", "--indexerURL", dest="indexingURL",
-                      help="[REQUIRED] url of the indexer host ")
 
     parser.add_option("-i", "--inputDir", dest="inputDir",
                       help="[optional] base input dir which contains documents to be indexed ",
@@ -292,8 +206,6 @@ if __name__ == '__main__':
         frequentPost.preChecks(options)
         frequentPost.writeLogMessage("moving documents " + frequentPost.currentDateTime())
         frequentPost.moveDocuments()
-        frequentPost.writeLogMessage("post 2 SOLR4: " + frequentPost.currentDateTime())
-        frequentPost.post2SOLR()
         frequentPost.writeLogMessage("post 2 SOLR7: " + frequentPost.currentDateTime())
         frequentPost.post2SOLR7MF()
 
