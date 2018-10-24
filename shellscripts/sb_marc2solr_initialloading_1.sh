@@ -54,7 +54,7 @@ function marc2solrAndPost ()
 }
 
 # path definitions
-PROJECTDIR_DOCPROCESSING=/swissbib_index/solrDocumentProcessing/MarcToSolr
+PROJECTDIR_DOCPROCESSING=/swissbib_index/solrDocumentProcessing/MarcToSolr.v7
 
 PROJECTDIR_FREQUENT=/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing
 
@@ -64,7 +64,7 @@ inputpath=${PROJECTDIR_FREQUENT}/data/format_1
 
 confFile=${PROJECTDIR_DOCPROCESSING}/dist/config.properties
 
-outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles
+outDirBase=${PROJECTDIR_DOCPROCESSING}/data/outputfiles.v7
 
 postjar=${PROJECTDIR_DOCPROCESSING}/dist/post.jar
 marc2Solrjar=${PROJECTDIR_DOCPROCESSING}/dist/content2SearchDocs-0.8-SNAPSHOT.jar
