@@ -42,13 +42,18 @@ class ProcessHANForSearchDocs:
 
         self.SF = args.solrfrequent
         self.M2S = args.marc2solr
+        self.METAFACTURE_HOME =args.mfhome
+
+        self.configGreen = args.green
+        self.configOrange = args.orange
+
 
 
         #self.urlGreen = args.green
         #self.urlOrange = args.orange
         self.urlGreenCommit = []
         self.urlOrangeCommit = []
-        self.__createClusterURL(args)
+        #self.__createClusterURL(args)
         self.M2SarchiveFilesArchivaldata =  self.M2S + '/data/archivaldata_archive'
         self.M2SoutfilesArchivalData = self.M2S + '/data/outputfiles_archivaldata'
         self.SFarchiveFilesFrequent = self.SF +  '/data/archivaldata_archive'
@@ -86,21 +91,6 @@ class ProcessHANForSearchDocs:
                                    self.binDir,
                                    self.logDir,
                                    self.SFrawFromHANProcess])
-        #logging framework doesn't work at the moment - don't know why
-        #logging.basicConfig( filename="test.log", format='%(asctime)s %(message)s', level=logging.INFO,
-        #                    filemode='a')
-
-
-    def __createClusterURL(self,args):
-        self.urlGreen = args.green.split("###")
-        self.urlOrange = args.orange.split("###")
-
-        for url in self.urlGreen:
-            self.urlGreenCommit.append( url + "?commit=true")
-
-        for url in self.urlOrange:
-            self.urlOrangeCommit.append(url + "?commit=true")
-
 
 
     def checkfileexists(self,filelist):
@@ -168,12 +158,29 @@ class ProcessHANForSearchDocs:
 
     def sendToSearchServer(self):
 
-        for url in self.urlGreen:
-            self.post2SOLR(url,"gruen_marcxml")
-            self.post2SOLR(url,"orange_marcxml")
+        self.writeLog(self.currentDateTime() + " documents are now posted to SOLR 7 cluster for green ...")
 
-        for url in self.urlOrange:
-            self.post2SOLR(url,"orange_marcxml")
+        #currentDir = self.M2SoutfilesArchivalData + os.sep + subdir
+
+        #For green we can use the base directory for all the content divided into green and orange
+        #thanks to MF ability to search recursive
+        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {MF_HOME}/sb_post2solr.sh -i {INPUT_DIR} -c {INDEX_CONFIG}".format(
+            MF_HOME=self.METAFACTURE_HOME,INPUT_DIR=self.M2SoutfilesArchivalData, INDEX_CONFIG=self.configGreen
+        )
+
+        self.writeLog("call for indexerclient: " + runIndexerClientMF)
+        os.system(runIndexerClientMF)
+
+        #now - for BB - we only send the specific orange content (defined by the subdirectory)
+        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {MF_HOME}/sb_post2solr.sh -i {INPUT_DIR} -c {INDEX_CONFIG}".format(
+            MF_HOME=self.METAFACTURE_HOME,INPUT_DIR=self.M2SoutfilesArchivalData + "/orange_marcxml", INDEX_CONFIG=self.configOrange
+        )
+
+        self.writeLog("call for indexerclient: " + runIndexerClientMF)
+        os.system(runIndexerClientMF)
+
+
+        self.writeLog(self.currentDateTime() + " finished posting documents  to SOLR 7 cluster...")
 
 
 
@@ -340,23 +347,29 @@ def subroutine(arglist, instance = None, cwd='.', ):
 
 if __name__ == '__main__':
 
-    usage = "usage: %prog -g [index green] -o [index orange]  "
-    #in case you want to update more than one cluster use the syntax:
-    #default='http://sb-us15.swissbib.unibas.ch:8080/solr/green/update###http://sb-whatover:8080/solr/green/update')
-
-
+    usage = "usage: %prog -g [index green] -o [index orange] " \
+            "-f [base directory for frequent updates] -s [software base directory] -m [Metfacture Home]"
     parser = ArgumentParser(usage=usage)
-    parser.add_argument('-g', '--green', help='url for index www.swissbib.ch', type=str,
-                        default='http://sgreenc1.swissbib.ch/solr/green/update###http://sgreenc2.swissbib.ch/solr/green/update')
-    #hier fehlt noch der Fallbackcluster zum Beispiel:
-    #default='http://sb-up1.swissbib.unibas.ch/solr/green/update###http://sb-us14.swissbib.unibas.ch:8080/solr/green/update'
-    #server stehen noch nicht fest
-    parser.add_argument('-o', '--orange', help='Path to logging directory', type=str,
-                        default='http://sbbc1.swissbib.ch/solr/bb/update###http://sbbc2.swissbib.ch/solr/bb/update')
+
+    #with Solr7 I'm going to use the new Indexersolr client based on Metafacture because I got some trouble with the old client.
+    #The old client used curl directly from this python script against the SOLR4 master node
+    #First step with SOLR7 was to use the new loadbalancers (sb-up1 and sb-up2) with curl to distribute the index requests to all the
+    #nodes of the clusters. This led to messsage too long errors because the nginx servers of the proxies didn't accept the requests.
+    #Instead of tweeking the proxies I changed to the new indexersolrclient based on MF so I'm able to use Java clients which are going
+    #to connect to the single Zookeeper-ensembles.
+    #This eliminates possible problems with third services like proxies based on nginx and with SOLR7 Zookeeper services always have to be active
+    #Otherwise we can't run distributed search sevices
+    parser.add_argument('-g', '--green', help='path to Zookeeper config for green clusters', type=str,
+                        default='../app.c1c2.properties')
+    parser.add_argument('-o', '--orange', help='path to Zookeeper config for bb clusters', type=str,
+                        default='../app.c1c2.bb.properties')
     parser.add_argument('-f', '--solrfrequent', help='Path to directory structure where frequent updates are processed', type=str,
                         default='/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing')
-    parser.add_argument('-m', '--marc2solr', help='Path to directory structure where software and data is located', type=str,
+    parser.add_argument('-s', '--software', help='Path to directory structure where software and data is located', type=str,
                         default='/swissbib_index/solrDocumentProcessing/MarcToSolr')
+
+    parser.add_argument('-m', '--mfhome', help='Path Metafacture Home directory', type=str,
+                        default='/swissbib_index/solrDocumentProcessing/MarcToSolr/dist/postclient')
 
 
     parser.parse_args()
