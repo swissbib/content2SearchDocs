@@ -347,12 +347,12 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(usage=usage)
     parser.add_argument('-g', '--green', help='url for index www.swissbib.ch', type=str,
-                        default='http://sgreenc1.swissbib.ch/solr/green/update###http://sgreenc2.swissbib.ch/solr/green/update')
+                        default='http://sb-us15.swissbib.unibas.ch:8080/solr/green/update###http://sb-us19.swissbib.unibas.ch.ch:8080/solr/green/update')
     #hier fehlt noch der Fallbackcluster zum Beispiel:
     #default='http://sb-up1.swissbib.unibas.ch/solr/green/update###http://sb-us14.swissbib.unibas.ch:8080/solr/green/update'
     #server stehen noch nicht fest
     parser.add_argument('-o', '--orange', help='Path to logging directory', type=str,
-                        default='http://sbbc1.swissbib.ch/solr/bb/update###http://sbbc2.swissbib.ch/solr/bb/update')
+                        default='http://sb-us11.swissbib.unibas.ch:8080/solr/bb/update###http://sb-us5.swissbib.unibas.ch:8080/solr/bb/update')
     parser.add_argument('-f', '--solrfrequent', help='Path to directory structure where frequent updates are processed', type=str,
                         default='/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing')
     parser.add_argument('-m', '--marc2solr', help='Path to directory structure where software and data is located', type=str,
