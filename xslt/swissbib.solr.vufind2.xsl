@@ -64,6 +64,9 @@
             <xsl:call-template name="jus_class_E">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="subject-code_to_ddc">
+                <xsl:with-param name="fragment" select="record"/>
+            </xsl:call-template>
             <!--xsl:call-template name="jus_class_F">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template -->
@@ -406,38 +409,37 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
-        <!-- DDC main class, standard and non-standard -->
-        <xsl:for-each select="$fragment/datafield[@tag='082']/subfield[@code='a']">
-            <field name="classif_ddc_main">
-                <xsl:value-of select="concat('ddc', substring(., 1,1))" />
-            </field>
-        </xsl:for-each>
-        <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'sb_2001', 'i')]/subfield[@code='c']">)">
-            <field name="classif_ddc_main">
-                <xsl:value-of select="concat('ddc', substring(., 1,1))" />
-            </field>
-        </xsl:for-each>
-        <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'ehelv', 'i')]/subfield[@code='d']">)">
-            <field name="classif_ddc_main">
-                <xsl:value-of select="concat('ddc', substring(., 1,1))" />
-            </field>
-        </xsl:for-each>
-        <!-- DDC degree of determinancy 3, standard and non-standard fields -->
-        <xsl:for-each select="$fragment/datafield[@tag='082']/subfield[@code='a']">
-            <field name="classif_ddc_3">
-                <xsl:value-of select="substring(., 1,3)" />
-            </field>
-        </xsl:for-each>
-        <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'sb_2001', 'i')]/subfield[@code='c']">)">
-            <field name="classif_ddc_3">
-                <xsl:value-of select="substring(., 1,3)" />
-            </field>
-        </xsl:for-each>
-        <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'ehelv', 'i')]/subfield[@code='d']">)">
-            <field name="classif_ddc_3">
-                <xsl:value-of select="substring(., 1,3)" />
-            </field>
-        </xsl:for-each>
+        <!-- DDC for hierarchical facet  -->
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='082']/subfield[@code='a']">
+                <xsl:value-of select="concat('0/', substring(., 1,1), '/', '##xx##')" />
+                <xsl:choose>
+                    <xsl:when test="matches(., '^1[1246789].*')">
+                        <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^21.*')">
+                        <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^2[45678].*')">
+                        <xsl:value-of select="concat('1/', substring(., 1,1), '/3/##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^41.*')">
+                        <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^68.*')">
+                        <xsl:value-of select="concat('1/', substring(., 1,1), '/7/##xx##')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="concat('1/', substring(., 1,1), '/', substring(., 2,1), '/', '##xx##')" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'classif_ddc_facet'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+        </xsl:call-template>
         <!-- RVK / ZDBS classifications  -->
         <xsl:for-each select="$fragment/datafield[@tag='084']/subfield[@code='a']">
             <xsl:if test="matches(following-sibling::subfield[@code='2'], 'rvk', 'i')">
@@ -633,7 +635,29 @@
         </xsl:call-template>
     </xsl:template>
 
-
+    <xsl:template name="subject-code_to_ddc">
+        <xsl:param name="fragment" />
+        <!-- convert 912 (=072) of IDSBB to DDC for hierarchical facet  -->
+        <xsl:variable name="forDeduplication">
+            <xsl:if test="not($fragment/datafield[@tag='082'])">
+            <xsl:for-each select="$fragment/datafield[@tag='912'][matches(descendant::subfield[@code='2'][1], '^SzZuIDS BS/BE', 'i')]/subfield[@code='a']">
+                <xsl:choose>
+                    <xsl:when test="matches(., '^yi$')">
+                        <xsl:value-of select="concat('0/4/', '##xx##')" />
+                        <xsl:value-of select="concat('1/4/3/', '##xx##')" />
+                        <xsl:value-of select="concat('0/8/', '##xx##')" />
+                        <xsl:value-of select="concat('1/8/3/', '##xx##')" />
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:for-each>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'classif_ddc_facet'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+        </xsl:call-template>
+    </xsl:template>
 
 
 
