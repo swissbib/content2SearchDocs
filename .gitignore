@@ -5,3 +5,9 @@ data
 lib
 target
 src/main/resources/saxon-license.lic
+out
+ghscripts.latest
+.gradle
+build
+
+

@@ -97,6 +97,9 @@
             <xsl:call-template name="itemid">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="location">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
             <xsl:call-template name="filter">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -128,6 +131,9 @@
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
             <xsl:call-template name="journals">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
+            <xsl:call-template name="descriptionlevel">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
             <xsl:call-template name="add_fields">
@@ -419,6 +425,22 @@
                 <xsl:value-of select="concat('ddc', substring(., 1,1))" />
             </field>
         </xsl:for-each>
+        <!-- DDC degree of determinancy 3, standard and non-standard fields -->
+        <xsl:for-each select="$fragment/datafield[@tag='082']/subfield[@code='a']">
+            <field name="classif_ddc_3">
+                <xsl:value-of select="substring(., 1,3)" />
+            </field>
+        </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'sb_2001', 'i')]/subfield[@code='c']">)">
+            <field name="classif_ddc_3">
+                <xsl:value-of select="substring(., 1,3)" />
+            </field>
+        </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'ehelv', 'i')]/subfield[@code='d']">)">
+            <field name="classif_ddc_3">
+                <xsl:value-of select="substring(., 1,3)" />
+            </field>
+        </xsl:for-each>
         <!-- RVK / ZDBS classifications  -->
         <xsl:for-each select="$fragment/datafield[@tag='084']/subfield[@code='a']">
             <xsl:if test="matches(following-sibling::subfield[@code='2'], 'rvk', 'i')">
@@ -428,6 +450,11 @@
             </xsl:if>
             <xsl:if test="matches(following-sibling::subfield[@code='2'], 'zdbs', 'i')">
                 <field name="classif_zdbs">
+                    <xsl:value-of select="." />
+                </field>
+            </xsl:if>
+            <xsl:if test="matches(following-sibling::subfield[@code='2'], 'sdnb', 'i')">
+                <field name="sdnb_str_mv">
                     <xsl:value-of select="." />
                 </field>
             </xsl:if>
@@ -901,6 +928,15 @@
             <xsl:for-each select="$fragment/datafield[matches(@tag, '240|242|243|246|247')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '240|242|243|246|247')]/subfield[@code='b']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '240|242|243|246|247')]/subfield[@code='n']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '240|242|243|246|247')]/subfield[@code='p']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='245']/subfield[@code='n']">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
@@ -1263,6 +1299,11 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='024'][@ind1='8']/subfield[@code='a']">
+            <field name="other_id_isn_mv">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
         <xsl:for-each select="$fragment/datafield[@tag='773']/subfield[@code='o']">
             <field name="hostotherID_str_mv">
                 <xsl:value-of select="." />
@@ -1382,7 +1423,7 @@
                     <xsl:when test="matches(., 'A145|B405|B406|B407')">
                         <xsl:value-of select="concat(., '##xx##')" />
                     </xsl:when>
-                    <xsl:when test="matches(., 'FREE|BORIS|RETROS')">
+                    <xsl:when test="matches(., 'FREE|BORIS|RETROS|EDOC')">
                         <xsl:text>FREE##xx##</xsl:text>
                     </xsl:when>
                 </xsl:choose>
@@ -1423,6 +1464,23 @@
         <xsl:call-template name="createUniqueFields">
             <xsl:with-param name="fieldname" select="'itemid_isn_mv'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="location">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='852']/subfield[@code='c']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='949']/subfield[@code='c']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'location_str_mv'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
         </xsl:call-template>
     </xsl:template>
 
@@ -1508,7 +1566,7 @@
     <xsl:template name="publplace">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='752'] | $fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '751')]">
+            <xsl:for-each select="$fragment/datafield[@tag='752'] | $fragment/datafield[@tag='751']">
                 <xsl:for-each select="child::subfield[@code='a']">
                     <xsl:value-of select="concat(., '##xx##')" />
                 </xsl:for-each>
@@ -1534,7 +1592,7 @@
             </xsl:call-template>
         </xsl:for-each>
         <!-- added entries from GND -->
-        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '751')][matches(descendant::subfield[@code='0'][1], '^\(DE-588\)', 'i')]/subfield[@code='0']">
+        <xsl:for-each select="$fragment/datafield[@tag='751'][matches(descendant::subfield[@code='0'][1], '^\(DE-588\)', 'i')]/subfield[@code='0']">
             <xsl:variable name="gndFacade" select="java-gnd-ext:new()" />
             <xsl:variable name="gndnumber" select="text()" />
             <xsl:variable name="forDeduplication" select="java-gnd-ext:getReferencesConcatenated($gndFacade, string($gndnumber))"></xsl:variable>
@@ -1545,7 +1603,7 @@
             </xsl:call-template>
         </xsl:for-each>
         <!-- relator specific search fields -->
-        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '751')]/subfield[@code='4']">
+        <xsl:for-each select="$fragment/datafield[@tag='751']/subfield[@code='4']">
             <xsl:variable name="relatorcode" select="." />
             <xsl:variable name="forDeduplication">
                 <xsl:for-each select="preceding-sibling::subfield[@code='a']">
@@ -1560,6 +1618,42 @@
             </xsl:call-template>
         </xsl:for-each>
     </xsl:template>
+
+    <!-- HAN Description Level as number for sorting in Archives online -->
+    <xsl:template name="descriptionlevel">
+        <xsl:param name="fragment" />
+        <xsl:variable name="forDeduplication">
+            <xsl:for-each select="$fragment/datafield[@tag='351']">
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Bestand')">
+                    <xsl:value-of select="7" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Teilbestand')">
+                    <xsl:value-of select="6" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Serie')">
+                    <xsl:value-of select="5" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Teilserie')">
+                    <xsl:value-of select="4" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Dossier')">
+                    <xsl:value-of select="3" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Teildossier')">
+                    <xsl:value-of select="2" />
+                </xsl:if>
+                <xsl:if test="matches(descendant::subfield[@code='c'][1], '^Dokument')">
+                    <xsl:value-of select="1" />
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)" />
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'description_level_str_mv'" />
+            <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
+        </xsl:call-template>
+    </xsl:template>
+
 
     <!-- additional content, anything not indexed somewhere else: -->
     <!-- 245, 250, 255, 260, 264, 300, 500, 501, 502, 504, 505, 506, 507, 508, 509, 510, 511, 513, 516, 518, 520, 521,
@@ -1758,8 +1852,8 @@
             <xsl:with-param name="fieldname" select="'subpers_lcsh'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -1784,8 +1878,8 @@
             <xsl:with-param name="fieldname" select="'subtitle_lcsh'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -1831,8 +1925,8 @@
             <xsl:with-param name="fieldname" select="'subtop_lcsh'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -1935,7 +2029,7 @@
         </xsl:call-template>
 
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -1980,7 +2074,7 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2066,7 +2160,7 @@
                     </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='g']/text()">
-                    <xsl:value-of select="concat(' (', following-sibling::subfield[@code='g'][1]), ')'" />
+                    <xsl:value-of select="concat(' (', following-sibling::subfield[@code='g'][1], ')')" />
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
                     <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
@@ -2093,15 +2187,10 @@
             <xsl:with-param name="fieldname" select="'subpers_gnd'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-
-
-
-
     </xsl:template>
 
     <xsl:template name="subtitle_gnd">
@@ -2122,7 +2211,7 @@
         </xsl:call-template>
 
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2163,7 +2252,7 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -2348,8 +2437,8 @@
             <xsl:with-param name="fieldname" select="'subpers_rero'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2371,8 +2460,8 @@
             <xsl:with-param name="fieldname" select="'subtitle_rero'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -2415,8 +2504,8 @@
             <xsl:with-param name="fieldname" select="'subtop_rero'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2509,7 +2598,7 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2528,7 +2617,7 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -2570,7 +2659,7 @@
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
         <xsl:call-template name="createNavMultipleFieldsCombined">
-            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green'"/>
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_orange##xx##navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -2660,8 +2749,8 @@
             <xsl:with-param name="fieldname" select="'subpers_idszbz'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2679,8 +2768,8 @@
             <xsl:with-param name="fieldname" select="'subtitle_idszbz'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
     </xsl:template>
@@ -2736,8 +2825,8 @@
             <xsl:with-param name="fieldname" select="'subtop_idszbz'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2836,8 +2925,8 @@
             <xsl:with-param name="fieldname" select="'subpers_sbt'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2879,8 +2968,8 @@
             <xsl:with-param name="fieldname" select="'subtop_sbt'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -2974,8 +3063,8 @@
             <xsl:with-param name="fieldname" select="'subpers_jurivoc'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 
@@ -3017,8 +3106,8 @@
             <xsl:with-param name="fieldname" select="'subtop_jurivoc'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
-        <xsl:call-template name="createNavFieldCombined">
-            <xsl:with-param name="fieldname" select="'navSub_green'"/>
+        <xsl:call-template name="createNavMultipleFieldsCombined">
+            <xsl:with-param name="fieldnamesAsConcatenatedString" select="'navSub_green##xx##navSub_jus'"/>
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
 

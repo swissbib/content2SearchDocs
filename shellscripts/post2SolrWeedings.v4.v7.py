@@ -15,14 +15,16 @@ __license__ = """
         * along with this program; if not, write to the Free Software
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  """
-__version__ = "0.9"
+__version__ = "0.9, 10.3.2015"
 __maintainer__ = 'Guenter Hipler'
 __email__ = 'guenter.hipler@unibas.ch'
 __status__ = "in development"
 __description__ = """
-                    script to control the posting of Search documents (at the moment only SOLR)
-                     which are the outcome of the regular processing of updated content from the data-hub
+                    script to control the posting of documents which are weeded (shouldn't be part of the index) but are still part
+                     of the index (because of processes in the past)
+                     compare: https://github.com/swissbib/content2SearchDocs/issues/34
                 """
+
 
 
 
@@ -38,35 +40,24 @@ class Post2SolrFrequent:
     def __init__(self):
 
         self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
-        self.PROJECTDIR_DOCPROCESSING_MF = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
-        self.POSTCLIENTDIR = self.PROJECTDIR_DOCPROCESSING_MF +  "/dist/postclient"
-
         self.PROJECTDIR_DOCPREPROCESSING = "/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing"
         self.LOGDIR = self.PROJECTDIR_DOCPREPROCESSING + "/log/update"
         self.POSTJAR = self.PROJECTDIR_DOCPROCESSING + "/dist/post.jar"
-        self.LOGFILE = open (self.LOGDIR + os.sep + self.currentDateTime() + ".post2SolrFrequentDocs.log","a")
+        self.LOGFILE = open (self.LOGDIR + os.sep + self.currentDateTime() + ".post2SolrWeededDocs.log","a")
         self.LOGSPOST2SOLR = self.LOGDIR + "/post2SOLR" +  self.currentDateTime() + ".log"
-        self.POSTDIRBASE_FROM = self.PROJECTDIR_DOCPROCESSING + "/data/outputfilesFrequent"
-        self.POSTDIRBASE_TO = self.PROJECTDIR_DOCPROCESSING + "/data/outputfilesFrequentProcess"
+        self.POSTDIRBASE_FROM = self.PROJECTDIR_DOCPROCESSING + "/data/weedingDocumentsDeleteOnServer"
+        self.POSTDIRBASE_TO = self.PROJECTDIR_DOCPROCESSING + "/data/outputfilesWeededProcess"
         self.ARCHIVE_DIR = self.PROJECTDIR_DOCPROCESSING + "/data/archiveFilesFrequent"
-        self.SOLR7_CLIENT_DIR = self.PROJECTDIR_DOCPROCESSING + "/distsolr7"
-        self.SOLR7_INDEX_LOGPATH = self.SOLR7_CLIENT_DIR + "/indexerlogs"
-        self.SOLR7_PROPERTIES = self.SOLR7_CLIENT_DIR + "/app.properties"
-        #self.POST_URL = 'curl http://sb-s7.swissbib.unibas.ch:8080/solr/sb-biblio/update?commit=false -H "Content-Type: text/xml" --data-binary @{0}'
         self.POST_URL = 'curl {0}?commit=false -H "Content-Type: text/xml" --data-binary @{1}'
-        #self.POST_URL_SUBPROCESS = 'http://sb-s7.swissbib.unibas.ch:8080/solr/sb-biblio/update?commit=false'
         self.POST_URL_SUBPROCESS = '{0}?commit=false'
-        #self.POST_COMMIT = 'curl http://sb-s7.swissbib.unibas.ch:8080/solr/sb-biblio/update?stream.body=%3Ccommit/%3E'
         self.POST_COMMIT = 'curl {0}?stream.body=%3Ccommit/%3E'
-        #self.DEFAULT_STDOUT = sys.stdout
-        #self.DEFAULT_STDERR = sys.stderr
-        #sys.stdout = self.LOGFILE
-        #sys.stderr = self.LOGFILE
+
+        self.PROJECTDIR_DOCPROCESSING = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
+        self.PROJECTDIR_DOCPROCESSING_MF = "/swissbib_index/solrDocumentProcessing/MarcToSolr"
+        self.POSTCLIENTDIR = self.PROJECTDIR_DOCPROCESSING_MF +  "/dist/postclient"
+
         self.METAFACTURE_HOME = self.POSTCLIENTDIR
         self.SOLR7_INDEX_LOGPATH = self.POSTCLIENTDIR + "/log"
-
-
-
 
 
 
@@ -79,9 +70,20 @@ class Post2SolrFrequent:
         if not os.path.exists(self.PROJECTDIR_DOCPREPROCESSING):
             raise Exception("directory " + self.PROJECTDIR_DOCPREPROCESSING  + " is missing")
 
+        if options.indexingURL is None:
+            self.writeLogMessage("no indexer URL given..")
+            print "URL for indexer host is missing"
+            print "<usage(e.g.): python post2SolrWeedings.py -shttp://[host]:8080/solr/sb-biblio/update  > "
+            sys.exit(0)
+        else:
+            self.INDEXING_MASTER_URL = options.indexingURL
+            #self.POST_URL = self.POST_URL.format(self.INDEXING_MASTER_URL)
+            #self.POST_URL_SUBPROCESS = self.POST_URL_SUBPROCESS.format(self.INDEXING_MASTER_URL)
+            #self.POST_COMMIT = self.POST_COMMIT.format(self.INDEXING_MASTER_URL)
 
         self.INPUT_DIR = options.inputDir
         self.writeLogMessage("base input directory: " + self.INPUT_DIR)
+
 
 
         if not os.path.exists(self.POSTDIRBASE_TO):
@@ -132,6 +134,21 @@ class Post2SolrFrequent:
         self.writeLogMessage("moving documents...")
         os.system("mv " + self.POSTDIRBASE_FROM + os.sep  + "*" +  " " + self.POSTDIRBASE_TO)
 
+    def post2SOLR(self):
+        self.writeLogMessage("weeded documents are now posted to SOLR...")
+
+        for singleFile in sorted(os.listdir(self.POSTDIRBASE_TO)):
+
+            self.__sendUseProc(self.POSTDIRBASE_TO,singleFile)
+            #would be better - more evaluation necessary
+            #self.__sendUseSubProc(patternAbsolutePathSubDir,singleFile)
+            self.writeLogMessage("weeded documents in file: " + singleFile + " were posted to master index")
+        self.writeLogMessage("now commit the changes for weeded documents")
+        pipe = os.popen(self.POST_COMMIT.format(self.INDEXING_MASTER_URL))
+        rc = pipe.close()
+        if rc is not None and rc >> 8:
+            self.writeLogMessage("errors while committing posts")
+
 
     def post2SOLR7MF(self):
         self.writeLogMessage(self.currentDateTime() + " documents are now posted to SOLR 7 cluster...")
@@ -146,17 +163,74 @@ class Post2SolrFrequent:
         self.writeLogMessage(self.currentDateTime() + " finished posting documents  to SOLR 7 cluster...")
 
 
-
-
     def archiveAndZip(self):
         self.writeLogMessage(" documents are now archived...")
-        os.system("tar zcf " + self.ARCHIVE_DIR + os.sep + "PostedSolrDocuments" + self.currentDateTime() + "tar.gz " + self.POSTDIRBASE_TO + os.sep + "* --remove-files")
+        os.system("tar zcf " + self.ARCHIVE_DIR + os.sep + "PostedWeededSolrDocuments" + self.currentDateTime() + "tar.gz " + self.POSTDIRBASE_TO + os.sep + "* --remove-files")
 
 
 
 
     def __initialize(self):
         pass
+
+    def __sendUseSubProc(self,path=None ,file=None):
+        if (path is not None and file is not None):
+            #proc = subprocess.Popen(['curl','http://sb-s7.swissbib.unibas.ch:8080/solr/sb-biblio/update?commit=false'
+            #                        '-H "Content-Type: text/xml',
+            #                         '--data-binary',
+            #                         '@/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfilesFrequentProcess/123/solrout5.xml'],
+            #                        stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            #doesn't work - why??
+            #see also: https://docs.python.org/2/library/subprocess.html#replacing-os-popen-os-popen2-os-popen3
+            #!!!
+            #use pycurl: http://pycurl.sourceforge.net/doc/install.html#easy-install-pip
+            #example: https://github.com/pycurl/pycurl/blob/master/examples/file_upload.py
+            #!!!
+            url = self.POST_URL_SUBPROCESS.format(self.INDEXING_MASTER_URL)
+            filename = path + os.sep + file
+            request = 'curl ' + url +' -H "Content-Type: text/xml" --data-binary \@' + filename
+            #proc = subprocess.Popen(request,
+            #                        stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            proc = subprocess.Popen(request, stdout=subprocess.PIPE).communicate()[0]
+            #proc = subprocess.Popen(['curl',url,
+            #                        '-H "Content-Type: text/xml',
+            #                         '--data-binary',
+            #                         '@' + filename],
+            #                        stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+
+            output = proc.stdout.read()
+            err = proc.stderr.read()
+            self.writeLogMessage(">committed file: " + file + "< ")
+            self.writeLogMessage(">stdout / stderr" )
+            self.writeLogMessage(output)
+            self.writeLogMessage(err)
+
+    def __sendUseProc(self,path=None ,file=None):
+
+        if (path is not None and file is not None):
+            cmdline = self.POST_URL.format(self.INDEXING_MASTER_URL, path + os.sep + file)
+            self.writeLogMessage(">>sending file: " + file + " <<")
+            pipe =  os.popen(cmdline)
+            rc = pipe.close()
+            if rc is not None and rc >> 8:
+                self.writeLogMessage("errors while sending content to SearchServer")
+
+
+    def __sendUseJava(self,path=None, file=None):
+        pass
+        #don't use this
+        #cmdline =  "java -Xms2048m -Xmx2048m"                               \
+        #    + " -Durl=" + self.INDEXING_MASTER_URL                          \
+        #    + " -Dcommit=no"                                                \
+        #    + " -jar " + self.POSTJAR + " " + patternAbsolutePathSubDir
+
+        #cmdline =  "java -Xms2048m -Xmx2048m"                               \
+        #    + " -Durl=" + self.INDEXING_MASTER_URL                          \
+        #    + " -Dcommit=yes"                                                \
+        #    + " -jar " + self.POSTJAR
+
+
+
 
 
     def currentDateTime(self,onlyDate = False, wait = False):
@@ -187,13 +261,16 @@ class Post2SolrFrequent:
 
 if __name__ == '__main__':
 
-    usage = "usage: %prog -i [INPUTDIR]  "
+    usage = "usage: %prog -s [INDEXINGMASTERURL]  "
 
+    #parser = OptionParser(usage=usage)
     parser = OptionParser(usage=usage)
+    parser.add_option("-s", "--indexerURL", dest="indexingURL",
+                      help="[REQUIRED] url of the indexer host ")
 
     parser.add_option("-i", "--inputDir", dest="inputDir",
                       help="[optional] base input dir which contains documents to be indexed ",
-                      default='/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfilesFrequentProcess')
+                      default='/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfilesWeededProcess')
 
 
     (options, args) = parser.parse_args()
@@ -211,16 +288,19 @@ if __name__ == '__main__':
     try:
 
         frequentPost = Post2SolrFrequent()
-        frequentPost.writeLogMessage("call prechecks: " + frequentPost.currentDateTime())
+        frequentPost.writeLogMessage("pre checks: " + frequentPost.currentDateTime())
         frequentPost.preChecks(options)
-        frequentPost.writeLogMessage("move documents: " + frequentPost.currentDateTime())
+        frequentPost.writeLogMessage("moving documents " + frequentPost.currentDateTime())
         frequentPost.moveDocuments()
-        frequentPost.writeLogMessage("post 2 SOLR7 with MF: " + frequentPost.currentDateTime())
+        frequentPost.writeLogMessage("post 2 SOLR4: " + frequentPost.currentDateTime())
+        frequentPost.post2SOLR()
+        frequentPost.writeLogMessage("post 2 SOLR7: " + frequentPost.currentDateTime())
         frequentPost.post2SOLR7MF()
-        frequentPost.writeLogMessage("now archiving starts: " + frequentPost.currentDateTime())
+
+        frequentPost.writeLogMessage("archiving documents: " + frequentPost.currentDateTime())
         frequentPost.archiveAndZip()
 
-        frequentPost.writeLogMessage("post to SOLR has finished: " + frequentPost.currentDateTime())
+        frequentPost.writeLogMessage("post to SOLR for weeded documents has finished: " + frequentPost.currentDateTime())
 
 
     except Exception as argsError:
