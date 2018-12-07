@@ -17,7 +17,7 @@
 
         <xsl:call-template name="related_person"/>
         <xsl:call-template name="related_corporate"/>
-        <xsl:call-template name="related_topic"/>
+        <!--<xsl:call-template name="related_topic"/>-->
         <xsl:call-template name="related_place"/>
 
 
@@ -25,11 +25,10 @@
 
 
     <xsl:variable name="newline"><xsl:text>&#10;</xsl:text></xsl:variable>
-<!--Prüfung auf Unterfeld $9 -> muss wegen Änderung GND-Datenformat ab 12.9. auf $4 erfolgen, Text ohne 4: -->
     <xsl:template name="related_person">
         <xsl:for-each select="/record/datafield[@tag='500']">
-            <xsl:for-each select="./subfield[@code='9']">
-                <xsl:if test="matches(./text(),'4:nawi|4:pseu')">
+            <xsl:for-each select="./subfield[@code='4']">
+                <xsl:if test="matches(./text(),'nawi|pseu')">
                     <xsl:variable name="values">
                         <xsl:text>500XLIMITERX</xsl:text>
                         <xsl:if test="exists(../subfield[@code='a'])">
@@ -61,8 +60,8 @@
 
     <xsl:template name="related_corporate">
         <xsl:for-each select="/record/datafield[@tag='510']">
-            <xsl:for-each select="./subfield[@code='9']">
-                <xsl:if test="matches(./text(),'4:vorg|4:nach|4:nazw')">
+            <xsl:for-each select="./subfield[@code='4']">
+                <xsl:if test="matches(./text(),'vorg|nach|nazw')">
                     <xsl:variable name="values">
                         <xsl:text>510XLIMITERX</xsl:text>
                         <xsl:if test="exists(../subfield[@code='a'])">
@@ -80,10 +79,10 @@
         </xsl:for-each>
     </xsl:template>
 
-    <xsl:template name="related_topic">
+<!--    <xsl:template name="related_topic">
         <xsl:for-each select="/record/datafield[@tag='550']">
-            <xsl:for-each select="./subfield[@code='9']">
-                <xsl:if test="matches(./text(),'4:obal')">
+            <xsl:for-each select="./subfield[@code='4']">
+                <xsl:if test="matches(./text(),'obal')">
                     <xsl:variable name="values">
                         <xsl:text>550XLIMITERX</xsl:text>
                         <xsl:if test="exists(../subfield[@code='a'])">
@@ -95,12 +94,12 @@
                 </xsl:if>
             </xsl:for-each>
         </xsl:for-each>
-    </xsl:template>
+    </xsl:template>-->
 
     <xsl:template name="related_place">
         <xsl:for-each select="/record/datafield[@tag='551']">
-            <xsl:for-each select="./subfield[@code='9']">
-                <xsl:if test="matches(./text(),'4:vorg|4:nach|4:nazw')">
+            <xsl:for-each select="./subfield[@code='4']">
+                <xsl:if test="matches(./text(),'vorg|nach|nazw')">
                     <xsl:variable name="values">
                         <xsl:text>551XLIMITERX</xsl:text>
                         <xsl:if test="exists(../subfield[@code='a'])">

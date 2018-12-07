@@ -2317,7 +2317,7 @@
     <!-- Anreicherung des Index mit ausgewählten in Beziehung stehenden Entitäten, siehe gnd500.xsl -->
     <xsl:template name="subenrichment_gnd_related">
         <xsl:param name="fragment" />
-        <xsl:for-each select="$fragment/datafield[matches(@tag, '^[6][015][0]')][@ind2='7'][matches(descendant::subfield[@code='2'][1], '^gnd', 'i')]/subfield[@code='0'] |
+        <xsl:for-each select="$fragment/datafield[matches(@tag, '^[6][01][0]')][@ind2='7'][matches(descendant::subfield[@code='2'][1], '^gnd', 'i')]/subfield[@code='0'] |
                               $fragment/datafield[matches(@tag, '^651')][@ind2='7'][matches(descendant::subfield[@code='2'][1], '^gnd', 'i')]/subfield[@code='0']">
             <xsl:variable name="gndFacade" select="java-gnd-ext:new()" />
             <xsl:variable name="gndnumber" select="text()" />
