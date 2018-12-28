@@ -49,12 +49,24 @@ class ProcessHANForSearchDocs:
         self.urlGreenCommit = []
         self.urlOrangeCommit = []
         self.__createClusterURL(args)
+        self.greenInput = args.greenInput
+        self.orangeInput = args.orangeInput
+
+        self.greenZKConfig = args.zgreen
+        self.orangeZKConfig = args.zorange
+
         self.M2SarchiveFilesArchivaldata =  self.M2S + '/data/archivaldata_archive'
         self.M2SoutfilesArchivalData = self.M2S + '/data/outputfiles_archivaldata'
         self.SFarchiveFilesFrequent = self.SF +  '/data/archivaldata_archive'
         self.SFrawFromHAN =  self.SF +  '/data/format_archivaldata'
         self.SFrawFromHANProcess = self.SF +  '/data/format_archivaldata_process'
         self.binDir = self.M2S +  '/dist'
+        self.binPostDir = self.binDir + os.sep + "postclient"
+        self.postScript = self.binPostDir + os.sep + "sb_post2solr.sh"
+
+        self.METAFACTURE_HOME = self.binPostDir
+
+
         self.bashScriptProcessing = 'sb_marc2solr_archivaldata.sh'
         self.hanDeleteQuery = 'commit=true -H "Content-Type: text/xml" -d \'<delete><query>ctrlnum:HAN*</query></delete>\''
         self.logDir = '/swissbib_index/solrDocumentProcessing/MarcToSolr/data/log'
@@ -70,7 +82,6 @@ class ProcessHANForSearchDocs:
         #self.POST_URL_NO_COMMIT = '{0}?commit=false -H "Content-Type: text/xml" --data-binary @{1}'
         self.POST_URL_NO_COMMIT = '{0}?commit=false'
         self.POST_COMMIT = '{0}?stream.body=%3Ccommit/%3E'
-
 
         self.__initialize()
 
@@ -92,14 +103,14 @@ class ProcessHANForSearchDocs:
 
 
     def __createClusterURL(self,args):
-        self.urlGreen = args.green.split("###")
-        self.urlOrange = args.orange.split("###")
+         self.urlGreen = args.green.split("###")
+         self.urlOrange = args.orange.split("###")
 
-        for url in self.urlGreen:
-            self.urlGreenCommit.append( url + "?commit=true")
+         for url in self.urlGreen:
+             self.urlGreenCommit.append( url + "?commit=true")
 
-        for url in self.urlOrange:
-            self.urlOrangeCommit.append(url + "?commit=true")
+         for url in self.urlOrange:
+             self.urlOrangeCommit.append(url + "?commit=true")
 
 
 
@@ -168,12 +179,10 @@ class ProcessHANForSearchDocs:
 
     def sendToSearchServer(self):
 
-        for url in self.urlGreen:
-            self.post2SOLR(url,"gruen_marcxml")
-            self.post2SOLR(url,"orange_marcxml")
+        #index green
+        self.post2SOLR(self.greenInput,self.greenZKConfig)
 
-        for url in self.urlOrange:
-            self.post2SOLR(url,"orange_marcxml")
+        self.post2SOLR(self.orangeInput,self.orangeZKConfig)
 
 
 
@@ -203,31 +212,17 @@ class ProcessHANForSearchDocs:
         self.writeLog("Java program for creating SearchDocs has finished at: {0}".format( self.currentDateTime()))
 
 
-    def post2SOLR(self, server, subdir):
+    def post2SOLR(self, inputDir, config):
 
         self.writeLog("documents are now posted to SOLR...")
-        self.writeLog("server: {0} sub-directory: {1}".format(server,subdir))
-        currentDir = self.M2SoutfilesArchivalData + os.sep + subdir
-        self.writeLog("processing documents in subdir: " + currentDir)
+        self.writeLog("inoutDir: {0} config: {1}".format(inputDir,config))
 
-
-        if os.path.isdir(currentDir):
-
-            for singleFile in sorted(os.listdir(currentDir)):
-                subroutine(["curl",
-                            self.POST_URL_NO_COMMIT.format(server),
-                            "-H",
-                            "Content-Type: text/xml",
-                            "--data-binary",
-                            "@" + currentDir + os.sep + singleFile])
-
-            self.writeLog("content of sub-dir was posted - now commit the updates")
-            subroutine(["curl",
-                       self.POST_COMMIT.format(server)])
-        else:
-            self.writeLog("".join(["no files in dir: ",currentDir, os.linesep,
-                                   "which could be sent by post2Solr job", os.linesep,
-                                   "shouldn't be possible because new content was processed before"] ))
+        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {POSTSCRIPT} -i {INPUT_DIR} -c {INDEX_CONFIG}".format(
+            MF_HOME=self.METAFACTURE_HOME,
+            POSTSCRIPT=self.postScript,
+            INPUT_DIR=inputDir, INDEX_CONFIG=config
+        )
+        os.system(runIndexerClientMF)
 
     def archiveCurrentHANcontent(self):
         for f in os.listdir(self.SFrawFromHAN):
@@ -353,10 +348,32 @@ if __name__ == '__main__':
     #server stehen noch nicht fest
     parser.add_argument('-o', '--orange', help='Path to logging directory', type=str,
                         default='http://sb-us11.swissbib.unibas.ch:8080/solr/bb/update###http://sb-us5.swissbib.unibas.ch:8080/solr/bb/update')
+
     parser.add_argument('-f', '--solrfrequent', help='Path to directory structure where frequent updates are processed', type=str,
                         default='/swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing')
+
     parser.add_argument('-m', '--marc2solr', help='Path to directory structure where software and data is located', type=str,
                         default='/swissbib_index/solrDocumentProcessing/MarcToSolr')
+
+    parser.add_argument('-z', '--zgreen', help='config file with zookeeper definitions for green',
+                        type=str,
+                        default='../app.c1c2.properties')
+    #hier fehlt noch der Fallbackcluster zum Beispiel:
+    #default='http://sb-up1.swissbib.unibas.ch/solr/green/update###http://sb-us14.swissbib.unibas.ch:8080/solr/green/update'
+    #server stehen noch nicht fest
+    parser.add_argument('-c', '--zorange', help='path to directory which contains files and subdirs with content for green to be indexed',
+                        type=str,
+                        default='../app.c1c2.bb.properties')
+
+    parser.add_argument('-i', '--greenInput', help='path to directory which contains files and subdirs with content for green to be indexed',
+                        type=str,
+                        default='/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfiles_archivaldata')
+    #hier fehlt noch der Fallbackcluster zum Beispiel:
+    #default='http://sb-up1.swissbib.unibas.ch/solr/green/update###http://sb-us14.swissbib.unibas.ch:8080/solr/green/update'
+    #server stehen noch nicht fest
+    parser.add_argument('-j', '--orangeInput', help='path to directory which contains files and subdirs with content for green to be indexed',
+                        type=str,
+                        default='/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfiles_archivaldata/orange_marcxml')
 
 
     parser.parse_args()
