@@ -8,6 +8,7 @@
     xmlns:java-nodouble-ext="java:org.swissbib.documentprocessing.plugins.RemoveDuplicates"
     xmlns:java-isbn-ext="java:org.swissbib.documentprocessing.plugins.CreateSecondISBN"
     xmlns:java-analyzeValue="java:org.swissbib.documentprocessing.plugins.SolrStringTypePreprocessor"
+    xmlns:java-institutionFacet="java:org.swissbib.documentprocessing.plugins.CreateLibraryFacets"
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
     xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib java-isbn-ext java-analyzeValue">
     <!--xmlns:fn="http://www.w3.org/2005/xpath-functions"> -->
