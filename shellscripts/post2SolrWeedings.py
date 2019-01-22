@@ -74,6 +74,8 @@ class Post2SolrFrequent:
         self.INPUT_DIR = options.inputDir
         self.writeLogMessage("base input directory: " + self.INPUT_DIR)
 
+        self.INDEX_CONFIG = options.configIndex
+        self.writeLogMessage("index config: " + self.INDEX_CONFIG)
 
 
         if not os.path.exists(self.POSTDIRBASE_TO):
@@ -129,8 +131,8 @@ class Post2SolrFrequent:
         self.writeLogMessage(self.currentDateTime() + " documents are now posted to SOLR 7 cluster...")
 
 
-        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {MF_HOME}/sb_post2solr.sh -i {INPUT_DIR} ".format(
-            MF_HOME=self.METAFACTURE_HOME,INPUT_DIR=self.INPUT_DIR
+        runIndexerClientMF = "export METAFACTURE_HOME={MF_HOME}; cd {MF_HOME}; {MF_HOME}/sb_post2solr.sh -i {INPUT_DIR} -c {INDEX_CONFIG}".format(
+            MF_HOME=self.METAFACTURE_HOME,INPUT_DIR=self.INPUT_DIR, INDEX_CONFIG=self.INDEX_CONFIG
         )
 
         self.writeLogMessage("call for indexerclient: " + runIndexerClientMF)
@@ -185,6 +187,10 @@ if __name__ == '__main__':
     parser.add_option("-i", "--inputDir", dest="inputDir",
                       help="[optional] base input dir which contains documents to be indexed ",
                       default='/swissbib_index/solrDocumentProcessing/MarcToSolr/data/outputfilesWeededProcess')
+
+    parser.add_option("-c", "--configIndex", dest="configIndex",
+                      help="[mandatory] index config properties ",
+                      default='../app.c1c2.properties')
 
 
     (options, args) = parser.parse_args()
