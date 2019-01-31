@@ -747,27 +747,29 @@
             </xsl:for-each>
             <!-- DDC for hierarchical facet  -->
                 <xsl:for-each select="$fragment/datafield[@tag='082']/subfield[@code='a']">
-                    <xsl:value-of select="concat('0/', substring(., 1,1), '/', '##xx##')" />
-                    <xsl:choose>
-                        <xsl:when test="matches(., '^1[1246789].*')">
-                            <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
-                        </xsl:when>
-                        <xsl:when test="matches(., '^21.*')">
-                            <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
-                        </xsl:when>
-                        <xsl:when test="matches(., '^2[45678].*')">
-                            <xsl:value-of select="concat('1/', substring(., 1,1), '/3/##xx##')" />
-                        </xsl:when>
-                        <xsl:when test="matches(., '^41.*')">
-                            <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
-                        </xsl:when>
-                        <xsl:when test="matches(., '^68.*')">
-                            <xsl:value-of select="concat('1/', substring(., 1,1), '/7/##xx##')" />
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="concat('1/', substring(., 1,1), '/', substring(., 2,1), '/', '##xx##')" />
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:if test="matches(., '^[0-9][0-9]')">
+                        <xsl:value-of select="concat('0/', substring(., 1,1), '/', '##xx##')" />
+                        <xsl:choose>
+                            <xsl:when test="matches(., '^1[1246789].*')">
+                                <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
+                            </xsl:when>
+                            <xsl:when test="matches(., '^21.*')">
+                                <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
+                            </xsl:when>
+                            <xsl:when test="matches(., '^2[45678].*')">
+                                <xsl:value-of select="concat('1/', substring(., 1,1), '/3/##xx##')" />
+                            </xsl:when>
+                            <xsl:when test="matches(., '^41.*')">
+                                <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
+                            </xsl:when>
+                            <xsl:when test="matches(., '^68.*')">
+                                <xsl:value-of select="concat('1/', substring(., 1,1), '/7/##xx##')" />
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="concat('1/', substring(., 1,1), '/', substring(., 2,1), '/', '##xx##')" />
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:if>
                 </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
