@@ -750,6 +750,9 @@
                     <xsl:if test="matches(., '^[0-9][0-9]')">
                         <xsl:value-of select="concat('0/', substring(., 1,1), '/', '##xx##')" />
                         <xsl:choose>
+                            <xsl:when test="matches(., '^04.*')">
+                                <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
+                            </xsl:when>
                             <xsl:when test="matches(., '^1[1246789].*')">
                                 <xsl:value-of select="concat('1/', substring(., 1,1), '/0/##xx##')" />
                             </xsl:when>
