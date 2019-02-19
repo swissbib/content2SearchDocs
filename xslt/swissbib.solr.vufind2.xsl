@@ -1,43 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
-    xmlns:java-tika-ext="java:org.swissbib.documentprocessing.plugins.FulltextContentEnrichment"
-    xmlns:java-gnd-ext="java:org.swissbib.documentprocessing.plugins.GNDContentEnrichment"
-    xmlns:java-viaf-ext="java:org.swissbib.documentprocessing.plugins.ViafContentEnrichment"
-    xmlns:java-dsv11-ext="java:org.swissbib.documentprocessing.plugins.DSV11ContentEnrichment"
-    xmlns:java-nodouble-ext="java:org.swissbib.documentprocessing.plugins.RemoveDuplicates"
-    xmlns:java-isbn-ext="java:org.swissbib.documentprocessing.plugins.CreateSecondISBN"
-    xmlns:java-analyzeValue="java:org.swissbib.documentprocessing.plugins.SolrStringTypePreprocessor"
-    xmlns:java-institutionFacet="java:org.swissbib.documentprocessing.plugins.CreateLibraryFacets"
-    xmlns:fn="http://www.w3.org/2005/xpath-functions"
-    xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib java-isbn-ext java-analyzeValue">
+                xmlns:java-tika-ext="java:org.swissbib.documentprocessing.plugins.FulltextContentEnrichment"
+                xmlns:java-gnd-ext="java:org.swissbib.documentprocessing.plugins.GNDContentEnrichment"
+                xmlns:java-viaf-ext="java:org.swissbib.documentprocessing.plugins.ViafContentEnrichment"
+                xmlns:java-dsv11-ext="java:org.swissbib.documentprocessing.plugins.DSV11ContentEnrichment"
+                xmlns:java-nodouble-ext="java:org.swissbib.documentprocessing.plugins.RemoveDuplicates"
+                xmlns:java-isbn-ext="java:org.swissbib.documentprocessing.plugins.CreateSecondISBN"
+                xmlns:java-analyzeValue="java:org.swissbib.documentprocessing.plugins.SolrStringTypePreprocessor"
+                xmlns:java-institutionFacet="java:org.swissbib.documentprocessing.plugins.CreateLibraryFacets"
+                xmlns:fn="http://www.w3.org/2005/xpath-functions"
+                xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib java-isbn-ext java-analyzeValue java-institutionFacet">
     <!--xmlns:fn="http://www.w3.org/2005/xpath-functions"> -->
 
     <xsl:output method="xml"
-            encoding="UTF-8"
-            indent="yes"
-            omit-xml-declaration="yes"
-/>
+                encoding="UTF-8"
+                indent="yes"
+                omit-xml-declaration="yes"
+    />
 
     <doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
-    <desc>
-        Dieses Skript ist die zweite Stufe (step2) der Verarbeitung im Document-Processing zur Aufbereitung
-        der Daten vor der eigentlich Indexierung.
-        Siehe Kurzbeschreibung im Step1, Dokumentation im wiki, Issues, etc.
+        <desc>
+            Dieses Skript ist die zweite Stufe (step2) der Verarbeitung im Document-Processing zur Aufbereitung
+            der Daten vor der eigentlich Indexierung.
+            Siehe Kurzbeschreibung im Step1, Dokumentation im wiki, Issues, etc.
 
-        ************************
-        www.swissbib.org
-        guenter.hipler@unibas.ch
-        oliver.schihin@unibas.ch
-        ************************
+            ************************
+            www.swissbib.org
+            guenter.hipler@unibas.ch
+            oliver.schihin@unibas.ch
+            matthias.edel@unibas.ch
+            ************************
 
-        ****************************
-        07.02.2013 : Guenter : integration of complete holdings structure into the index as stored field
-        ****************************
-        09.08.2013 : Oliver : Beginn Anpassungen neues CBS
-        ****************************
-    </desc>
-</doc>
+            ****************************
+            07.02.2013 : Guenter : integration of complete holdings structure into the index as stored field
+            ****************************
+            09.08.2013 : Oliver : Beginn Anpassungen neues CBS
+            ****************************
+            24.01.2019 : Matthias: Beginn hinzufügen der hierarchischen Library-Facet
+            ****************************
+        </desc>
+    </doc>
 
     <xsl:param name="holdingsStructure" select="''"/>
 
@@ -158,10 +161,10 @@
             <xsl:call-template name="subtop_lcsh">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
-             <xsl:call-template name="subgeo_lcsh">
+            <xsl:call-template name="subgeo_lcsh">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
-             <xsl:call-template name="subform_lcsh">
+            <xsl:call-template name="subform_lcsh">
                 <xsl:with-param name="fragment" select="record"/>
             </xsl:call-template>
             <xsl:call-template name="subpers_mesh">
@@ -300,6 +303,9 @@
                 <xsl:with-param name="nativeXML" select="record" />
             </xsl:call-template>
             <xsl:call-template name="createHoldings" />
+            <xsl:call-template name="createLibraryFacet">
+                <xsl:with-param name="fragment" select="record" />
+            </xsl:call-template>
         </doc>
     </xsl:template>
 
@@ -330,13 +336,13 @@
                 </xsl:choose>
             </xsl:for-each>
             <xsl:for-each select="$fragment/controlfield[@tag='008']">
-				<xsl:variable name="lang" select="substring(text()[1],36,3)"/>
-				<xsl:choose>
-				    <xsl:when test="matches($lang, '\|\|\||und')" />
-				    <xsl:otherwise>
-				        <xsl:value-of select="concat($fragment/substring(controlfield[@tag='008'][1],36,3), '##xx##')" />
-				    </xsl:otherwise>
-				</xsl:choose>
+                <xsl:variable name="lang" select="substring(text()[1],36,3)"/>
+                <xsl:choose>
+                    <xsl:when test="matches($lang, '\|\|\||und')" />
+                    <xsl:otherwise>
+                        <xsl:value-of select="concat($fragment/substring(controlfield[@tag='008'][1],36,3), '##xx##')" />
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
@@ -707,7 +713,7 @@
         <!-- authors -->
         <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='B'], 'IDSBB')][matches(child::subfield[@code='P'], '100|700')]/subfield[@code='a']">
             <xsl:variable name="dsv11Facade" select="java-dsv11-ext:new()" />
-            <xsl:variable name="authorMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='D'], 
+            <xsl:variable name="authorMatchString" select="replace(lower-case(concat(., following-sibling::subfield[@code='D'],
                                                                                         following-sibling::subfield[@code='b'][1],
                                                                                         following-sibling::subfield[@code='c'][1],
                                                                                         following-sibling::subfield[@code='d'][1],
@@ -757,11 +763,11 @@
             <xsl:variable name="relatorcode" select="." />
             <xsl:variable name="forDeduplication">
                 <xsl:for-each select="preceding-sibling::subfield[@code='a']">
-                <xsl:value-of select="." />
+                    <xsl:value-of select="." />
                     <xsl:for-each select="following-sibling::subfield[matches(@code, '[Db-df-su-z]')]">
                         <xsl:value-of select="concat(', ', .)" />
                     </xsl:for-each>
-                <xsl:text>##xx##</xsl:text>
+                    <xsl:text>##xx##</xsl:text>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
@@ -769,7 +775,7 @@
                 <xsl:with-param name="fieldname" select="concat('author_', $relatorcode, '_txt_mv')" />
                 <xsl:with-param name="fieldValues" select="$uniqueSeqValues" />
             </xsl:call-template>
-            </xsl:for-each>
+        </xsl:for-each>
         <!-- generic author facet-->
         <xsl:variable name="forDeduplication">
             <xsl:for-each select="$fragment/navAuthor">
@@ -876,7 +882,7 @@
                 <xsl:when test="matches(text(), '^@$') and exists($fragment/datafield[@tag='773']/subfield[@code='t']/text())">
                     <field name="title">
                         <xsl:value-of select="concat($fragment/datafield[@tag='773'][1]/subfield[@code='t'][1],
-                                                    ', ', 
+                                                    ', ',
                                                     $fragment/datafield[@tag='773'][1]/subfield[@code='g'][1])" />
                     </field>
                     <field name="title_short">
@@ -888,8 +894,8 @@
                 </xsl:when>
                 <xsl:when test="matches(text(), '^@$') and exists($fragment/datafield[@tag='490']/subfield[@code='a']/text())">
                     <field name="title">
-                        <xsl:value-of select="concat($fragment/datafield[@tag='490'][1]/subfield[@code='a'][1], 
-                                                    ', ', 
+                        <xsl:value-of select="concat($fragment/datafield[@tag='490'][1]/subfield[@code='a'][1],
+                                                    ', ',
                                                     $fragment/datafield[@tag='490'][1]/subfield[@code='v'][1])" />
                     </field>
                     <field name="title_short">
@@ -1031,14 +1037,14 @@
                 <xsl:value-of select="substring(replace(., '[\W]', ''), 1,25)" />
             </field>
         </xsl:for-each>
-     </xsl:template>
+    </xsl:template>
 
     <xsl:template name="title_old">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-        <xsl:for-each select="$fragment/datafield[@tag='780']/subfield[@code='t']">
-            <xsl:value-of select="concat(., '##xx##')" />
-        </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='780']/subfield[@code='t']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)" />
         <xsl:call-template name="createUniqueFields">
@@ -1050,9 +1056,9 @@
     <xsl:template name="title_new">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-        <xsl:for-each select="$fragment/datafield[@tag='785']/subfield[@code='t']">
-            <xsl:value-of select="concat(., '##xx##')" />
-        </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='785']/subfield[@code='t']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)" />
         <xsl:call-template name="createUniqueFields">
@@ -1335,7 +1341,7 @@
         </xsl:for-each>
     </xsl:template>
 
-    <!-- formerly 'slinkarticle', indexed to link articles from journal 
+    <!-- formerly 'slinkarticle', indexed to link articles from journal
           @todo necessary in VuFind? -->
     <xsl:template name="container_id">
         <xsl:param name="fragment"/>
@@ -1690,10 +1696,10 @@
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='300']/subfield[@code='a']">
-                <xsl:value-of select="concat(replace(., 
-                                             '[\d]+|bd|vol|band|volume|tome', 
-                                             '', 
-                                             'i'), 
+                <xsl:value-of select="concat(replace(.,
+                                             '[\d]+|bd|vol|band|volume|tome',
+                                             '',
+                                             'i'),
                                              '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[matches(@tag, '8[01][01]')]/subfield[matches(@code, 't|v')]">
@@ -1807,9 +1813,9 @@
         </xsl:call-template>
     </xsl:template>
 
-   <!-- ====
-        LCSH
-        ==== -->
+    <!-- ====
+         LCSH
+         ==== -->
     <xsl:template name="subpers_lcsh">
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
@@ -1827,22 +1833,22 @@
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
-            <!-- Umgang mit $t klaeren, eigener Eintrag nur aus $a und $t fuer Facette waere moeglich (s.u. bei Koerp) -->
+                <!-- Umgang mit $t klaeren, eigener Eintrag nur aus $a und $t fuer Facette waere moeglich (s.u. bei Koerp) -->
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='610'][@ind2='0']/subfield[@code='a']">
-               <xsl:value-of select="."/>
-               <xsl:if test="following-sibling::subfield[@code='b']/text()">
-                   <xsl:for-each select="following-sibling::subfield[@code='b']">
-                       <xsl:value-of select="concat(', ', .)"/>
-                   </xsl:for-each>
-               </xsl:if>
-               <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
-               </xsl:if>
-               <xsl:text>##xx##</xsl:text>
+                <xsl:value-of select="."/>
+                <xsl:if test="following-sibling::subfield[@code='b']/text()">
+                    <xsl:for-each select="following-sibling::subfield[@code='b']">
+                        <xsl:value-of select="concat(', ', .)"/>
+                    </xsl:for-each>
+                </xsl:if>
+                <xsl:if test="following-sibling::subfield[@code='t']/text()">
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                </xsl:if>
+                <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='611'][@ind2='0']/subfield[@code='a']">
                 <xsl:value-of select="." />
@@ -1945,7 +1951,7 @@
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='0']/subfield[@code='z']">
-            <!--<xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='0']/subfield[@code='z']">-->
+                <!--<xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='0']/subfield[@code='z']">-->
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
         </xsl:variable>
@@ -1977,9 +1983,9 @@
         </xsl:call-template>
     </xsl:template>
 
-   <!-- ====
-        MESH
-        ==== -->
+    <!-- ====
+         MESH
+         ==== -->
     <xsl:template name="subpers_mesh">
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
@@ -1997,21 +2003,21 @@
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='610'][@ind2='2']/subfield[@code='a']">
-               <xsl:value-of select="."/>
-               <xsl:if test="following-sibling::subfield[@code='b']/text()">
-                   <xsl:for-each select="following-sibling::subfield[@code='b']">
-                       <xsl:value-of select="concat(', ', .)"/>
-                   </xsl:for-each>
-               </xsl:if>
-               <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                  <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
-               </xsl:if>
-               <xsl:text>##xx##</xsl:text>
+                <xsl:value-of select="."/>
+                <xsl:if test="following-sibling::subfield[@code='b']/text()">
+                    <xsl:for-each select="following-sibling::subfield[@code='b']">
+                        <xsl:value-of select="concat(', ', .)"/>
+                    </xsl:for-each>
+                </xsl:if>
+                <xsl:if test="following-sibling::subfield[@code='t']/text()">
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                </xsl:if>
+                <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='611'][@ind2='2']/subfield[@code='a']">
                 <xsl:value-of select="." />
@@ -2069,7 +2075,7 @@
                 <xsl:if test="following-sibling::subfield[@code='x']/text()">
                     <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='x'][1])" />
                 </xsl:if>
-            <xsl:text>##xx##</xsl:text>
+                <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
@@ -2090,7 +2096,7 @@
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5]')][@ind2='2']/subfield[@code='z']">
-            <!--<xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='2']/subfield[@code='z']">-->
+                <!--<xsl:for-each select="$fragment/datafield[starts-with(@tag, '6')][@ind2='2']/subfield[@code='z']">-->
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
         </xsl:variable>
@@ -2128,9 +2134,9 @@
         </xsl:call-template>
     </xsl:template>
 
-   <!-- ===
-        GND
-        === -->
+    <!-- ===
+         GND
+         === -->
     <xsl:template name="subpers_gnd">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
@@ -2296,7 +2302,7 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- Anreicherung des Index mit GND-Nebenvarianten, Feld wird vorläufig lediglich 
+    <!-- Anreicherung des Index mit GND-Nebenvarianten, Feld wird vorläufig lediglich
          in 'subfull' indexiert (siehe copyField-Direktiven im Schema) (15.01.2013) -->
     <xsl:template name="subenrichment_gnd">
         <xsl:param name="fragment" />
@@ -2376,9 +2382,9 @@
         </xsl:choose>
     </xsl:template>
 
-   <!-- ====
-        RERO
-        ==== -->
+    <!-- ====
+         RERO
+         ==== -->
     <xsl:template name="subpers_rero">
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
@@ -2396,7 +2402,7 @@
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
@@ -2408,9 +2414,9 @@
                     </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
-               <xsl:text>##xx##</xsl:text>
+                <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
@@ -2531,9 +2537,9 @@
         </xsl:call-template>
     </xsl:template>
 
-   <!-- ======
-        IDS BB
-        ====== -->
+    <!-- ======
+         IDS BB
+         ====== -->
     <xsl:template name="subpers_idsbb">
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
@@ -2551,7 +2557,7 @@
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
@@ -2563,7 +2569,7 @@
                     </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
@@ -2681,9 +2687,9 @@
         </xsl:call-template>
     </xsl:template>
 
-   <!-- ===
-        ZBZ
-        === -->
+    <!-- ===
+         ZBZ
+         === -->
     <xsl:template name="subpers_idszbz">
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
@@ -2701,7 +2707,7 @@
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
@@ -2713,7 +2719,7 @@
                     </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
@@ -2848,9 +2854,9 @@
         </xsl:call-template>
     </xsl:template>
 
-   <!-- ===
-        SBT
-        === -->
+    <!-- ===
+         SBT
+         === -->
     <xsl:template name="subpers_sbt">
         <xsl:param name="fragment"/>
         <xsl:variable name="forDeduplication">
@@ -2868,7 +2874,7 @@
                     <xsl:value-of select="concat(' (', following-sibling::subfield[@code='d'][1], ')')"/>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
@@ -2880,7 +2886,7 @@
                     </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="following-sibling::subfield[@code='t']/text()">
-                   <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
+                    <xsl:value-of select="concat(' - ', following-sibling::subfield[@code='t'][1])" />
                 </xsl:if>
                 <xsl:text>##xx##</xsl:text>
             </xsl:for-each>
@@ -2981,7 +2987,7 @@
     </xsl:template>
 
     <!-- ===
-        JURIVOC 
+        JURIVOC
         === -->
     <xsl:template name="subpers_jurivoc">
         <xsl:param name="fragment"/>
@@ -3108,12 +3114,12 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- allgemeines Feld subundef, wird nicht in Facette navSubidsbb kopiert (25.05.2012/osc) 
+    <!-- allgemeines Feld subundef, wird nicht in Facette navSubidsbb kopiert (25.05.2012/osc)
          erweitert für Felder 653 (4.9.2012/osc) -->
     <xsl:template name="subundef">
         <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5][0-9]')][@ind2='4']/subfield[@code='a'] | 
+            <xsl:for-each select="$fragment/datafield[matches(@tag, '^6[0-5][0-9]')][@ind2='4']/subfield[@code='a'] |
                                   $fragment/datafield[matches(@tag, '^653')]/subfield[@code='a']">
                 <xsl:value-of select="concat(., '##xx##')" />
                 <xsl:if test="following-sibling::subfield[@code='b']/text()">
@@ -3148,6 +3154,32 @@
             <xsl:with-param name="fieldname" select="'subundef'" />
             <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
         </xsl:call-template>
+    </xsl:template>
+
+    <!-- create hierarchical facet for institutions/libraries -->
+    <xsl:template name="createLibraryFacet">
+
+        <xsl:param name="fragment" />
+
+        <!-- this block extracts the institutionCodes form the solrMarc, puts them into 'institutionCodes': -->
+        <xsl:variable name="institutionCodes">
+            <xsl:for-each select="$fragment/datafield[@tag='949']/subfield[@code='F'] |
+                                  $fragment/datafield[@tag='852']/subfield[@code='F']
+            ">
+                <xsl:value-of select="text()"/><xsl:text>,</xsl:text>
+            </xsl:for-each>
+        </xsl:variable>
+
+        <!-- this block passes the institutionCodes to java and puts the return value in 'hierarchyStrings' -->
+        <xsl:variable name="InstitutionFacetExtension" select="java-institutionFacet:new()"/>
+        <xsl:variable name="hierarchyStrings" select="java-institutionFacet:getHierarchicalLibraryFacet($InstitutionFacetExtension, $institutionCodes)"/>
+
+        <!-- this block deduplicates the values 'hierarchyString' and puts them into the solr field "libraryFacet": -->
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'libraryFacet'"/>
+            <xsl:with-param name="fieldValues" select="$hierarchyStrings"/>
+        </xsl:call-template>
+
     </xsl:template>
 
     <!-- Lokalbeschlagwortung Musik (Ketten, Feld 692 -->
@@ -3296,18 +3328,18 @@
         <xsl:param name="fieldValues"/>
         <xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']">
             <xsl:variable name="analyzeTokens" select="java-analyzeValue:new()" />
-                <xsl:for-each select="$fieldValues">
-                    <xsl:variable name="currentValue" select="." />
-                    <xsl:variable name="analyzedValue" select="java-analyzeValue:getNavFieldCombined($analyzeTokens, string($currentValue))"/>
-                    <xsl:if test="$analyzedValue ne ''">
-                        <xsl:element name="field">
-                            <xsl:attribute name="name">
-                                <xsl:value-of select="$fieldname"/>
-                            </xsl:attribute>
-                            <xsl:value-of select="$analyzedValue"/>
-                        </xsl:element>
-                    </xsl:if>
-                </xsl:for-each>
+            <xsl:for-each select="$fieldValues">
+                <xsl:variable name="currentValue" select="." />
+                <xsl:variable name="analyzedValue" select="java-analyzeValue:getNavFieldCombined($analyzeTokens, string($currentValue))"/>
+                <xsl:if test="$analyzedValue ne ''">
+                    <xsl:element name="field">
+                        <xsl:attribute name="name">
+                            <xsl:value-of select="$fieldname"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="$analyzedValue"/>
+                    </xsl:element>
+                </xsl:if>
+            </xsl:for-each>
         </xsl:if>
         <!--<xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']"> -->
     </xsl:template>
@@ -3340,16 +3372,16 @@
     <xsl:template name="createNavFieldCombinedSingleValue">
         <xsl:param name="fieldname"/>
         <xsl:param name="fieldValue"/>
-            <xsl:variable name="analyzeTokens" select="java-analyzeValue:new()" />
-            <xsl:variable name="analyzedValue" select="java-analyzeValue:getNavFieldCombined($analyzeTokens, string($fieldValue))"/>
-            <xsl:if test="$analyzedValue ne ''">
-                <xsl:element name="field">
-                    <xsl:attribute name="name">
-                        <xsl:value-of select="$fieldname"/>
-                    </xsl:attribute>
-                    <xsl:value-of select="$analyzedValue"/>
-                </xsl:element>
-            </xsl:if>
+        <xsl:variable name="analyzeTokens" select="java-analyzeValue:new()" />
+        <xsl:variable name="analyzedValue" select="java-analyzeValue:getNavFieldCombined($analyzeTokens, string($fieldValue))"/>
+        <xsl:if test="$analyzedValue ne ''">
+            <xsl:element name="field">
+                <xsl:attribute name="name">
+                    <xsl:value-of select="$fieldname"/>
+                </xsl:attribute>
+                <xsl:value-of select="$analyzedValue"/>
+            </xsl:element>
+        </xsl:if>
         <!--<xsl:if test="(count($fieldValues) > 0) and $fieldValues[1][. ne '']"> -->
     </xsl:template>
 
