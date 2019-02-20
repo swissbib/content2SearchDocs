@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,6 +34,7 @@ import java.util.List;
  * license:  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  *
  * @author Guenter Hipler  <guenter.hipler@unibas.ch>
+ * @author Matthias Edel   <matthias.edel@unibas.ch>
  * @link http://www.swissbib.org
  * @link https://github.com/swissbib/content2SearchDocs
  */
