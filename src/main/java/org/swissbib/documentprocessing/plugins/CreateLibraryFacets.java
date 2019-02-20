@@ -125,6 +125,8 @@ class Properties {
     private String group_code;
     private Address address;
     private String canton;
+    private String website;
+    private Label group_label;
     private Label label;
     private Url url;
     public String getBib_code() { return this.bib_code; }
@@ -135,10 +137,14 @@ class Properties {
     public void setAddress(Address address) { this.address = address; }
     public String getCanton() { return this.canton; }
     public void setCanton(String canton) { this.canton = canton; }
+    public Label getGroup_label() { return this.group_label; }
+    public void setGroup_label(Label group_label) { this.group_label = group_label; }
     public Label getLabel() { return this.label; }
     public void setLabel(Label label) { this.label = label; }
     public Url getUrl() { return this.url; }
     public void setUrl(Url url) { this.url = url; }
+    public String getWebsite() { return this.website; }
+    public void setWebsite(String website) { this.website = website; }
 }
 
 class Address {
