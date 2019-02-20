@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,9 +58,9 @@ public class CreateLibraryFacets implements IDocProcPlugin {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            this.libadminGeoJson = mapper.readValue(new URL(configuration.get("LIBADMIN_DEFINITIONS")), LibadminGeoJson.class);
+            libadminGeoJson = mapper.readValue(new URL(configuration.get("LIBADMIN_DEFINITIONS")), LibadminGeoJson.class);
         } catch (Exception e) {
-            CreateLibraryFacets.facetLibraryLogger.error(e.getMessage() + "\\r\\n" + e.getStackTrace());
+            CreateLibraryFacets.facetLibraryLogger.error(e.getMessage() + "\\r\\n" + e);
         }
     }
 
@@ -79,7 +80,7 @@ public class CreateLibraryFacets implements IDocProcPlugin {
         List<String> hierarchyStrings = new ArrayList<String>();
 
         for (int i=0; i< institutionCodeArray.length; i++) {
-            for (LibadminGeoJsonFeature feature : this.libadminGeoJson.getFeatures()) {
+            for (LibadminGeoJsonFeature feature : libadminGeoJson.getFeatures()) {
                 if (feature.getProperties().getBib_code().equals(institutionCodeArray[i])) {
                     hierarchyStrings.add("0/" + feature.getProperties().getCanton() + "/");
                     hierarchyStrings.add("1/" + feature.getProperties().getCanton() + "/" + institutionCodeArray[i] + "/");
