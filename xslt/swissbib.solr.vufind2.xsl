@@ -3158,9 +3158,7 @@
 
     <!-- create hierarchical facet for institutions/libraries -->
     <xsl:template name="createLibraryFacet">
-
         <xsl:param name="fragment" />
-
         <!-- this block extracts the institutionCodes form the solrMarc, puts them into 'institutionCodes': -->
         <xsl:variable name="institutionCodes">
             <xsl:for-each select="$fragment/datafield[@tag='949']/subfield[@code='F'] |
@@ -3169,17 +3167,14 @@
                 <xsl:value-of select="text()"/><xsl:text>,</xsl:text>
             </xsl:for-each>
         </xsl:variable>
-
         <!-- this block passes the institutionCodes to java and puts the return value in 'hierarchyStrings' -->
         <xsl:variable name="InstitutionFacetExtension" select="java-institutionFacet:new()"/>
         <xsl:variable name="hierarchyStrings" select="java-institutionFacet:getHierarchicalLibraryFacet($InstitutionFacetExtension, $institutionCodes)"/>
-
-        <!-- this block deduplicates the values 'hierarchyString' and puts them into the solr field "libraryFacet": -->
+        <!-- this block deduplicates the values 'hierarchyString' and puts them into the solr field "library_hierarchy_str_mv": -->
         <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'libraryFacet'"/>
+            <xsl:with-param name="fieldname" select="'library_hierarchy_str_mv'"/>
             <xsl:with-param name="fieldValues" select="$hierarchyStrings"/>
         </xsl:call-template>
-
     </xsl:template>
 
     <!-- Lokalbeschlagwortung Musik (Ketten, Feld 692 -->
