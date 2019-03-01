@@ -1606,6 +1606,13 @@
                     </xsl:when>
                 </xsl:choose>
             </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='909'][matches(descendant::subfield[@code='2'][1], '^idsbb [AB]', 'i')]/subfield[@code='f']">
+                <xsl:choose>
+                    <xsl:when test="matches(., 'erarabe|erarabs')">
+                        <xsl:text>FREE##xx##</xsl:text>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
