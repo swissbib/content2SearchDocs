@@ -2550,6 +2550,12 @@
             <xsl:when test="matches(., '^\(viaf\)', 'i')">
                 <xsl:text>viaf</xsl:text>
             </xsl:when>
+            <xsl:when test="matches(., '^\(RERO\)', 'i')">
+                <xsl:text>rero</xsl:text>
+            </xsl:when>
+            <xsl:when test="matches(., '^jurivoc', 'i')">
+                <xsl:text>jurivoc</xsl:text>
+            </xsl:when>
             <xsl:otherwise>
                 <xsl:text>undef</xsl:text>
             </xsl:otherwise>
