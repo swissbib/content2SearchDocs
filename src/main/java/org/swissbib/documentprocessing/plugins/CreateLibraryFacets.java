@@ -94,7 +94,7 @@ public class CreateLibraryFacets implements IDocProcPlugin {
                 }
             }
         }
-        if (hierarchyStrings.size() == 0) hierarchyStrings.add("noMatchingInstitutionCodeFound");
+        if (hierarchyStrings.size() == 0) hierarchyStrings.add("");
         String[] stringArray = new String[hierarchyStrings.size()];
         hierarchyStrings.toArray(stringArray);
         //System.out.println("returning:" + Arrays.toString(stringArray));
