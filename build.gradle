@@ -22,6 +22,8 @@ buildscript {
     repositories {
         jcenter()
         mavenLocal()
+        maven { url 'https://gitlab.com/api/v4/projects/9908493/packages/maven' }
+
     }
     dependencies {
         //http://imperceptiblethoughts.com/shadow/
@@ -34,6 +36,7 @@ repositories {
 
     maven { url "http://repo.maven.apache.org/maven2" }
     mavenLocal()
+    maven { url 'https://gitlab.com/api/v4/projects/9908493/packages/maven' }
     //ich benoetige jcenter damit die dependency auf diese Komponente aufgelöst werden kann
     //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet/2.3.0/org.restlet-2.3.0.pom
     //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet.ext.servlet/2.3.0/org.restlet.ext.servlet-2.3.0.pom
