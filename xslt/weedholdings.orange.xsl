@@ -58,7 +58,7 @@
     </xsl:template>
 
     <xsl:template match="datafield[@tag=852]/subfield">
-        <xsl:if test="matches(@code, 'a|F|B|b|j|s|c')">
+        <xsl:if test="matches(@code, 'a|F|B|b|j|s|x|c')">
             <xsl:copy-of select="." />
         </xsl:if>
     </xsl:template>
