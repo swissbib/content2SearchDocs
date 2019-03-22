@@ -955,7 +955,7 @@
 
         <xsl:for-each select="$fragment/sortauthor">
             <field name="author_sort">
-                <xsl:value-of select="." />
+                <xsl:value-of select="substring(replace(., '[\W]', ''), 1,25)" />
             </field>
         </xsl:for-each>
     </xsl:template>
