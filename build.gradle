@@ -69,6 +69,7 @@ dependencies {
 
 
     compile 'org.swissbib.linked:metafacture-xml:2.0-gh'
+    compile group: 'org.metafacture', name: 'metafacture-io', version: '5.0.1'
 
     testCompile(
             'junit:junit:4.12',
@@ -81,7 +82,9 @@ dependencies {
 
 }
 
-
+test {
+    useJUnitPlatform()
+}
 
 
 task copyToLib(type: Copy) {
