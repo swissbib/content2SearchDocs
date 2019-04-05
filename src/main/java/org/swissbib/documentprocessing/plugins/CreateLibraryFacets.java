@@ -83,7 +83,8 @@ public class CreateLibraryFacets implements IDocProcPlugin {
 
         for (int i=0; i< institutionCodeArray.length; i++) {
             for (Institution institution : libadminGeoJson.getInstitutions()) {
-                if (institution.getBib_code().equals(institutionCodeArray[i])) {
+                if (institution.getBib_code().equals(institutionCodeArray[i])
+                    && !institution.getCanton().isEmpty()) {
                     e0 =  "0/" + institution.getCanton() + "/";
                     e1 = "1/" + institution.getCanton() + "/" + institutionCodeArray[i] + "/";
                     if (!hierarchyStrings.contains(e0)) {
