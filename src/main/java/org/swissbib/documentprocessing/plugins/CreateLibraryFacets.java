@@ -44,9 +44,9 @@ import java.util.List;
 public class CreateLibraryFacets implements IDocProcPlugin {
     private static LibadminGeoJson libadminGeoJson;
     private static Logger facetLibraryLogger;
+    private static boolean initSucceeded = false;
 
     static {
-        //so far I haven't defined this Logger in Log4J configuration
         CreateLibraryFacets.facetLibraryLogger = LoggerFactory.getLogger("facetLibraries");
     }
 
@@ -61,8 +61,10 @@ public class CreateLibraryFacets implements IDocProcPlugin {
         try {
             // get libadminGeoJson from local file (synced by nightly cronjob)
             libadminGeoJson = mapper.readValue(new FileInputStream(configuration.get("LIBADMIN_DEFINITIONS")), LibadminGeoJson.class);
+            initSucceeded = true;
         } catch (Exception e) {
-            CreateLibraryFacets.facetLibraryLogger.error(e.getMessage() + "\\r\\n" + e);
+            initSucceeded = false;
+            CreateLibraryFacets.facetLibraryLogger.warn(e.getMessage() + "\\r\\n" + e);
         }
     }
 
@@ -77,30 +79,34 @@ public class CreateLibraryFacets implements IDocProcPlugin {
      * @return
      */
     public String[] getHierarchicalLibraryFacet(String institutionCode) {
-        String[] institutionCodeArray = institutionCode.split(",");
-        List<String> hierarchyStrings = new ArrayList<String>();
-        String e0, e1;
+        if (initSucceeded) {
+            String[] institutionCodeArray = institutionCode.split(",");
+            List<String> hierarchyStrings = new ArrayList<String>();
+            String e0, e1;
 
-        for (int i=0; i< institutionCodeArray.length; i++) {
-            for (Institution institution : libadminGeoJson.getInstitutions()) {
-                if (institution.getBib_code().equals(institutionCodeArray[i])
-                    && !institution.getCanton().isEmpty()) {
-                    e0 =  "0/" + institution.getCanton() + "/";
-                    e1 = "1/" + institution.getCanton() + "/" + institutionCodeArray[i] + "/";
-                    if (!hierarchyStrings.contains(e0)) {
-                        hierarchyStrings.add(e0);
-                    }
-                    if (!hierarchyStrings.contains(e1)) {
-                        hierarchyStrings.add(e1);
+            for (int i = 0; i < institutionCodeArray.length; i++) {
+                for (Institution institution : libadminGeoJson.getInstitutions()) {
+                    if (institution.getBib_code().equals(institutionCodeArray[i])
+                            && !institution.getCanton().isEmpty()) {
+                        e0 = "0/" + institution.getCanton() + "/";
+                        e1 = "1/" + institution.getCanton() + "/" + institutionCodeArray[i] + "/";
+                        if (!hierarchyStrings.contains(e0)) {
+                            hierarchyStrings.add(e0);
+                        }
+                        if (!hierarchyStrings.contains(e1)) {
+                            hierarchyStrings.add(e1);
+                        }
                     }
                 }
             }
+            if (hierarchyStrings.size() == 0) hierarchyStrings.add("");
+            String[] stringArray = new String[hierarchyStrings.size()];
+            hierarchyStrings.toArray(stringArray);
+            return stringArray;
         }
-        if (hierarchyStrings.size() == 0) hierarchyStrings.add("");
-        String[] stringArray = new String[hierarchyStrings.size()];
-        hierarchyStrings.toArray(stringArray);
-        System.out.println("returning:" + Arrays.toString(stringArray));
-        return stringArray;
+        else {
+            return new String[0];
+        }
     }
 
 }
