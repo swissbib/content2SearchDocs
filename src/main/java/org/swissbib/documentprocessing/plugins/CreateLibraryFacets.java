@@ -79,11 +79,10 @@ public class CreateLibraryFacets implements IDocProcPlugin {
      * @return
      */
     public String[] getHierarchicalLibraryFacet(String institutionCode) {
+        List<String> hierarchyStrings = new ArrayList<String>();
         if (initSucceeded) {
             String[] institutionCodeArray = institutionCode.split(",");
-            List<String> hierarchyStrings = new ArrayList<String>();
             String e0, e1;
-
             for (int i = 0; i < institutionCodeArray.length; i++) {
                 for (Institution institution : libadminGeoJson.getInstitutions()) {
                     if (institution.getBib_code().equals(institutionCodeArray[i])
@@ -99,14 +98,11 @@ public class CreateLibraryFacets implements IDocProcPlugin {
                     }
                 }
             }
-            if (hierarchyStrings.size() == 0) hierarchyStrings.add("");
-            String[] stringArray = new String[hierarchyStrings.size()];
-            hierarchyStrings.toArray(stringArray);
-            return stringArray;
         }
-        else {
-            return new String[0];
-        }
+        if (hierarchyStrings.size() == 0) hierarchyStrings.add("");
+        String[] stringArray = new String[hierarchyStrings.size()];
+        stringArray = hierarchyStrings.toArray(stringArray);
+        return stringArray;
     }
 
 }
