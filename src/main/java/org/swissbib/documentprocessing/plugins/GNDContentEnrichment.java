@@ -3,7 +3,9 @@ package org.swissbib.documentprocessing.plugins;
 import com.mongodb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.*;
 import java.text.MessageFormat;
@@ -11,6 +13,9 @@ import java.text.Normalizer;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
+
 
 
 /**
@@ -48,6 +53,10 @@ import java.util.regex.Pattern;
 public class GNDContentEnrichment implements IDocProcPlugin{
 
 
+
+    private HashMap<String,List<String>> test = new HashMap<>();
+
+
     private static Logger gndProcessing;
     private static Logger macsProcessing;
     private static Logger gndProcessingError;
@@ -75,6 +84,14 @@ public class GNDContentEnrichment implements IDocProcPlugin{
     private static RemoveDuplicates duplicateDetection;
     private static boolean inProductionMode = false;
 
+    //private static final HashMap<String,HashMap<String,List<String>>> gndRules;
+    //private static final HashMap<String,List<String>> gndValues;
+
+    private static final TransformerFactory transformerFactory;
+    private static Transformer gndTransformer = null;
+
+
+
     //private static BufferedWriter logFile = null;
 
     static {
@@ -89,6 +106,33 @@ public class GNDContentEnrichment implements IDocProcPlugin{
         initialized = false;
         errorInitializing = false;
         gndLogOpen = false;
+
+        /* rules Silvia
+        gndRules = new HashMap<>();
+        gndRules.put("500",new HashMap<>());
+        gndRules.get("500").put("4", Arrays.asList("nawi","pseu"));
+        gndRules.put("510",new HashMap<>());
+        gndRules.get("510").put("4", Arrays.asList("vorg","nach","nazw"));
+        gndRules.put("550",new HashMap<>());
+        gndRules.get("550").put("4", Arrays.asList("vorg","nach","nazw"));
+        gndRules.put("551",new HashMap<>());
+        gndRules.get("551").put("4", Arrays.asList("vorg","nach","nazw"));
+
+        gndValues = new HashMap<>();
+        gndValues.put("500",Arrays.asList("a","b","c","d","q"));
+        gndValues.put("510",Arrays.asList("a","b"));
+        gndValues.put("550",Arrays.asList("a"));
+        gndValues.put("551",Arrays.asList("a"));
+        */
+        transformerFactory = TransformerFactory.newInstance();
+        try {
+            InputStream in = GNDContentEnrichment.class.getResourceAsStream("gnd500.xsl");
+            gndTransformer = transformerFactory.newTransformer(new StreamSource(in));
+        } catch (TransformerConfigurationException c) {
+            //gndTransformer = null;
+
+            c.printStackTrace();
+        }
 
 
     }
@@ -141,17 +185,110 @@ public class GNDContentEnrichment implements IDocProcPlugin{
     }
 
 
+    public String getReferences5xxConcatenated(String gndID) {
+
+        String toReturn = "";
+
+        if (!this.checkReadyForProcessing()) return toReturn;
+
+
+
+        if (!errorInitializing) {
+
+            StringBuilder concatReferences = new StringBuilder();
+
+            BasicDBObject query = null;
+            DBCursor cursor = null;
+            try {
+                query = new BasicDBObject(searchField, gndID);
+                cursor = searchCollection.find(query);
+                boolean append = false;
+
+                while (cursor.hasNext()) {
+                    DBObject dbObject =  cursor.next();
+                    byte[] data = (byte[])dbObject.get("record");
+
+                    Optional<String> unzippedRecord = this.getDeCompressedRecord(data,gndID);
+
+                    if (unzippedRecord.isPresent()) {
+
+                        //System.out.println(unzippedRecord.get());
+                        //String completeRecord = unzippedRecord.get();
+                        //StringReader strReader = new StringReader(unzippedRecord.get());
+
+                        //Source gndRecord = new StreamSource(new StringReader(testRecord()));
+                        Source gndRecord = new StreamSource(new StringReader(unzippedRecord.get()));
+                        StringWriter result = new StringWriter();
+                        Result xsltGndResult = new StreamResult(result);
+                        gndTransformer.transform(gndRecord,xsltGndResult);
+                        String extractedGNDValues = result.toString();
+                        if (!extractedGNDValues.isEmpty()) {
+
+                            //System.out.println(extractedGNDValues);
+                            //expected format of the result:
+                            //500XLIMITERX###dies ist b###only test
+                            //510XLIMITERX###dies ist b
+                            for (String line: extractedGNDValues.split("\n")) {
+                                if (line.isEmpty() ) continue; //do not consider empty lines
+                                String[] lineElements = line.split("XLIMITERX");
+                                if (lineElements.length == 2) {
+                                    append = true;
+                                    String elements = lineElements[1];
+                                    String[] tokens = elements.split("###");
+                                    for (String token : tokens) {
+                                        if (token.isEmpty()) continue;
+                                        concatReferences.append(token).append("##xx##");
+                                    }
+
+
+                                }else {
+                                    gndProcessingError.error("getReferences5xxConcatenated - result from xslt not correct, got %s");
+                                }
+
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                toReturn = concatReferences.toString();
+                if (append) {
+                    toReturn = toReturn.substring(0,toReturn.length()-6);
+                }
+
+            } catch (Exception excep) {
+
+                gndProcessingError.error("Error reading from Mongo DB in getReferences5xxConcatenated", excep);
+
+
+            } finally {
+                if (cursor != null){
+                    cursor.close();
+                }
+            }
+            //to suppress duplicates makes sense because we collect values from GND and MACS and merge them together which might produce duplicates
+            toReturn = duplicateDetection.removeDuplicatesFromMultiValuedField(toReturn);
+
+            if (! toReturn.isEmpty()) {
+                gndProcessing.debug("getReferencesConcatenated: gndID: " + gndID + " / references: " + toReturn);
+            }
+
+        }
+
+        return toReturn;
+    }
+
+
+
     public String getReferencesConcatenated(String gndID) {
 
         String toReturn = "";
 
-        if (!inProductionMode) return toReturn;
+        if (!checkReadyForProcessing()) return toReturn;
 
-        if (!initialized)  {
-            initDefaultValues();
-            writeLog("late initialized");
-
-        }
 
         if (!errorInitializing) {
 
@@ -254,81 +391,70 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
         return toReturn;
 
+    }
 
 
-          //old way using the SRU interface of DNB for each request
-//        StringBuilder concatReferences = new StringBuilder();
-//
-//        //1. get the id we can use to fetch GND record
-//        String tgndid = gndID;
-//        writeLog("tgnid: " + tgndid);
-//        Matcher  matcher = idPattern.matcher(tgndid);
-//        boolean append = false;
-//        if (matcher.find()) {
-//
-//            try {
-//
-//                tgndid = matcher.group(2);
-//                writeLog("matched number: " + tgndid);
-//                String url = MessageFormat.format(urlToSource,tgndid);
-//
-//                HttpURLConnection connection = getHTTPConnection (url);
-//                InputStream is = (InputStream) connection.getContent();
-//                MarcXmlReader marcReader = new MarcXmlReader(is);
-//
-//                while (marcReader.hasNext()) {
-//                    Record record = marcReader.next();
-//
-//                    Iterator iter  = record.getDataFields().iterator();
-//
-//                    while (iter.hasNext()) {
-//                        DataField df = (DataField)iter.next();
-//
-//                        for (GNDTagValues tags: tagsToUse) {
-//                            if(df.getTag().equalsIgnoreCase(tags.tagValue)) {
-//                                append = true;
-//                                concatReferences.append(df.getSubfield('a').getData()).append("##xx##");
-//                            }
-//                        }
-//
-//                    }
-//
-//                }
-//
-//
-//                if (null != is)  {
-//                    is.close();
-//                }
-//
-//            }catch (IOException ioEx) {
-//                ioEx.printStackTrace();
-//                gndProcessingError.error("getReferencesConcatenated","IOException ",ioEx);
-//                //ioEx.printStackTrace();
-//
-//            } catch (Exception exc) {
-//                exc.printStackTrace();
-//                gndProcessingError.error("getReferencesConcatenated","Exception ",exc);
-//            } catch (Throwable thr) {
-//                thr.printStackTrace();
-//                gndProcessingError.error("getReferencesConcatenated","Throwable ",thr);
-//            }
-//
-//
-//
-//        }
-//
-//
-//        String toReturn = concatReferences.toString();
-//        if (append) {
-//            toReturn = toReturn.substring(0,toReturn.length()-6);
-//            gndProcessing.info("getReferencesConcatenated", "gndID: " + gndID + " / references: " + toReturn);
-//        }
-//
-//        writeLog("toReturn: " + toReturn);
-//        return toReturn;
+    private boolean checkReadyForProcessing() {
+
+        if (!inProductionMode) return false;
+
+        if (!initialized)  {
+            initDefaultValues();
+
+
+        }
+
+        return true;
+    }
+
+
+    private String testRecord () {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").
+                append("<record type=\"Authority\" xmlns=\"http://www.loc.gov/MARC21/slim\">")
+                .append("<datafield tag=\"500\" ind1=\" \" ind2=\" \">")
+                .append("<subfield code=\"4\">nawi</subfield>")
+                .append("<subfield code=\"0\">(DE-101)041530985</subfield>")
+                .append("<subfield code=\"c\">only test</subfield>")
+                .append("<subfield code=\"0\">(uri)http://d-nb.info/gnd/4153098-6</subfield>")
+                .append("<subfield code=\"b\">dies ist b in 500</subfield>")
+                .append("</datafield>")
+                .append("<datafield tag=\"510\" ind1=\" \" ind2=\" \">")
+                .append("<subfield code=\"4\">vorg</subfield>")
+                .append("<subfield code=\"0\">(DE-101)041530985</subfield>")
+                .append("<subfield code=\"0\">(DE-588)4153098-6</subfield>")
+                .append("<subfield code=\"0\">(uri)http://d-nb.info/gnd/4153098-6</subfield>")
+                .append("<subfield code=\"b\">dies ist b in 510</subfield>")
+                .append("</datafield>")
+                .append("</record>");
+
+        return sb.toString();
+
 
     }
 
+
+    private Optional<String> getDeCompressedRecord(byte[] zippedByteStream, String gndid) {
+        Optional<String> opt = Optional.empty();
+
+        try {
+            Inflater decompresser = new Inflater();
+            decompresser.setInput(zippedByteStream);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(zippedByteStream.length);
+            byte[] buffer = new byte[8192];
+            while (!decompresser.finished()) {
+                int size = decompresser.inflate(buffer);
+                bos.write(buffer, 0, size);
+            }
+            opt = Optional.of(bos.toString());
+            decompresser.end();
+        } catch (DataFormatException dfe) {
+            gndProcessing.error(String.format("couldn't get the zipped GND record from id: %s", gndid));
+        }
+
+        return opt;
+    }
 
 
     public String getReferencesAsXML(String gndID) {
@@ -580,31 +706,6 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
     }
 
-
-    private void writeLog (String message) {
-//        if (gndLogOpen) {
-//            try {
-//                logFile.write(message + "\n");
-//            } catch (IOException ioExc) {
-//                ioExc.printStackTrace();
-//            }
-//        }
-
-    }
-
-
-
 }
 
 
-//class GNDTagValues {
-
-//    public String tagValue;
-//    public String subFieldValue;
-
-//    public GNDTagValues(String tag, String subfield) {
-//        this.tagValue = tag;
-//        this.subFieldValue = subfield;
-//    }
-
-//}
