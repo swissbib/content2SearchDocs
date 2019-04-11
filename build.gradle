@@ -58,7 +58,8 @@ dependencies {
     }
     compile group: 'org.apache.solr', name: 'solr-solrj', version:'7.3.1'
     compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.4.1'
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version:'1.5.7'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.1'
+
     compile(group: 'org.apache.tika', name: 'tika-app', version:'1.19.1') {
         exclude(module: 'slf4j-log4j12')
     }
@@ -68,16 +69,16 @@ dependencies {
     //testCompile group: 'junit', name: 'junit', version:'4.12'
 
 
-    compile 'org.swissbib.linked:metafacture-xml:2.0-gh'
+    compile 'org.swissbib.linked:metafacture-xml:2.0.42-alpha1'
     compile group: 'org.metafacture', name: 'metafacture-io', version: '5.0.1'
 
     testCompile(
             'junit:junit:4.12',
-            'org.junit.jupiter:junit-jupiter-api:5.4.0'
+            'org.junit.jupiter:junit-jupiter-api:5.2.0'
     )
     testRuntime(
-            'org.junit.jupiter:junit-jupiter-engine:5.4.0',
-            'org.junit.vintage:junit-vintage-engine:5.4.0'
+            'org.junit.jupiter:junit-jupiter-engine:5.2.0',
+            'org.junit.vintage:junit-vintage-engine:5.2.0'
     )
 
 }

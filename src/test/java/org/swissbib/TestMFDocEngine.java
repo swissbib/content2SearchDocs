@@ -31,6 +31,7 @@ public class TestMFDocEngine {
         fo.setReceiver(lr);
         XSLTPipeStart ps = new XSLTPipeStart();
         ps.setTemplate(startfile.getAbsolutePath());
+        ps.setTransformerFactory("net.sf.saxon.TransformerFactoryImpl");
         lr.setReceiver(ps);
 
         XSLTPipeStop pipeStop = new XSLTPipeStop();
