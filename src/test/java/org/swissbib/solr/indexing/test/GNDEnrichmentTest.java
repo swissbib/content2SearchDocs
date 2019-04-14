@@ -1,7 +1,8 @@
 package org.swissbib.solr.indexing.test;
 
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.swissbib.documentprocessing.plugins.GNDContentEnrichment;
 
 import java.util.HashMap;
@@ -40,6 +41,7 @@ public class GNDEnrichmentTest {
 
    }
 
+    @Disabled("actually not running - again after MF integration")
     @Test
     public void fetchGNDID () {
 
@@ -65,6 +67,7 @@ public class GNDEnrichmentTest {
 
     }
 
+    @Disabled("actually not running - again after MF integration")
     @Test
     public void fetchGNDIDasXML () {
 

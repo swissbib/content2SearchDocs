@@ -1,9 +1,10 @@
 package org.swissbib.solr.indexing.test;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import static org.junit.Assert.*;
 
 
+import org.junit.jupiter.api.Disabled;
 import org.swissbib.documentprocessing.solr.XML2SOLRDocEngine;
 import org.swissbib.documentprocessing.plugins.RemoveDuplicates;
 
@@ -16,6 +17,7 @@ import org.swissbib.documentprocessing.plugins.RemoveDuplicates;
  */
 public class RemoveDuplicatesTest {
 
+    @Disabled("actually not running")
     @Test
     public void testDeduplication() {
 
@@ -26,6 +28,7 @@ public class RemoveDuplicatesTest {
     }
 
 
+    @Disabled("no longer used after MF integration")
     @Test
     public void testStartMainClass() {
 

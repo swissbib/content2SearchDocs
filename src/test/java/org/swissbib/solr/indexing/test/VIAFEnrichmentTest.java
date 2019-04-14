@@ -1,8 +1,10 @@
 package org.swissbib.solr.indexing.test;
 
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import static org.junit.Assert.*;
+
+import org.junit.jupiter.api.Disabled;
 import org.swissbib.documentprocessing.plugins.ViafContentEnrichment;
 
 import java.util.HashMap;
@@ -39,6 +41,7 @@ public class VIAFEnrichmentTest {
 
     }
 
+    @Disabled("no longer used in the xslt pipe")
     @Test
     public void initializeSolrServer() {
 
@@ -51,6 +54,7 @@ public class VIAFEnrichmentTest {
 
 
 
+    @Disabled("no longer used in the xslt pipe")
     @Test
     public void runSimpleRequest() {
 

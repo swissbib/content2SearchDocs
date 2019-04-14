@@ -1,0 +1,70 @@
+simpleValues:
+  SKIPRECORDS : "false"
+  zwei: "drei"
+
+xsltTemplates:
+  simpleValues:
+
+    XSLTTEMPLATESKIP : "belongs.2.orange.repository.xsl"
+    TRANSFORMERIMPL: "net.sf.saxon.TransformerFactoryImpl"
+    collect_holdings_template: "collect.holdings.xsl"
+    weedholdings_template: "weedholdings.xsl"
+
+  xsltPipe:
+    0: "swissbib.solr.step1.xsl"
+    1: "vufind.special.green.xsl"
+    2: "swissbib.solr.vufind2.xsl"
+
+
+plugins:
+
+  PLUGINS_TO_LOAD:
+    0: "org.swissbib.metafacture.xml.xslt.plugins.ExamplePlugin"
+
+  "PLUGINS_IN_PRODUCTIONMODE":
+    0: "org.swissbib.documentprocessing.plugins.FulltextContentEnrichment"
+    1: "org.swissbib.documentprocessing.plugins.RemoveDuplicates"
+    2: "org.swissbib.documentprocessing.plugins.GNDContentEnrichment"
+    3: "org.swissbib.documentprocessing.plugins.CreateSecondISBN"
+    4: "org.swissbib.documentprocessing.plugins.SolrStringTypePreprocessor"
+    5: "org.swissbib.documentprocessing.plugins.CreateLibraryFacets"
+    6: "org.swissbib.metafacture.xml.xslt.plugins.ExamplePlugin"
+
+  FulltextContentEnrichment:
+    ALLOWED_DOCUMENTS: 'http://www\.ub\.unibas\.ch/tox/IDSLUZ/.*?/PDF###http://www\.ub\.unibas\.ch/tox/IDSBB/.*?/PDF###http://www\.ub\.unibas\.ch/tox/HBZ/.*?/OCR###http://d-nb\.info/.*?/04###http://aleph\.unisg\.ch/hsgscan/.*?\.pdf###http://opac\.nebis\.ch/objects/pdf/.*?\.pdf###http://biblio\.unizh\.ch/objects/pdf/.*?\.pdf###http://libraries\.admin\.ch/gw/toc/pdf/.*?\.pdf###https://www.edubs.ch/unterstuetzung/buecher/.*?\.pdf###https://www.edubs.ch/unterstuetzung/bibliothek/.*?\.pdf'
+    HTTP_FETCH_NOT_ALLOWED: 'http://opac\.nebis\.ch/objects/pdf/.*?\.pdf###http://opac.nebis.ch/objects/pdf03/.*?\.pdf'
+    REMOTEFETCHING: true
+    ALLOWED_CONTENTTYPE: 'application/pdf###application/pdf;charset=UTF-8###application/pdf;charset=Binary'
+    JDBCDRIVER: 'org.mariadb.jdbc.Driver'
+    JDBCCONNECTION: '[define]'
+    user: '[define]'
+    passwd: '[define]'
+
+
+  GNDContentEnrichment:
+    ID_PATTERN_TO_REPLACE: '?##?'
+    PATTERN_FOR_ID: '^(\\(.*?\\))(.*)$'
+    TAGS_TO_USE: '400_a###400_b###400_c###400_d###400_x###410_a###410_b###411_a###411_b###430_a###450_a###450_x###451_a###451_x'
+    TAGS_TO_USE_FOR_MACS: '750_a'
+    DB_HOST: '[define]'
+    DB_PORT: '[define]'
+    AUTHENTICATION_DB: '[define]'
+    AUTHENTICATION_USER: '[define]'
+    AUTHENTICATION_PASSWD: '[define]'
+
+    CONTENT_DB: 'nativeSources'
+    CONTENT_COLLECTION: 'sourceDNBGND1'
+
+  SolrStringTypePreprocessor:
+    NAV_FIELD_FORM_SYNONYMS_DIR: '/swissbib_index/solrDocumentProcessing/MarcToSolr/dist/predoc'
+
+
+
+
+
+
+
+fileBasedConfig:
+  SOLRDOCSIZE : 1000
+  BASENAME_FILE_SOLRDOCS : "solrout.xml"
+  INTERMEDIATE_RESULT_OUTPUT_DIR_FILE:
