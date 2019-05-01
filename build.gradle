@@ -36,7 +36,12 @@ repositories {
 
     maven { url "http://repo.maven.apache.org/maven2" }
     mavenLocal()
+
+    //swissbib-metafacture-extensions
     maven { url 'https://gitlab.com/api/v4/projects/9908493/packages/maven' }
+
+    //kafka-metadata-wrapper
+    maven {url 'http://gitlab.com/api/v4/projects/11507450/packages/maven'}
     //ich benoetige jcenter damit die dependency auf diese Komponente aufgelöst werden kann
     //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet/2.3.0/org.restlet-2.3.0.pom
     //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet.ext.servlet/2.3.0/org.restlet.ext.servlet-2.3.0.pom
@@ -53,10 +58,17 @@ repositories {
 
 
 dependencies {
-    compile(group: 'org.apache.solr', name: 'solr-analysis-extras', version:'7.3.1') {
-        exclude(module: 'slf4j-log4j12')
-    }
-    compile group: 'org.apache.solr', name: 'solr-solrj', version:'7.3.1'
+    //compile(group: 'org.apache.solr', name: 'solr-analysis-extras', version:'7.3.1') {
+    //    exclude(module: 'slf4j-log4j12')
+    //}
+
+
+    //compile(group: 'org.apache.solr', name: 'solr-analysis-extras', version:'8.0.0') {
+    //    exclude(module: 'slf4j-log4j12')
+    //}
+
+
+    //compile group: 'org.apache.solr', name: 'solr-solrj', version:'7.3.1'
     compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.4.1'
     compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.1'
 
@@ -64,14 +76,26 @@ dependencies {
         exclude(module: 'slf4j-log4j12')
     }
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version:'1.7.25'
-    //compile group: 'net.sf.saxon', name: 'Saxon-PE', version:'9.5.1.4J'
-    compile group: 'net.sf.saxon', name: 'Saxon-HE', version: '9.9.1-2'
+    compile group: 'net.sf.saxon', name: 'Saxon-PE', version:'9.5.1.4J'
+    //compile group: 'net.sf.saxon', name: 'Saxon-HE', version: '9.9.1-2'
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.25.2'
     //testCompile group: 'junit', name: 'junit', version:'4.12'
 
 
-    compile 'org.swissbib.linked:metafacture-xml:2.0.43-alpha1'
+    compile 'org.swissbib.linked:metafacture-xml:2.0.45-alpha1'
     compile group: 'org.metafacture', name: 'metafacture-io', version: '5.0.1'
+
+    compile group: 'org.apache.flink', name: 'flink-connector-kafka_2.12', version: '1.8.0'
+    compile group: 'org.apache.flink', name: 'flink-java', version: '1.7.1'
+    compile group: 'org.apache.flink', name: 'flink-streaming-java_2.12', version: '1.8.0'
+    //compile group: 'org.apache.flink', name: 'flink-streaming-scala_2.12', version: '1.7.1'
+    compile group: 'org.apache.flink', name: 'flink-clients_2.12', version: '1.8.0'
+
+    compile 'org.swissbib:kafka-metadata-wrapper:1.1.0'
+    implementation "org.metafacture:metafacture-framework:5.0.1"
+//    implementation "org.metafacture:metafacture-io:5.0.1"
+
+
 
     testCompile(
             'junit:junit:4.12',

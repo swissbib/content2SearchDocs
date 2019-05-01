@@ -9,7 +9,7 @@ import java.util.Optional;
 public class MFXsltBasedBridge {
 
 
-    private MFXsltBasedBridge singleBridge = null;
+    private static MFXsltBasedBridge singleBridge = null;
 
     private PipeConfig pipeConfig = null;
     private String pipeConfigName = "pipeDefaultConfig.yaml";
@@ -17,15 +17,15 @@ public class MFXsltBasedBridge {
 
     private XSLTPipeStart pipe = null;
 
-    public MFXsltBasedBridge build() {
+    //public static  MFXsltBasedBridge build() {
 
-        if (null == this.singleBridge) {
-            return new MFXsltBasedBridge();
-        } else {
-            return this.singleBridge;
-        }
+    //    if (null == singleBridge) {
+    //        singleBridge = new MFXsltBasedBridge();
+    //    }
+    //    return singleBridge;
 
-    }
+
+    //}
 
     public MFXsltBasedBridge setPipeConfig(PipeConfig config) {
         this.pipeConfig = config;
@@ -43,7 +43,11 @@ public class MFXsltBasedBridge {
     }
 
 
-    private MFXsltBasedBridge() {}
+    public MFXsltBasedBridge(String configFileName) {
+        //this.transformerFactory = transformerFactory;
+        this.pipeConfigName = configFileName;
+
+    }
 
 
     public void init () throws MetafactureException {
@@ -57,12 +61,12 @@ public class MFXsltBasedBridge {
         pipeStart.setConfigFile(this.pipeConfigName);
         pipeStart.setTransformerFactory(this.transformerFactory);
 
-        this.pipe = pipeStart;
+        pipe = pipeStart;
 
     }
 
     public String transform(String content) {
-        this.pipe.process(content);
+        pipe.process(content);
 
         Optional<String> tR = this.pipe.getTransformationResultOfPipe();
         return tR.orElse("");
