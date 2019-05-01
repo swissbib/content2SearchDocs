@@ -15,6 +15,8 @@ import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import org.swissbib.SbMetadataModel;
 import org.swissbib.documentprocessing.MFXsltBasedBridge;
 
 import java.util.Properties;
@@ -33,17 +35,28 @@ public class DocProcEngine {
         //env.getConfig().setGlobalJobParameters(parameters);
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "localhost:9092,localhost:9093,localhost:9094");
-        properties.setProperty("group.id", "test2");
-        properties.setProperty("auto.offset.reset", "earliest");
-        DataStream<FlinkSbMetadaModel> stream = env.addSource(  new FlinkKafkaConsumer<FlinkSbMetadaModel>(    "sb-all",    new SwissbibFlinkMetadataSchema(),    properties));
+        properties.setProperty("group.id", "test4");
+        //properties.setProperty("auto.offset.reset", "earliest");
+
+
+        FlinkKafkaConsumer<FlinkSbMetadaModel> fc = new FlinkKafkaConsumer<FlinkSbMetadaModel>(    "sb-all",    new KeyedSwissbibFlinkMetadataSchema(),    properties);
+        fc.setStartFromEarliest();
+
+
+        FlinkKafkaProducer<FlinkSbMetadaModel> kafkaProducer = new FlinkKafkaProducer<FlinkSbMetadaModel>("sb-solr", new KeyedSwissbibFlinkMetadataSchema() ,properties);
+
+
+
+        DataStream<FlinkSbMetadaModel> stream = env.addSource(fc);
         //DataSource<String> docProcRecords = env.readTextFile("/swissbib_index/rawData/marcDataCBS/MFconform/job2r9A151.format.nocollection.xml");
 
         //docProcRecords.map(new SolrDocProcFunction()).withParameters(parameters.getConfiguration())
         //        .writeAsText("dataout/output.txt", FileSystem.WriteMode.OVERWRITE);
         //docProcRecords.map(new SolrDocProcFunction())
         //        .writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
-        stream.map(new SolrDocProcFunction())
-                .writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
+        stream.map(new DocProcFunction())
+               // .writeAsText("outputdir", FileSystem.WriteMode.OVERWRITE);
+            .addSink(kafkaProducer);
 
         env.setParallelism(1);
 
@@ -62,11 +75,7 @@ public class DocProcEngine {
         @Override
         public String map(FlinkSbMetadaModel record) throws Exception {
 
-            //todo make transformations
-            String test = record.getData();
-
-            String response = bridge2pipe.transform(test);
-            return response;
+            return bridge2pipe.transform(record.getData());
 
         }
 

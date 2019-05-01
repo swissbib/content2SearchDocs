@@ -58,6 +58,10 @@ repositories {
 
 
 dependencies {
+
+    //Bläht die Grösse des Respositories ernorm auf (evtl. mit excludes arbeiten)
+    //brauche ich wenn ich die plugins wieder implementiere
+    //offen: Version 8 oder 9??
     //compile(group: 'org.apache.solr', name: 'solr-analysis-extras', version:'7.3.1') {
     //    exclude(module: 'slf4j-log4j12')
     //}
@@ -82,18 +86,23 @@ dependencies {
     //testCompile group: 'junit', name: 'junit', version:'4.12'
 
 
-    compile 'org.swissbib.linked:metafacture-xml:2.0.45-alpha1'
+
+    //es braucht die jackson dependencies, wenn ich metafacture-xml nicht einbinde
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.8'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    //compile 'org.swissbib.linked:metafacture-xml:2.0.48-alpha1'
+
+    //brauche ich implementation?
+    implementation "org.metafacture:metafacture-framework:5.0.1"
     compile group: 'org.metafacture', name: 'metafacture-io', version: '5.0.1'
 
     compile group: 'org.apache.flink', name: 'flink-connector-kafka_2.12', version: '1.8.0'
-    compile group: 'org.apache.flink', name: 'flink-java', version: '1.7.1'
+    compile group: 'org.apache.flink', name: 'flink-java', version: '1.8.0'
     compile group: 'org.apache.flink', name: 'flink-streaming-java_2.12', version: '1.8.0'
-    //compile group: 'org.apache.flink', name: 'flink-streaming-scala_2.12', version: '1.7.1'
     compile group: 'org.apache.flink', name: 'flink-clients_2.12', version: '1.8.0'
 
-    compile 'org.swissbib:kafka-metadata-wrapper:1.1.0'
-    implementation "org.metafacture:metafacture-framework:5.0.1"
-//    implementation "org.metafacture:metafacture-io:5.0.1"
+    //Beschreibung des Typs zur Serialisierung/Deserialisierung in Kafka
+    compile 'org.swissbib:kafka-metadata-wrapper:2.0.1'
 
 
 

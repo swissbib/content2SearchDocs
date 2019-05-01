@@ -1,12 +1,14 @@
 package org.swissbib.flink;
 
-import org.swissbib.SbMetadataModel;
+import org.swissbib.types.CbsActions;
+import org.swissbib.types.EsBulkActions;
+import org.swissbib.types.EsMergeActions;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Base64;
 
-public class FlinkSbMetadaModel {
+public class FlinkSbMetadaModel  {
 
     /**
      * Prefix signalling a base64 encoded String
@@ -26,24 +28,55 @@ public class FlinkSbMetadaModel {
     final static String listElementSeparator = "\u200d";
 
     /**
+     * CBS action type
+     */
+    private CbsActions cbsAction;
+
+    /**
      * The data
      */
     private String data;
 
     /**
-     * Status of message
+     * Elasticsearch bulk action type
      */
-    private String status;
+    private EsBulkActions esBulkAction;
 
     /**
-     * Category of message
+     * Name of Elasticsearch document type
      */
-    private String category;
+    private String esDocTypeName;
 
     /**
-     *  Version of message
+     * Version of message needs to match the corresponding version number of the index document.
+     * If the indexed document has a higher version number the index operation is rejected and the
+     * request will have to be retried.
      */
-    private Long version = null;
+    private Long esDocumentVersion = null;
+
+    /**
+     * Used as an indication how the message should be prepared for indexing into elasticsearch.
+     * This is used for a preprocessor before it is sent to the elastic consumer!
+     * - NEW -> A new document will be created with this message or an existing document should be updated.
+     * - UPDATE -> Only update an existing document, do not create a new document if no match was found.
+     * - RETRY -> This document was rejected by elasticsearch due to a version conflict. Check whether it still needs to
+     * be updated or not.
+     */
+    private EsMergeActions esMergeAction;
+
+    /**
+     * Name of Elasticsearch index
+     */
+    private String esIndexName;
+
+    public FlinkSbMetadaModel setCbsAction(CbsActions cbsAction) {
+        this.cbsAction = cbsAction;
+        return this;
+    }
+
+    public CbsActions getCbsAction() {
+        return cbsAction;
+    }
 
     public String getData() {
         return isNull(data) ? null : (isBase64String(data) ? decodeString(data) : data);
@@ -54,62 +87,69 @@ public class FlinkSbMetadaModel {
         return this;
     }
 
-    public ArrayList<String> getStatus() {
-        return isNull(status) ? null : toListElements(status);
-    }
-
-    public FlinkSbMetadaModel setStatus(String[] status) {
-        this.status = addListElements(this.status, concatListElements(status));
+    public FlinkSbMetadaModel setEsBulkAction(EsBulkActions esBulkAction) {
+        this.esBulkAction = esBulkAction;
         return this;
     }
 
-    public FlinkSbMetadaModel setStatus(String status) {
-        this.status = addListElements(this.status, shouldBeBase64Encoded(status) ? encodeStringToBase64(status) : status);
-        return this;
+    public EsBulkActions getEsBulkAction() {
+        return esBulkAction;
     }
 
-    public ArrayList<String> getCategory() {
-        return isNull(category) ? null : toListElements(category);
+    public String getEsDocTypeName() {
+        return esDocTypeName;
     }
 
-    public FlinkSbMetadaModel setCategory(String[] category) {
-        this.category = addListElements(this.category, concatListElements(category));
-        return this;
-    }
-
-    public FlinkSbMetadaModel setCategory(String category) {
-        this.category = addListElements(this.category, shouldBeBase64Encoded(category) ? encodeStringToBase64(category) : category);
+    public FlinkSbMetadaModel setEsDocTypeName(String esDocTypeName) {
+        this.esDocTypeName = esDocTypeName;
         return this;
     }
 
     /**
-     *
-     * @return Whether this message contains a version number.
+     * @return The esDocumentVersion number of this message.
+     * @throws NullPointerException - when no esDocumentVersion is defined.
      */
-    public boolean hasVersion() {
-        return version != null;
+    public long getEsDocumentVersion() throws NullPointerException {
+        return esDocumentVersion;
     }
 
-    /**
-     *
-     * @return The version number of this message.
-     * @throws NullPointerException - when no version is defined.
-     */
-    public long getVersion() throws NullPointerException {
-        return version;
+    public FlinkSbMetadaModel setEsDocumentVersion(long esDocumentVersion) {
+        this.esDocumentVersion = esDocumentVersion;
+        return this;
     }
 
-    public FlinkSbMetadaModel setVersion(long version) {
-        this.version = version;
+    public EsMergeActions getEsMergeAction() {
+        return esMergeAction;
+    }
+
+    public FlinkSbMetadaModel setEsMergeAction(EsMergeActions esMergeAction) {
+        this.esMergeAction = esMergeAction;
         return this;
     }
 
     /**
-     * Parse byte array as {@link SbMetadataModel}
+     * @return Whether this message contains a esDocumentVersion number.
+     */
+    public boolean hasEsDocumentVersion() {
+        return esDocumentVersion != null;
+    }
+
+    public String getEsIndexName() {
+        return esIndexName;
+    }
+
+    public FlinkSbMetadaModel setEsIndexName(String esIndexName) {
+        this.esIndexName = esIndexName;
+        return this;
+    }
+
+
+    /**
+     * Parse byte array as {@link FlinkSbMetadaModel}
      *
      * @param binaryData Byte array to be parsed
      * @param encoding   Characters encoding
-     * @return Instance of type {@link SbMetadataModel}
+     * @return Instance of type {@link FlinkSbMetadaModel}
      * @throws UnsupportedEncodingException If encoding is not supported
      * @see #toByteArray(String) for opposite operation
      */
@@ -118,25 +158,33 @@ public class FlinkSbMetadaModel {
         for (String fields : rawData.split(fieldSeparator)) {
             String[] keyValue = fields.split(keyValueSeparator, 2);
             switch (keyValue[0]) {
+                case "cbsAction":
+                    this.cbsAction = CbsActions.valueOf(keyValue[1]);
+                    break;
                 case "data":
                     this.data = keyValue[1];
                     break;
-                case "category":
-                    this.category = keyValue[1];
+                case "esBulkAction":
+                    this.esBulkAction = EsBulkActions.valueOf(keyValue[1]);
                     break;
-                case "status":
-                    this.status = keyValue[1];
+                case "esDocTypeName":
+                    this.esDocTypeName = keyValue[1];
                     break;
-                case "version":
-                    this.version = Long.parseLong(keyValue[1]);
+                case "esDocumentVersion":
+                    this.esDocumentVersion = Long.parseLong(keyValue[1]);
                     break;
+                case "esIndexName":
+                    this.esIndexName = keyValue[1];
+                    break;
+                case "esMergeAction":
+                    this.esMergeAction = EsMergeActions.valueOf(keyValue[1]);
             }
         }
         return this;
     }
 
     /**
-     * Returns {@link SbMetadataModel} instance as byte array
+     * Returns {@link FlinkSbMetadaModel} instance as byte array
      *
      * @param encoding Characters encoding
      * @return Instance as byte array
@@ -145,20 +193,30 @@ public class FlinkSbMetadaModel {
      */
     byte[] toByteArray(String encoding) throws UnsupportedEncodingException {
         String rawData = "";
+        if (cbsAction != null) {
+            rawData = concatFields(rawData, "cbsAction" + keyValueSeparator + cbsAction);
+        }
         if (!isNull(data)) {
             rawData = concatFields(rawData, "data" + keyValueSeparator + data);
         }
-        if (!isNull(category)) {
-            rawData = concatFields(rawData, "category" + keyValueSeparator + category);
+        if (esBulkAction != null) {
+            rawData = concatFields(rawData, "esBulkAction" + keyValueSeparator + esBulkAction);
         }
-        if (!isNull(status)) {
-            rawData = concatFields(rawData, "status" + keyValueSeparator + status);
+        if (!isNull(esDocTypeName)) {
+            rawData = concatFields(rawData, "esDocTypeName" + keyValueSeparator + esDocTypeName);
         }
-        if (hasVersion()) {
-            rawData = concatFields(rawData, "version" + keyValueSeparator + version.toString());
+        if (hasEsDocumentVersion()) {
+            rawData = concatFields(rawData, "esDocumentVersion" + keyValueSeparator + esDocumentVersion.toString());
+        }
+        if (!isNull(esIndexName)) {
+            rawData = concatFields(rawData, "esIndexName" + keyValueSeparator + esIndexName);
+        }
+        if (esMergeAction != null) {
+            rawData = concatFields(rawData, "esMergeAction" + keyValueSeparator + esMergeAction);
         }
         return rawData.getBytes(encoding);
     }
+
 
     /**
      * Add String to existing String of list elements using {@link this.listElementSeparator}}

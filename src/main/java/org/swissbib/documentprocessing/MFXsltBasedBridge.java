@@ -72,4 +72,15 @@ public class MFXsltBasedBridge {
         return tR.orElse("");
     }
 
+    public void close () throws MetafactureException {
+
+
+        pipe.resetStream();
+        pipe.closeStream();
+
+
+    }
+
+
+
 }

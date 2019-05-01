@@ -10,7 +10,6 @@
                 xmlns:java-analyzeValue="java:org.swissbib.metafacture.xml.xslt.plugins.SolrStringTypePreprocessor"
                 xmlns:java-institutionFacet="java:org.swissbib.metafacture.xml.xslt.plugins.CreateLibraryFacets"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                xmlns="http://www.loc.gov/MARC21/slim"
                 xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib java-isbn-ext java-analyzeValue java-institutionFacet">
     <!--xmlns:fn="http://www.w3.org/2005/xpath-functions"> -->
 
