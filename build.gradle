@@ -102,7 +102,7 @@ dependencies {
     compile group: 'org.apache.flink', name: 'flink-clients_2.12', version: '1.8.0'
 
     //Beschreibung des Typs zur Serialisierung/Deserialisierung in Kafka
-    compile 'org.swissbib:kafka-metadata-wrapper:2.0.1'
+    compile 'org.swissbib:kafka-metadata-wrapper:2.1.0'
 
 
 
@@ -147,7 +147,7 @@ jar {
     manifest {
         //attributes "Class-Path": configurations.compile.collect { it.absolutePath }.join(" ")
         attributes "Class-Path": configurations.runtime.files.collect { jarDir+"/$it.name" }.join(' ')
-        attributes "Main-Class": 'org.swissbib.documentprocessing.XML2SearchDocEngine'
+        attributes "Main-Class": 'org.swissbib.flink.DocProcEngine'
 
         //attributes 'Class-Path': configurations.compile.collect{it.toURI().toString()}.join(' ')
     }

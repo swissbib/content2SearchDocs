@@ -7,40 +7,41 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
 import org.apache.flink.streaming.util.serialization.KeyedSerializationSchema;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.swissbib.SbMetadataModel;
 
 import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class KeyedSwissbibFlinkMetadataSchema implements
-        KeyedSerializationSchema<FlinkSbMetadaModel>, KafkaDeserializationSchema<FlinkSbMetadaModel> {
+        KeyedSerializationSchema<SbMetadataModel>, KafkaDeserializationSchema<SbMetadataModel> {
 
     //<field name="id">131051466</field>
     private Pattern idPattern = Pattern.compile(".*?<field name=\"id\">(.*?)</field>.*",Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
 
 
     @Override
-    public boolean isEndOfStream(FlinkSbMetadaModel nextElement) {
+    public boolean isEndOfStream(SbMetadataModel nextElement) {
         return false;
     }
 
     @Override
-    public FlinkSbMetadaModel deserialize(ConsumerRecord<byte[], byte[]> record) throws Exception {
+    public SbMetadataModel deserialize(ConsumerRecord<byte[], byte[]> record) throws Exception {
         //String key =  new String(record.key());
         //String body = new String(record.);
-        FlinkSbMetadaModel fm = new FlinkSbMetadaModel();
+        SbMetadataModel fm = new SbMetadataModel();
         fm.fromByteArray(record.value(),"UTF8");
         return fm;
     }
 
 
     @Override
-    public TypeInformation<FlinkSbMetadaModel> getProducedType() {
-        return TypeExtractor.getForClass(FlinkSbMetadaModel.class);
+    public TypeInformation<SbMetadataModel> getProducedType() {
+        return TypeExtractor.getForClass(SbMetadataModel.class);
     }
 
     @Override
-    public byte[] serializeKey(FlinkSbMetadaModel element) {
+    public byte[] serializeKey(SbMetadataModel element) {
         //String test = element.getData();
         Matcher m = idPattern.matcher(element.getData());
         String id = null;
@@ -54,7 +55,7 @@ public class KeyedSwissbibFlinkMetadataSchema implements
     }
 
     @Override
-    public byte[] serializeValue(FlinkSbMetadaModel element) {
+    public byte[] serializeValue(SbMetadataModel element) {
 
         byte [] b;
 
@@ -70,7 +71,7 @@ public class KeyedSwissbibFlinkMetadataSchema implements
     }
 
     @Override
-    public String getTargetTopic(FlinkSbMetadaModel element) {
+    public String getTargetTopic(SbMetadataModel element) {
         return "sb-solr";
     }
 }

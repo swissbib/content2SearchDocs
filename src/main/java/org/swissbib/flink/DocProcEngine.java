@@ -20,12 +20,23 @@ import org.swissbib.SbMetadataModel;
 import org.swissbib.documentprocessing.MFXsltBasedBridge;
 
 import java.util.Properties;
+import java.util.UUID;
 
 
 /**
  * Created by swissbib on 08.05.17.
  */
 public class DocProcEngine {
+
+
+
+    //ssl config: https://ci.apache.org/projects/flink/flink-docs-release-1.8/ops/security-ssl.html
+    //https://github.com/GezimSejdiu/flink-starter
+    //https://de.slideshare.net/sbaltagi/apache-flinkcrashcoursebyslimbaltagiandsrinipalthepu?next_slideshow=1
+    //https://de.slideshare.net/sbaltagi/stepbystep-introduction-to-apache-flink
+
+    //https://www.ververica.com/blog/how-apache-flink-manages-kafka-consumer-offsets
+
 
     public static void main (String[] args) throws Exception {
 
@@ -34,20 +45,21 @@ public class DocProcEngine {
         //ParameterTool parameters = ParameterTool.fromPropertiesFile("data/config.us-13.properties");
         //env.getConfig().setGlobalJobParameters(parameters);
         Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "localhost:9092,localhost:9093,localhost:9094");
-        properties.setProperty("group.id", "test4");
+        //properties.setProperty("bootstrap.servers", "localhost:9092,localhost:9093,localhost:9094");
+        properties.setProperty("bootstrap.servers", "sb-uka3:9092,sb-uka4:9092,sb-uka5:9092,sb-uka6:9092");
+        properties.setProperty("group.id", UUID.randomUUID().toString());
         //properties.setProperty("auto.offset.reset", "earliest");
 
 
-        FlinkKafkaConsumer<FlinkSbMetadaModel> fc = new FlinkKafkaConsumer<FlinkSbMetadaModel>(    "sb-all",    new KeyedSwissbibFlinkMetadataSchema(),    properties);
-        fc.setStartFromEarliest();
+        FlinkKafkaConsumer<SbMetadataModel> fc = new FlinkKafkaConsumer<SbMetadataModel>(    "sb-all",    new KeyedSwissbibFlinkMetadataSchema(),    properties);
+        fc.setStartFromGroupOffsets();
 
 
-        FlinkKafkaProducer<FlinkSbMetadaModel> kafkaProducer = new FlinkKafkaProducer<FlinkSbMetadaModel>("sb-solr", new KeyedSwissbibFlinkMetadataSchema() ,properties);
+        FlinkKafkaProducer<SbMetadataModel> kafkaProducer = new FlinkKafkaProducer<SbMetadataModel>("sb-solr", new KeyedSwissbibFlinkMetadataSchema() ,properties);
 
 
 
-        DataStream<FlinkSbMetadaModel> stream = env.addSource(fc);
+        DataStream<SbMetadataModel> stream = env.addSource(fc);
         //DataSource<String> docProcRecords = env.readTextFile("/swissbib_index/rawData/marcDataCBS/MFconform/job2r9A151.format.nocollection.xml");
 
         //docProcRecords.map(new SolrDocProcFunction()).withParameters(parameters.getConfiguration())

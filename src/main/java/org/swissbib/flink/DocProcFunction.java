@@ -3,22 +3,22 @@ package org.swissbib.flink;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 //import org.swissbib.SbMetadataModel;
+import org.swissbib.SbMetadataDeserializer;
+import org.swissbib.SbMetadataModel;
 import org.swissbib.documentprocessing.MFXsltBasedBridge;
 import org.swissbib.types.CbsActions;
 
-public class DocProcFunction extends RichMapFunction<FlinkSbMetadaModel,FlinkSbMetadaModel> {
+public class DocProcFunction extends RichMapFunction<SbMetadataModel,SbMetadataModel> {
 
 
     MFXsltBasedBridge bridge2pipe;
 
     @Override
-    public FlinkSbMetadaModel map(FlinkSbMetadaModel record) throws Exception {
+    public SbMetadataModel map(SbMetadataModel record) throws Exception {
 
-        //todo make transformations
-        String test = record.getData();
 
-        String response = bridge2pipe.transform(test);
-        FlinkSbMetadaModel sbm = new FlinkSbMetadaModel();
+        String response = bridge2pipe.transform(record.getData());
+        SbMetadataModel sbm = new SbMetadataModel();
         sbm.setData(response);
         sbm.setCbsAction(CbsActions.CREATE);
         return sbm;
