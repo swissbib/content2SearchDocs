@@ -7,8 +7,8 @@
     xmlns:java-nodouble-ext="java:org.swissbib.metafacture.xml.xslt.plugins.RemoveDuplicates"
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
     xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins"
-
-                exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib">
+    exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib"
+>
     <!--xmlns:fn="http://www.w3.org/2005/xpath-functions"> -->
     
     <xsl:output method="xml"

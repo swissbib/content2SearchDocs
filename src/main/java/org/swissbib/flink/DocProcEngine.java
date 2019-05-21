@@ -46,7 +46,8 @@ public class DocProcEngine {
         //env.getConfig().setGlobalJobParameters(parameters);
         Properties properties = new Properties();
         //properties.setProperty("bootstrap.servers", "localhost:9092,localhost:9093,localhost:9094");
-        properties.setProperty("bootstrap.servers", "sb-uka3:9092,sb-uka4:9092,sb-uka5:9092,sb-uka6:9092");
+        //properties.setProperty("bootstrap.servers", "sb-uka3:9092,sb-uka4:9092,sb-uka5:9092,sb-uka6:9092");
+        properties.setProperty("bootstrap.servers", "localhost:9092,localhost:9093,localhost:9094");
         properties.setProperty("group.id", UUID.randomUUID().toString());
         //properties.setProperty("auto.offset.reset", "earliest");
 

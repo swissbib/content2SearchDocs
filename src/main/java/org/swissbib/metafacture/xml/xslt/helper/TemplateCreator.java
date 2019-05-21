@@ -34,6 +34,11 @@ public class TemplateCreator {
 
     public Transformer createTransformer() {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        try {
+            transformerFactory.setFeature("SUPPRESS_XSLT_NAMESPACE_CHECK", true);
+        } catch (TransformerConfigurationException ex) {
+            ex.printStackTrace();
+        }
         StreamSource source = null;
 
         Transformer transformer = null;
