@@ -1604,7 +1604,7 @@
             </xsl:for-each>
             <xsl:for-each select="$fragment/datafield[@tag='909'][matches(descendant::subfield[@code='2'][1], '^idsbb [AB]', 'i')]/subfield[@code='f']">
                 <xsl:choose>
-                    <xsl:when test="matches(., 'erarabe|erarabs')">
+                    <xsl:when test="matches(., 'erarabe|erarabs|^digibe')">
                         <xsl:text>FREE##xx##</xsl:text>
                     </xsl:when>
                 </xsl:choose>
