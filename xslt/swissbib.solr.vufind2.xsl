@@ -80,9 +80,6 @@
             <xsl:call-template name="bibid">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
-            <xsl:call-template name="container_id">
-                <xsl:with-param name="fragment" select="record" />
-            </xsl:call-template>
             <xsl:call-template name="series_hierarchy">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -1493,25 +1490,6 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
-    </xsl:template>
-
-    <!-- formerly 'slinkarticle', indexed to link articles from journal
-          @todo necessary in VuFind? -->
-    <xsl:template name="container_id">
-        <xsl:param name="fragment"/>
-        <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='772']/subfield[@code='9']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='773']/subfield[@code='9']">
-                <xsl:value-of select="concat(., '##xx##')" />
-            </xsl:for-each>
-        </xsl:variable>
-        <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
-        <xsl:call-template name="createUniqueFields">
-            <xsl:with-param name="fieldname" select="'container_id'"/>
-            <xsl:with-param name="fieldValues" select="$uniqueSeqValues"/>
-        </xsl:call-template>
     </xsl:template>
 
     <!-- for use in vufind hierarchy driver -->
