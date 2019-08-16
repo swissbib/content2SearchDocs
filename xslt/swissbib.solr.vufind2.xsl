@@ -122,6 +122,9 @@
             <xsl:call-template name="authors">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
+            <xsl:call-template name="author_first">
+                <xsl:with-param name="fragment" select="record"/>
+            </xsl:call-template>
             <xsl:call-template name="titles">
                 <xsl:with-param name="fragment" select="record" />
             </xsl:call-template>
@@ -795,7 +798,37 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- for the autocomplete suggestions -->
+    <xsl:template name="author_first">
+        <xsl:param name="fragment" />
+        <xsl:variable name="author_first_value">
+            <xsl:choose>
+                <xsl:when test="$fragment/datafield[matches(@tag, '100|110|111')]">
+                    <xsl:for-each select="$fragment/datafield[matches(@tag, '100|110|111')]/subfield[@code='a']">
 
+                        <xsl:if test="following-sibling::subfield[@code='D']">
+                            <xsl:value-of select="concat(following-sibling::subfield[@code='D'][1], ' ')" />
+                        </xsl:if>
+                        <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')" />
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:if test="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111')]/subfield[@code='a']">
+                        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111')]/subfield[@code='a']">
+                            <xsl:if test="following-sibling::subfield[@code='D']">
+                                <xsl:value-of select="concat(following-sibling::subfield[@code='D'][1], ' ')" />
+                            </xsl:if>
+                            <xsl:value-of select="replace(., '\[forme avant 2007\]', '', 'i')" />
+                        </xsl:for-each>
+                    </xsl:if>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:call-template name="createUniqueFields">
+            <xsl:with-param name="fieldname" select="'author_first'" />
+            <xsl:with-param name="fieldValues" select="$author_first_value" />
+        </xsl:call-template>
+    </xsl:template>
 
     <!-- main and added entries -->
     <xsl:template name="authors">
