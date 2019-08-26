@@ -814,7 +814,7 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:if test="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111')]/subfield[@code='a']">
-                        <xsl:for-each select="$fragment/datafield[@tag='950'][matches(child::subfield[@code='P'], '100|110|111')]/subfield[@code='a'][position()=1]">
+                        <xsl:for-each select="$fragment/datafield[@tag='950'][position()=1][matches(child::subfield[@code='P'], '100|110|111')]/subfield[@code='a']">
                             <xsl:if test="following-sibling::subfield[@code='D']">
                                 <xsl:value-of select="concat(following-sibling::subfield[@code='D'][1], ' ')" />
                             </xsl:if>
