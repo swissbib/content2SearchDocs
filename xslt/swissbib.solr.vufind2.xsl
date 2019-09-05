@@ -1587,6 +1587,19 @@
                     </xsl:when>
                 </xsl:choose>
             </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='909'][matches(descendant::subfield[@code='2'][1], '^idsbb [AB]', 'i')]/subfield[@code='a']">
+                <xsl:choose>
+                    <xsl:when test="matches(., 'ejB432|ebB432')">
+                        <xsl:text>B432##xx##</xsl:text>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='949'][matches(descendant::subfield[@code='c'][1], '332OL|342VT|342DB|342OF|351VT|351DB', 'i')]/subfield[@code='F']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
+            <xsl:for-each select="$fragment/datafield[@tag='852'][matches(descendant::subfield[@code='c'][1], '332OL|342VT|342DB|342OF|351VT|351DB', 'i')]/subfield[@code='F']">
+                <xsl:value-of select="concat(., '##xx##')" />
+            </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
