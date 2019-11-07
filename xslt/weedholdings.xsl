@@ -33,7 +33,7 @@
          j=Signatur 1, s=Signatur 2 -->
     
     <xsl:template match="datafield[@tag=949]/subfield">
-        <xsl:if test="matches(@code, 'F|B|b|j|s|x|z|c')">
+        <xsl:if test="matches(@code, 'F|B|b|j|s|x|y|z|c')">
             <xsl:copy-of select="." />    
         </xsl:if>
     </xsl:template>
