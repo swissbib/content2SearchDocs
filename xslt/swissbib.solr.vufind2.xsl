@@ -981,7 +981,7 @@
         </xsl:for-each>
         <!-- author facette for orange -->
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='979']/subfield[@code='a'][matches(following-sibling::subfield[@code='2'], 'IDSBB|SNL|HAN')]">
+            <xsl:for-each select="$fragment/datafield[@tag='979']/subfield[@code='a'][matches(following-sibling::subfield[@code='2'], 'IDSBB|SNL|HAN|EDOC|BORIS|RETROS')]">
                 <xsl:value-of select="concat(., '##xx##')" />
             </xsl:for-each>
         </xsl:variable>
