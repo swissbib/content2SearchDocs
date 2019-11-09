@@ -71,7 +71,8 @@ public class KeyedSwissbibFlinkMetadataSchema implements
     }
 
     @Override
-    public String getTargetTopic(SbMetadataModel element) {
+    public String getTargetTopic(SbMetadataModel element)
+    {
         return "sb-solr";
     }
 }

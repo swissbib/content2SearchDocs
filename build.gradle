@@ -8,7 +8,6 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 group = 'org.swissbib.docproc'
 version = '0.8-SNAPSHOT'
-
 description = """content2SearchDocs"""
 
 sourceCompatibility = 1.8
@@ -16,7 +15,7 @@ targetCompatibility = 1.8
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
-
+ext.flinkVersion = '1.9.1'
 
 buildscript {
     repositories {
@@ -27,7 +26,8 @@ buildscript {
     }
     dependencies {
         //http://imperceptiblethoughts.com/shadow/
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        //classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
     }
 }
 
@@ -96,13 +96,18 @@ dependencies {
     implementation "org.metafacture:metafacture-framework:5.0.1"
     compile group: 'org.metafacture', name: 'metafacture-io', version: '5.0.1'
 
-    compile group: 'org.apache.flink', name: 'flink-connector-kafka_2.12', version: '1.8.0'
+    compile group: 'org.apache.flink', name: 'flink-connector-kafka_2.12', version: "${flinkVersion}"
     compile group: 'org.apache.flink', name: 'flink-java', version: '1.8.0'
-    compile group: 'org.apache.flink', name: 'flink-streaming-java_2.12', version: '1.8.0'
-    compile group: 'org.apache.flink', name: 'flink-clients_2.12', version: '1.8.0'
+    compile group: 'org.apache.flink', name: 'flink-streaming-java_2.12', version: "${flinkVersion}"
+    compile group: 'org.apache.flink', name: 'flink-clients_2.12', version: "${flinkVersion}"
+
+    compile "org.apache.flink:flink-table-planner_2.12:${flinkVersion}"
+    compile "org.apache.flink:flink-table-api-java-bridge_2.12:${flinkVersion}"
+    compile "org.apache.flink:flink-streaming-scala_2.12:${flinkVersion}"
+
 
     //Beschreibung des Typs zur Serialisierung/Deserialisierung in Kafka
-    compile 'org.swissbib:kafka-metadata-wrapper:2.1.0'
+    compile 'org.swissbib:kafka-metadata-wrapper:2.4.0'
 
 
 

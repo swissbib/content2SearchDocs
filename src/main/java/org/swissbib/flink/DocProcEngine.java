@@ -6,6 +6,7 @@ import org.apache.flink.api.common.serialization.SimpleStringSchema;
 //import org.apache.flink.api.java.operators.DataSource;
 //import org.apache.flink.api.java.operators.DataSource;
 //import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.configuration.Configuration;
@@ -49,7 +50,7 @@ public class DocProcEngine {
         //properties.setProperty("bootstrap.servers", "sb-uka3:9092,sb-uka4:9092,sb-uka5:9092,sb-uka6:9092");
         properties.setProperty("bootstrap.servers", "localhost:9092,localhost:9093,localhost:9094");
         properties.setProperty("group.id", UUID.randomUUID().toString());
-        //properties.setProperty("auto.offset.reset", "earliest");
+        properties.setProperty("auto.offset.reset", "earliest");
 
 
         FlinkKafkaConsumer<SbMetadataModel> fc = new FlinkKafkaConsumer<SbMetadataModel>(    "sb-all",    new KeyedSwissbibFlinkMetadataSchema(),    properties);
@@ -68,6 +69,7 @@ public class DocProcEngine {
         //docProcRecords.map(new SolrDocProcFunction())
         //        .writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
         stream.map(new DocProcFunction())
+                //.returns(Types.POJO(SbMetadataModel.class))
                // .writeAsText("outputdir", FileSystem.WriteMode.OVERWRITE);
             .addSink(kafkaProducer);
 

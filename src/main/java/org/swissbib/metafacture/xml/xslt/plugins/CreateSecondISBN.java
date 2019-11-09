@@ -57,11 +57,10 @@ public class CreateSecondISBN implements IXSLTPlugin {
 
 
 
-
     @Override
     public void initPlugin(PipeConfig configuration) {
 
-        System.out.print("in ISBN Plugin");
+        System.out.print("in init ISBN Plugin");
 
     }
 
