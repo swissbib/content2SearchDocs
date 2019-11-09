@@ -29,6 +29,7 @@ buildscript {
     }
 }
 
+ext.flinkVersion = '1.9.1'
 
 repositories {
 
@@ -45,6 +46,9 @@ repositories {
     //ich habe immer noch das Problem, dass ich die saxon Komponente lokal bereitstellen muss, Finde ich hier noch einen besseren
     //Weg - provates remote respotory? - für Externe besser dokumentieren
     jcenter()
+
+    //kafka-metadata-wrapper
+    maven {url 'http://gitlab.com/api/v4/projects/11507450/packages/maven'}
 }
 
 
@@ -63,8 +67,36 @@ dependencies {
     compile group: 'net.sf.saxon', name: 'Saxon-PE', version:'9.5.1.4J'
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.25.2'
     testCompile group: 'junit', name: 'junit', version:'4.12'
+
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
+    compile group: 'org.apache.flink', name: 'flink-connector-kafka_2.12', version: "${flinkVersion}"
+    compile group: 'org.apache.flink', name: 'flink-java', version:  "${flinkVersion}"
+    compile group: 'org.apache.flink', name: 'flink-streaming-java_2.12', version: "${flinkVersion}"
+    compile group: 'org.apache.flink', name: 'flink-clients_2.12', version: "${flinkVersion}"
+
+    compile "org.apache.flink:flink-table-planner_2.12:${flinkVersion}"
+    compile "org.apache.flink:flink-table-api-java-bridge_2.12:${flinkVersion}"
+    compile "org.apache.flink:flink-streaming-scala_2.12:${flinkVersion}"
+
+
+    //Beschreibung des Typs zur Serialisierung/Deserialisierung in Kafka
+    compile 'org.swissbib:kafka-metadata-wrapper:2.4.0'
+
+    testCompile(
+            'junit:junit:4.12',
+            'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    )
+    testRuntime(
+            'org.junit.jupiter:junit-jupiter-engine:5.2.0',
+            'org.junit.vintage:junit-vintage-engine:5.2.0'
+    )
+
 }
 
+test {
+    useJUnitPlatform()
+}
 
 
 
