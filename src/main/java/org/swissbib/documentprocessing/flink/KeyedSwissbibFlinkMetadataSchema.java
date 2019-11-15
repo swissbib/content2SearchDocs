@@ -69,4 +69,6 @@ public class KeyedSwissbibFlinkMetadataSchema implements
         return new ProducerRecord<>("sb-solr",keyBytes,valueBytes);
 
     }
+
+
 }

@@ -9,5 +9,6 @@ out
 ghscripts.latest
 .gradle
 build
+srcxslt/
 
 

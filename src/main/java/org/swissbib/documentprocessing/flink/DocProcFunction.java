@@ -13,8 +13,7 @@ import org.swissbib.types.CbsActions;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DocProcFunction extends RichMapFunction<SbMetadataModel,SbMetadataModel>
-        implements ResultTypeQueryable<SbMetadataModel> {
+public class DocProcFunction extends RichMapFunction<SbMetadataModel,SbMetadataModel> {
 
 
     private static Pattern p = Pattern.compile("<record .*?>");
@@ -42,8 +41,8 @@ public class DocProcFunction extends RichMapFunction<SbMetadataModel,SbMetadataM
 
     }
 
-    @Override
-    public TypeInformation<SbMetadataModel> getProducedType() {
-        return Types.GENERIC(SbMetadataModel.class);
-    }
+    //@Override
+    //public TypeInformation<SbMetadataModel> getProducedType() {
+    //    return Types.GENERIC(SbMetadataModel.class);
+    //}
 }
