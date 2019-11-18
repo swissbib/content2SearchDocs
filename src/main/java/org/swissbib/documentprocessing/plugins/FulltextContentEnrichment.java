@@ -3,6 +3,7 @@ package org.swissbib.documentprocessing.plugins;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
 
 import java.io.*;
 import java.net.*;
@@ -44,7 +45,7 @@ import java.util.regex.Pattern;
 
 
 
-public class FulltextContentEnrichment implements IDocProcPlugin{
+public class FulltextContentEnrichment extends DocProcPlugin{
 
 
     private static  String ls = System.getProperties().getProperty("line.separator");
@@ -394,6 +395,12 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
 
 
     @Override
+    public void initPlugin(PipeConfig configuration) {
+        inProductionMode = checkProductive(configuration);
+    }
+
+    /*
+    @Override
     public void initPlugin(HashMap<String, String> configuration) {
 
         String className =  this.getClass().getName();
@@ -417,6 +424,8 @@ public class FulltextContentEnrichment implements IDocProcPlugin{
 
     }
 
+
+     */
     @Override
     public void finalizePlugIn() {
 

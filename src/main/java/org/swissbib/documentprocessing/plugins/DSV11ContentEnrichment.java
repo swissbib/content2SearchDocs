@@ -3,6 +3,7 @@ package org.swissbib.documentprocessing.plugins;
 import com.mongodb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -43,7 +44,7 @@ import java.util.regex.Pattern;
 
 
 
-public class DSV11ContentEnrichment implements IDocProcPlugin {
+public class DSV11ContentEnrichment extends DocProcPlugin {
 
 
     private static boolean initialized;
@@ -180,7 +181,12 @@ public class DSV11ContentEnrichment implements IDocProcPlugin {
     }
 
 
+    @Override
+    public void initPlugin(PipeConfig configuration) {
+        inProductionMode = checkProductive(configuration);
+    }
 
+    /*
     @Override
     public void initPlugin(HashMap<String, String> configuration) {
 
@@ -215,6 +221,8 @@ public class DSV11ContentEnrichment implements IDocProcPlugin {
         }
 
     }
+
+     */
 
     @Override
     public void finalizePlugIn() {
@@ -299,7 +307,8 @@ public class DSV11ContentEnrichment implements IDocProcPlugin {
         //    usEnc.printStackTrace();
         //}
 
-        initPlugin(configuration);
+        //todo: muss das für die Flink version gemacht werden
+        //initPlugin(configuration);
 
     }
 

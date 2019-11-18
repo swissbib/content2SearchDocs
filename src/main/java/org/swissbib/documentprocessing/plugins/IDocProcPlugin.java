@@ -1,5 +1,7 @@
 package org.swissbib.documentprocessing.plugins;
 
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
+
 import java.util.HashMap;
 
 
@@ -36,7 +38,7 @@ import java.util.HashMap;
 
 public interface IDocProcPlugin {
 
-    public void initPlugin(HashMap<String,String> configuration);
+    public void initPlugin(PipeConfig configuration);
 
 
     public void finalizePlugIn();

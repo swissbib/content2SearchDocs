@@ -3,6 +3,8 @@ package org.swissbib.documentprocessing.plugins;
 import com.mongodb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
+
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -50,7 +52,7 @@ import java.util.zip.Inflater;
 
 
 
-public class GNDContentEnrichment implements IDocProcPlugin{
+public class GNDContentEnrichment extends DocProcPlugin{
 
 
 
@@ -141,6 +143,12 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
 
     @Override
+    public void initPlugin(PipeConfig configuration) {
+        inProductionMode = checkProductive(configuration);
+    }
+
+    /*
+    @Override
     public void initPlugin(HashMap<String, String> configuration) {
 
         //in any case if the method is called the plugin will be marked as initialized
@@ -176,6 +184,8 @@ public class GNDContentEnrichment implements IDocProcPlugin{
 
 
     }
+
+     */
 
     @Override
     public void finalizePlugIn() {
@@ -702,7 +712,8 @@ public class GNDContentEnrichment implements IDocProcPlugin{
         //}
 
 
-        initPlugin(configuration);
+        //todo: brauchen wir das??
+        //initPlugin(configuration);
 
     }
 

@@ -20,6 +20,7 @@ public class MapDataObject2MetadaModelFunction extends RichMapFunction<XSLTDataO
 
         SbMetadataModel sbmdm = new SbMetadataModel();
         sbmdm.setData(value.record);
+        //holdingsStructure
         sbmdm.setCbsAction(CbsActions.CREATE);
 
         return sbmdm;

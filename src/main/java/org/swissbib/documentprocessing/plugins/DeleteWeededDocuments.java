@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -21,7 +22,7 @@ import java.util.HashMap;
 
 
 
-public class DeleteWeededDocuments implements  IDocProcPlugin{
+public class DeleteWeededDocuments extends  DocProcPlugin{
 
 
     private static int maxNumbers;
@@ -43,6 +44,13 @@ public class DeleteWeededDocuments implements  IDocProcPlugin{
     }
 
 
+    @Override
+    public void initPlugin(PipeConfig configuration) {
+        //super.initPlugin(configuration);
+        inProductionMode = this.checkProductive(configuration);
+    }
+
+    /*
     @Override
     public void initPlugin(HashMap<String, String> configuration) {
 
@@ -71,6 +79,8 @@ public class DeleteWeededDocuments implements  IDocProcPlugin{
         }
 
     }
+
+     */
 
     @Override
     public void finalizePlugIn() {

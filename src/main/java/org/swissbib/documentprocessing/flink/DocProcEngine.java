@@ -64,7 +64,7 @@ public class DocProcEngine {
             .map(new MapDataObject2DataObjectFunction(config,"0"))
                 .map(new MapDataObject2DataObjectFunction(config,"1"))
                 .map(new MapDataObject2DataObjectFunction(config,"2"))
-
+                .map(new MapDataObject2DataObjectFunction(config, "3", true,true))
                 .map(new MapDataObject2MetadaModelFunction(config)).returns(Types.GENERIC(SbMetadataModel.class))
 
             .addSink(kafkaProducer);

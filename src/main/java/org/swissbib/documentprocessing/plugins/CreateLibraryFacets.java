@@ -3,6 +3,7 @@ package org.swissbib.documentprocessing.plugins;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.util.List;
  * @link https://github.com/swissbib/content2SearchDocs
  */
 
-public class CreateLibraryFacets implements IDocProcPlugin {
+public class CreateLibraryFacets extends DocProcPlugin {
     private static LibadminGeoJson libadminGeoJson;
     private static Logger facetLibraryLogger;
     private static boolean initSucceeded = false;
@@ -50,6 +51,12 @@ public class CreateLibraryFacets implements IDocProcPlugin {
         CreateLibraryFacets.facetLibraryLogger = LoggerFactory.getLogger("facetLibraries");
     }
 
+    @Override
+    public void initPlugin(PipeConfig configuration) {
+        initSucceeded = checkProductive(configuration);
+    }
+
+    /*
     @Override
     public void initPlugin(HashMap<String, String> configuration) {
 
@@ -67,6 +74,8 @@ public class CreateLibraryFacets implements IDocProcPlugin {
             CreateLibraryFacets.facetLibraryLogger.warn(e.getMessage() + "\\r\\n" + e);
         }
     }
+
+     */
 
     @Override
     public void finalizePlugIn() {

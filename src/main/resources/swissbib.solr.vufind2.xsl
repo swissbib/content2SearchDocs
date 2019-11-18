@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
-                xmlns:java-tika-ext="java:org.swissbib.metafacture.xml.xslt.plugins.FulltextContentEnrichment"
-                xmlns:java-gnd-ext="java:org.swissbib.metafacture.xml.xslt.plugins.GNDContentEnrichment"
-                xmlns:java-viaf-ext="java:org.swissbib.metafacture.xml.xslt.plugins.ViafContentEnrichment"
-                xmlns:java-dsv11-ext="java:org.swissbib.metafacture.xml.xslt.plugins.DSV11ContentEnrichment"
-                xmlns:java-nodouble-ext="java:org.swissbib.metafacture.xml.xslt.plugins.RemoveDuplicates"
-                xmlns:java-isbn-ext="java:org.swissbib.metafacture.xml.xslt.plugins.CreateSecondISBN"
-                xmlns:java-analyzeValue="java:org.swissbib.metafacture.xml.xslt.plugins.SolrStringTypePreprocessor"
-                xmlns:java-institutionFacet="java:org.swissbib.metafacture.xml.xslt.plugins.CreateLibraryFacets"
+                xmlns:java-tika-ext="java:org.swissbib.documentprocessing.plugins.FulltextContentEnrichment"
+                xmlns:java-gnd-ext="java:org.swissbib.documentprocessing.plugins.GNDContentEnrichment"
+                xmlns:java-viaf-ext="java:org.swissbib.documentprocessing.plugins.ViafContentEnrichment"
+                xmlns:java-dsv11-ext="java:org.swissbib.documentprocessing.plugins.DSV11ContentEnrichment"
+                xmlns:java-nodouble-ext="java:org.swissbib.documentprocessing.plugins.RemoveDuplicates"
+                xmlns:java-isbn-ext="java:org.swissbib.documentprocessing.plugins.CreateSecondISBN"
+                xmlns:java-analyzeValue="java:org.swissbib.documentprocessing.plugins.SolrStringTypePreprocessor"
+                xmlns:java-institutionFacet="java:org.swissbib.documentprocessing.plugins.CreateLibraryFacets"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
                 xmlns:swissbib="www.swissbib.org/solr/documentprocessing.plugins" exclude-result-prefixes="java-tika-ext java-gnd-ext java-viaf-ext java-dsv11-ext java-nodouble-ext fn swissbib java-isbn-ext java-analyzeValue java-institutionFacet"
 >

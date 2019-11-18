@@ -2,6 +2,7 @@ package org.swissbib.documentprocessing.plugins;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ import java.util.HashSet;
  * @version 0.1
  */
 
-public class RemoveDuplicates implements IDocProcPlugin{
+public class RemoveDuplicates extends DocProcPlugin{
     /**
      *
      * @param inputValues a concatenated string using ### as separators
@@ -135,9 +136,17 @@ public class RemoveDuplicates implements IDocProcPlugin{
     }
 
     @Override
+    public void initPlugin(PipeConfig configuration) {
+        //super.initPlugin(configuration);
+    }
+
+    /*
+    @Override
     public void initPlugin(HashMap<String, String> configuration) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
+     */
 
     @Override
     public void finalizePlugIn() {

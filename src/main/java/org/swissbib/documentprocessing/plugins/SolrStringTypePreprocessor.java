@@ -5,6 +5,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
 import org.swissbib.documentprocessing.solr.analyzer.NavFieldCombinedAnalyzer;
 import org.swissbib.documentprocessing.solr.analyzer.NavFieldFormAnalyzer;
 
@@ -15,7 +16,7 @@ import java.util.HashMap;
 /**
  * Created by swissbib on 25.01.17.
  */
-public class SolrStringTypePreprocessor implements IDocProcPlugin {
+public class SolrStringTypePreprocessor extends DocProcPlugin {
 
     private static boolean inProductionMode = false;
     private static boolean initialized;
@@ -27,6 +28,7 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
     private static Logger navFieldForm;
     private static Logger navFieldCombined;
     private static Logger stringPreprocessorError;
+
 
 
 
@@ -43,6 +45,7 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
 
     public String getNavFieldForm(String rawToken) {
 
+        if (!inProductionMode) return rawToken;
 
         String retValue = "";
         NavFieldFormAnalyzer formAnalyzer =  (NavFieldFormAnalyzer) SolrStringTypePreprocessor.analyzerMap.get("navFieldFormAnalyzer");
@@ -96,6 +99,9 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
 
 
     public String getNavFieldCombined(String rawToken) {
+
+        if (!inProductionMode) return rawToken;
+
         Analyzer combinedAnalyzer =  SolrStringTypePreprocessor.analyzerMap.get("navFieldCombinedAnalyzer");
 
         TokenStream ts =  combinedAnalyzer.tokenStream("fieldNotNeeded",rawToken );
@@ -129,9 +135,12 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
     }
 
 
+    @Override
+    public void initPlugin(PipeConfig configuration) {
+        inProductionMode = checkProductive(configuration);
+    }
 
-
-
+    /*
     @Override
     public void initPlugin(HashMap<String, String> configuration) {
 
@@ -147,6 +156,8 @@ public class SolrStringTypePreprocessor implements IDocProcPlugin {
 
 
     }
+
+     */
 
     @Override
     public void finalizePlugIn() {

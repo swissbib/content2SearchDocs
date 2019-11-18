@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.swissbib.documentprocessing.flink.helper.PipeConfig;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +45,7 @@ import java.util.regex.Pattern;
 
 
 
-public class CreateSecondISBN implements IDocProcPlugin {
+public class CreateSecondISBN extends DocProcPlugin {
 
     private final static String ISBNDelimiiterPattern = "[\\-\\.]";
     private final static Pattern ISBNPattern = Pattern.compile("^.*?(?:\\A|\\D)(\\d{9})[\\dXx](?:\\Z|\\D).*$");
@@ -62,14 +63,21 @@ public class CreateSecondISBN implements IDocProcPlugin {
         isbnCreatorLog = LoggerFactory.getLogger(CreateSecondISBN.class);
     }
 
+    @Override
+    public void initPlugin(PipeConfig configuration) {
+        //super.initPlugin(configuration);
+        isbnCreatorLog.info("initialization of CreateSecondISBN Plugin");
+    }
 
-
+    /*
     @Override
     public void initPlugin(HashMap<String, String> configuration) {
 
         isbnCreatorLog.info("initialization of CreateSecondISBN Plugin");
 
     }
+
+     */
 
     @Override
     public void finalizePlugIn() {
