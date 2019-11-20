@@ -75,8 +75,11 @@ public class FulltextContentEnrichment extends DocProcPlugin{
     private static HashMap<String, PreparedStatement> prepStats = new HashMap<String, PreparedStatement>();
     private static boolean inProductionMode = false;
 
+    private static final Object initializeLock = new Object();
+
 
     static {
+
 
         FulltextContentEnrichment.tikaContentLogger = LoggerFactory.getLogger("tikaContent");
         FulltextContentEnrichment.tikaNoContentLogger = LoggerFactory.getLogger("tikaContentNoMatch");
@@ -394,38 +397,46 @@ public class FulltextContentEnrichment extends DocProcPlugin{
     }
 
 
+    /*
     @Override
     public void initPlugin(PipeConfig configuration) {
         inProductionMode = checkProductive(configuration);
     }
 
-    /*
+     */
+
+
     @Override
-    public void initPlugin(HashMap<String, String> configuration) {
+    public void initPlugin(PipeConfig configuration) {
 
-        String className =  this.getClass().getName();
-        if (configuration.containsKey("PLUGINS.IN.PRODUCTIONMODE") && configuration.get("PLUGINS.IN.PRODUCTIONMODE").contains(className) )
-            inProductionMode = true;
-        else
-            return;
+        inProductionMode = checkProductive(configuration) && configuration.getPlugins().
+                containsKey("FulltextContentEnrichment");
+
+        Map<String, String> localC = configuration.getPlugins().get("FulltextContentEnrichment");
 
 
-        initializeDBMS(configuration);
-        initializeallowedDocuments(configuration);
-        initializeNotallowedDocuments(configuration);
-        initializeDocumentMaxLength(configuration);
-        initializeTika(configuration);
-        initializeProxy(configuration);
-        initializeTestPDF(configuration);
-        initializeAllowedContentType(configuration);
-        initializeActivateRemoteFetching(configuration);
+        synchronized (initializeLock) {
 
-        initialized = true;
+            if (inProductionMode && !initialized) {
+
+
+                initializeDBMS(localC);
+                initializeallowedDocuments(localC);
+                initializeNotallowedDocuments(localC);
+                initializeDocumentMaxLength(localC);
+                initializeTika(localC);
+                initializeProxy(localC);
+                initializeTestPDF(localC);
+                initializeAllowedContentType(localC);
+                initializeActivateRemoteFetching(localC);
+                initialized = true;
+            }
+        }
 
     }
 
 
-     */
+
     @Override
     public void finalizePlugIn() {
 
@@ -440,12 +451,13 @@ public class FulltextContentEnrichment extends DocProcPlugin{
     }
 
 
-    private void initializeDBMS(HashMap<String, String> configuration) {
+    private void initializeDBMS(Map<String,String> localC) {
 
-        String driver = configuration.get("JDBCDRIVER");
-        String jdbcConnection = configuration.get("JDBCCONNECTION");
-        String user = configuration.get("user".toUpperCase());
-        String password = configuration.get("passwd".toUpperCase());
+
+        String driver = localC.get("JDBCDRIVER");
+        String jdbcConnection = localC.get("JDBCCONNECTION");
+        String user = localC.get("user");
+        String password = localC.get("passwd");
 
 
         if (null != driver && driver.length() > 0) {
@@ -518,9 +530,9 @@ public class FulltextContentEnrichment extends DocProcPlugin{
     }
 
 
-    private void initializeallowedDocuments(HashMap<String, String> configuration) {
+    private void initializeallowedDocuments(Map<String, String> configuration) {
 
-        String allowedDocs = configuration.get("ALLOWED.DOCUMENTS");
+        String allowedDocs = configuration.get("ALLOWED_DOCUMENTS");
         tikaContentProcessing.info("\n => Loading ALLOWED.DOCUMENTS: " + allowedDocs);
 
 
@@ -540,20 +552,23 @@ public class FulltextContentEnrichment extends DocProcPlugin{
 
 
 
-    private void initializeTestPDF(HashMap<String, String> configuration) {
+    private void initializeTestPDF(Map<String, String> configuration) {
 
-        String tP = configuration.get("TEST.PDF");
-        tikaContentProcessing.info("\n => Loading TEST.PDF: " + tP);
+        if (configuration.containsKey("TEST_PDF")) {
+            String tP = configuration.get("TEST_PDF");
+            tikaContentProcessing.info("\n => Loading TEST.PDF: " + tP);
 
-        if (tP != null && tP.length()>0) {
-            testPDF = tP;
+            if (tP != null && tP.length() > 0) {
+                testPDF = tP;
+            }
         }
     }
 
 
-    private void initializeAllowedContentType(HashMap<String, String> configuration) {
+    private void initializeAllowedContentType(Map<String, String> configuration) {
 
-        String propallowedContentType = configuration.get("ALLOWEDCONTENTTYPE");
+
+        String propallowedContentType = configuration.get("ALLOWED_CONTENTTYPE");
         tikaContentProcessing.info("\n => Loading ALLOWEDCONTENTTYPE: " + propallowedContentType);
 
         if (propallowedContentType != null && propallowedContentType.length()>0) {
@@ -564,22 +579,21 @@ public class FulltextContentEnrichment extends DocProcPlugin{
     }
 
 
-    private void initializeActivateRemoteFetching(HashMap<String, String> configuration) {
+    private void initializeActivateRemoteFetching(Map<String, String> configuration) {
 
         String sExec = configuration.get("REMOTEFETCHING");
         tikaContentProcessing.info("\n => Loading REMOTEFETCHING: " + sExec);
-        execRemoteFetching = Boolean.valueOf(sExec);
+        execRemoteFetching = Boolean.parseBoolean(sExec);
     }
 
 
 
-    private void initializeProxy(HashMap<String, String> configuration) {
+    private void initializeProxy(Map<String, String> configuration) {
 
-        String proxyProp = configuration.get("PROXYSERVER");
-
-        if (proxyProp != null && proxyProp.length()>0) {
+        if (configuration.containsKey("PROXYSERVER")  && configuration.get("PROXYSERVER").length() > 0) {
             try {
 
+                String proxyProp = configuration.get("PROXYSERVER");
                 String proxyServer = null;
                 Integer proxyPort = 0;
 
@@ -611,12 +625,12 @@ public class FulltextContentEnrichment extends DocProcPlugin{
 
 
 
-    private void initializeDocumentMaxLength(HashMap<String, String> configuration) {
+    private void initializeDocumentMaxLength(Map<String, String> configuration) {
 
 
         try {
 
-            maxLength = new Integer(configuration.get("MAXLENGTH.FETCHED.DOCUMENTS"));
+            maxLength = new Integer(configuration.get("MAXLENGTH_FETCHED_DOCUMENTS"));
 
         } catch (Throwable th) {
 
@@ -632,7 +646,7 @@ public class FulltextContentEnrichment extends DocProcPlugin{
     }
 
 
-    private void initializeTika(HashMap<String, String> configuration) {
+    private void initializeTika(Map<String, String> configuration) {
 
         tika = new Tika();
         tika.setMaxStringLength(maxLength);
@@ -640,9 +654,9 @@ public class FulltextContentEnrichment extends DocProcPlugin{
     }
 
 
-    private void initializeNotallowedDocuments(HashMap<String, String> configuration) {
+    private void initializeNotallowedDocuments(Map<String, String> configuration) {
 
-        String notAllowedDocs = configuration.get("HTTP.FETCH.NOT.ALLOWED");
+        String notAllowedDocs = configuration.get("HTTP_FETCH_NOT_ALLOWED");
         tikaContentProcessing.info("\n => Loading ALLOWED.DOCUMENTS: " + notAllowedDocs);
 
 

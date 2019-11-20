@@ -152,24 +152,6 @@ public class SolrStringTypePreprocessor extends DocProcPlugin {
 
     }
 
-    /*
-    @Override
-    public void initPlugin(HashMap<String, String> configuration) {
-
-
-        String className =  this.getClass().getName();
-        if (configuration.containsKey("PLUGINS.IN.PRODUCTIONMODE") && configuration.get("PLUGINS.IN.PRODUCTIONMODE").contains(className) )
-            inProductionMode = true;
-        else
-            return;
-
-        initializeAalyser(configuration);
-
-
-
-    }
-
-     */
 
     @Override
     public void finalizePlugIn() {

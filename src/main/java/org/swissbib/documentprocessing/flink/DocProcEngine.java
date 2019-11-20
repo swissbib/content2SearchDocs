@@ -99,8 +99,11 @@ public class DocProcEngine {
                 "localhost:9092,localhost:9093,localhost:9094"));
         properties.setProperty("group.id", config.getKafka().
                 getOrDefault("group.id",UUID.randomUUID().toString()));
-        properties.setProperty("auto.offset.reset",config.getKafka().getOrDefault("auto.offset.reset",
-                "earliest"));
+        if (config.getKafka().containsKey("auto.offset.reset")) {
+            properties.setProperty("auto.offset.reset",config.getKafka().get("auto.offset.reset"));
+        }
+        //properties.setProperty("auto.offset.reset",config.getKafka().getOrDefault("auto.offset.reset",
+        //        "earliest"));
 
         return properties;
 

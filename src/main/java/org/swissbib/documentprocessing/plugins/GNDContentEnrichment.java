@@ -86,6 +86,9 @@ public class GNDContentEnrichment extends DocProcPlugin{
     private static RemoveDuplicates duplicateDetection;
     private static boolean inProductionMode = false;
 
+    private static final Object initializeLock = new Object();
+
+
     //private static final HashMap<String,HashMap<String,List<String>>> gndRules;
     //private static final HashMap<String,List<String>> gndValues;
 
@@ -142,50 +145,52 @@ public class GNDContentEnrichment extends DocProcPlugin{
     //http://www.oxygenxml.com/doc/ug-editor/tasks/generate-certificate.html
 
 
+
     @Override
     public void initPlugin(PipeConfig configuration) {
-        inProductionMode = checkProductive(configuration);
-    }
 
-    /*
-    @Override
-    public void initPlugin(HashMap<String, String> configuration) {
-
-        //in any case if the method is called the plugin will be marked as initialized
-        //an error during initialization might occur - but this is another case
-
-        String className =  this.getClass().getName();
-        if (configuration.containsKey("PLUGINS.IN.PRODUCTIONMODE") && configuration.get("PLUGINS.IN.PRODUCTIONMODE").contains(className) )
-            inProductionMode = true;
-        else
-            return;
+        inProductionMode = checkProductive(configuration) && configuration.getPlugins().
+                containsKey("GNDContentEnrichment");
 
 
-        initialized = true;
+            synchronized (initializeLock) {
 
-        try {
-
-            //urlToSource = configuration.get("SOURCE.TO.FETCH.GND");
-            idPatternForReplacement = configuration.get("ID.PATTERN.TO.REPLACE");
-            initializeMongoConnection(configuration);
-
-            //initializeProxy(configuration);
-            //initializeIDPattern(configuration);
-            initializeTagsToUse(configuration);
-
-            duplicateDetection = new RemoveDuplicates();
-            duplicateDetection.initPlugin(configuration);
+                if (inProductionMode && !initialized && !errorInitializing) {
 
 
-        } catch (Exception ex) {
-            errorInitializing = true;
-            //initialized = false;
+                    Map<String, String> localC = configuration.getPlugins().get("GNDContentEnrichment");
+
+                //in any case if the method is called the plugin will be marked as initialized
+                //an error during initialization might occur - but this is another case
+
+
+                    initialized = true;
+
+                    try {
+
+                        //urlToSource = configuration.get("SOURCE.TO.FETCH.GND");
+                        idPatternForReplacement = localC.get("ID_PATTERN_TO_REPLACE");
+                        initializeMongoConnection(localC);
+
+                        //initializeProxy(configuration);
+                        //initializeIDPattern(configuration);
+                        initializeTagsToUse(localC);
+
+                        duplicateDetection = new RemoveDuplicates();
+                        duplicateDetection.initPlugin(configuration);
+
+
+                    } catch (Exception ex) {
+                        errorInitializing = true;
+                        //initialized = false;
+                    }
+                }
         }
 
 
     }
 
-     */
+
 
     @Override
     public void finalizePlugIn() {
@@ -282,9 +287,9 @@ public class GNDContentEnrichment extends DocProcPlugin{
             //to suppress duplicates makes sense because we collect values from GND and MACS and merge them together which might produce duplicates
             toReturn = duplicateDetection.removeDuplicatesFromMultiValuedField(toReturn);
 
-            if (! toReturn.isEmpty()) {
-                gndProcessing.debug("getReferencesConcatenated: gndID: " + gndID + " / references: " + toReturn);
-            }
+            //if (! toReturn.isEmpty()) {
+            //    gndProcessing.debug("getReferencesConcatenated: gndID: " + gndID + " / references: " + toReturn);
+            //}
 
         }
 
@@ -368,7 +373,7 @@ public class GNDContentEnrichment extends DocProcPlugin{
                                     String macsValuesForLogging = macsReferences.toString();
                                     macsValuesForLogging = macsValuesForLogging.substring(0,macsValuesForLogging.length()-6);
                                     macsValuesForLogging = duplicateDetection.removeDuplicatesFromMultiValuedField(macsValuesForLogging);
-                                    macsProcessing.info("additional MACS values for GND " + gndID + " : " + macsValuesForLogging);
+                                    //macsProcessing.info("additional MACS values for GND " + gndID + " : " + macsValuesForLogging);
                                 }
                             }
 
@@ -394,7 +399,7 @@ public class GNDContentEnrichment extends DocProcPlugin{
             }
             //to suppress duplicates makes sense because we collect values from GND and MACS and merge them together which might produce duplicates
             toReturn = duplicateDetection.removeDuplicatesFromMultiValuedField(toReturn);
-            gndProcessing.debug("getReferencesConcatenated: gndID: " + gndID + " / references: " + toReturn);
+            //gndProcessing.debug("getReferencesConcatenated: gndID: " + gndID + " / references: " + toReturn);
 
         }
 
@@ -562,13 +567,14 @@ public class GNDContentEnrichment extends DocProcPlugin{
         }
     }
 
-    private void initializeTagsToUse(HashMap<String, String> configuration) {
-        String sTagsToUse = configuration.get("TAGS.TO.USE");
-        String sTagsToUseForMACS = configuration.get("TAGS.TO.USE.FOR.MACS");
+    private void initializeTagsToUse(Map<String, String> configuration) {
+        String sTagsToUse = configuration.get("TAGS_TO_USE");
+        String sTagsToUseForMACS = configuration.get("TAGS_TO_USE_FOR_MACS");
 
 
         if (sTagsToUse != null && sTagsToUse.length()>0) {
             String[] aTagsToUse =  sTagsToUse.split("###");
+            //simpleTagsToUse.addAll(aTagsToUse)
             for (String tag: aTagsToUse) {
 
                 //I don't need this for the Mongo solution but won't throw it away so far
@@ -607,32 +613,48 @@ public class GNDContentEnrichment extends DocProcPlugin{
 
     }
 
-    private void initializeMongoConnection(HashMap<String, String> configuration)
+    private void initializeMongoConnection(Map<String, String> configuration)
         throws  Exception
     {
 
 
+
         try {
 
-            String[] mongoClient = configuration.get("MONGO.CLIENT").split("###");
-            String[] mongoAuthentication = null;
+            //String[] mongoClient = configuration.get("MONGO.CLIENT").split("###");
 
-            if (configuration.containsKey("MONGO.AUTHENTICATION")) {
-             mongoAuthentication = configuration.get("MONGO.AUTHENTICATION").split("###");
-            }
+            ServerAddress server = new ServerAddress(configuration.get("DB_HOST"),
+                    Integer.parseInt(configuration.get("DB_PORT")));
+            String contentDB = configuration.get("CONTENT_DB");
+            String collection = configuration.get("CONTENT_COLLECTION");
 
-            ServerAddress server = new ServerAddress(mongoClient[0], Integer.valueOf(mongoClient[1]));
-            String[] mongoDB = configuration.get("MONGO.DB").split("###");
+            Optional<String> authDB = configuration.containsKey("AUTHENTICATION_DB") &&
+                    configuration.get("AUTHENTICATION_DB").length() > 0 ?
+                    Optional.of(configuration.get("AUTHENTICATION_DB")) :
+                    Optional.empty();
+
+            Optional<String> authUser = configuration.containsKey("AUTHENTICATION_USER") &&
+                    configuration.get("AUTHENTICATION_USER").length() > 0 ?
+                    Optional.of(configuration.get("AUTHENTICATION_USER")) :
+                    Optional.empty();
+
+            Optional<String> authPw = configuration.containsKey("AUTHENTICATION_PASSWD") &&
+                    configuration.get("AUTHENTICATION_PASSWD").length() > 0 ?
+                    Optional.of(configuration.get("AUTHENTICATION_PASSWD")) :
+                    Optional.empty();
+
+            //String[] mongoDB = configuration.get("MONGO.DB").split("###");
 
             DB db = null;
-            if (mongoAuthentication != null ) {
-                MongoCredential credential = MongoCredential.createMongoCRCredential(mongoAuthentication[1], mongoAuthentication[0], mongoAuthentication[2].toCharArray());
+            if (authDB.isPresent() && authUser.isPresent() && authPw.isPresent()) {
+                MongoCredential credential = MongoCredential.createMongoCRCredential(
+                        authUser.get(), authDB.get(), authPw.get().toCharArray());
                 mClient = new MongoClient(server, Arrays.asList(credential));
-                db =  mClient.getDB(mongoAuthentication[0]);
+                db =  mClient.getDB(contentDB);
             }
             else {
                 mClient = new MongoClient(server);
-                db =  mClient.getDB(mongoDB[0]);
+                db =  mClient.getDB(contentDB);
             }
 
 
@@ -644,12 +666,14 @@ public class GNDContentEnrichment extends DocProcPlugin{
             }
 
 
-            nativeSource = mClient.getDB(mongoDB[0]);
-            searchCollection = nativeSource.getCollection(mongoDB[1]);
-            searchField = mongoDB[2];
-            responseField = mongoDB[3];
-            if (mongoDB.length > 4) {
-                responseFieldMACS = mongoDB[4];
+            nativeSource = mClient.getDB(contentDB);
+            searchCollection = nativeSource.getCollection(collection);
+            searchField = configuration.get("SEARCH_FIELD");
+            responseField = configuration.get("RESPONSE_FIELD");
+
+
+            if (configuration.containsKey("RESPONSE_FIELD_MACS")) {
+                responseFieldMACS = configuration.get("RESPONSE_FIELD_MACS");
             }
 
 

@@ -3,6 +3,7 @@ kafka:
   topicSource: "sb-all"
   topicSink: "sb-solr"
   auto.offset.reset: "earliest"
+  #group.id: "docproc"
 
 
 simpleValues:
@@ -54,16 +55,19 @@ plugins:
     2: "org.swissbib.documentprocessing.plugins.CreateSecondISBN"
     3: "org.swissbib.documentprocessing.plugins.CreateLibraryFacets"
     4: "org.swissbib.documentprocessing.plugins.SolrStringTypePreprocessor"
+    5: "org.swissbib.documentprocessing.plugins.FulltextContentEnrichment"
+    6: "org.swissbib.documentprocessing.plugins.GNDContentEnrichment"
 
   FulltextContentEnrichment:
     ALLOWED_DOCUMENTS: 'http://www\.ub\.unibas\.ch/tox/IDSLUZ/.*?/PDF###http://www\.ub\.unibas\.ch/tox/IDSBB/.*?/PDF###http://www\.ub\.unibas\.ch/tox/HBZ/.*?/OCR###http://d-nb\.info/.*?/04###http://aleph\.unisg\.ch/hsgscan/.*?\.pdf###http://opac\.nebis\.ch/objects/pdf/.*?\.pdf###http://biblio\.unizh\.ch/objects/pdf/.*?\.pdf###http://libraries\.admin\.ch/gw/toc/pdf/.*?\.pdf###https://www.edubs.ch/unterstuetzung/buecher/.*?\.pdf###https://www.edubs.ch/unterstuetzung/bibliothek/.*?\.pdf'
     HTTP_FETCH_NOT_ALLOWED: 'http://opac\.nebis\.ch/objects/pdf/.*?\.pdf###http://opac.nebis.ch/objects/pdf03/.*?\.pdf'
     REMOTEFETCHING: true
     ALLOWED_CONTENTTYPE: 'application/pdf###application/pdf;charset=UTF-8###application/pdf;charset=Binary'
+    MAXLENGTH_FETCHED_DOCUMENTS: '30000'
     JDBCDRIVER: 'org.mariadb.jdbc.Driver'
-    JDBCCONNECTION: '[define]'
-    user: '[define]'
-    passwd: '[define]'
+    JDBCCONNECTION: 'jdbc:mysql://localhost:3306/remotecontent'
+    user: '??'
+    passwd: '??'
 
 
   GNDContentEnrichment:
@@ -71,14 +75,17 @@ plugins:
     PATTERN_FOR_ID: '^(\\(.*?\\))(.*)$'
     TAGS_TO_USE: '400_a###400_b###400_c###400_d###400_x###410_a###410_b###411_a###411_b###430_a###450_a###450_x###451_a###451_x'
     TAGS_TO_USE_FOR_MACS: '750_a'
-    DB_HOST: '[define]'
-    DB_PORT: '[define]'
-    AUTHENTICATION_DB: '[define]'
-    AUTHENTICATION_USER: '[define]'
-    AUTHENTICATION_PASSWD: '[define]'
+    DB_HOST: 'localhost'
+    DB_PORT: '29017'
+    #AUTHENTICATION_DB: 'admin'
+    #AUTHENTICATION_USER: '??'
+    #AUTHENTICATION_PASSWD: '??'
 
     CONTENT_DB: 'nativeSources'
     CONTENT_COLLECTION: 'sourceDNBGND1'
+    SEARCH_FIELD: 'gndid'
+    RESPONSE_FIELD: 'gndfields'
+    RESPONSE_FIELD_MACS: 'macsfields'
 
   SolrStringTypePreprocessor:
     #NAV_FIELD_FORM_SYNONYMS_DIR: '/swissbib_index/solrDocumentProcessing/MarcToSolr/dist/predoc'
