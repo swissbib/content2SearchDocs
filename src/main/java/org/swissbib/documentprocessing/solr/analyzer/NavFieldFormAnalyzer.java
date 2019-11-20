@@ -8,12 +8,10 @@ import org.apache.lucene.analysis.miscellaneous.LengthFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.TrimFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternReplaceFilterFactory;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
-import org.apache.lucene.analysis.util.FilesystemResourceLoader;
+import org.apache.lucene.analysis.util.ClasspathResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoader;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.HashMap;
 
 /**
@@ -21,10 +19,10 @@ import java.util.HashMap;
  */
 public class NavFieldFormAnalyzer extends Analyzer {
 
-    private String synonymDir = "";
+    private String synonymFile = "";
 
-    public NavFieldFormAnalyzer(String synonymDir) {
-        this.synonymDir = synonymDir;
+    public NavFieldFormAnalyzer(String synonymFile) {
+        this.synonymFile = synonymFile;
     }
 
 
@@ -39,15 +37,15 @@ public class NavFieldFormAnalyzer extends Analyzer {
 
 
         HashMap<String,String> sFM = new HashMap<>();
-        sFM.put("synonyms","formsynonyms.txt");
+        sFM.put("synonyms",this.synonymFile);
         sFM.put("ignoreCase","true");
         sFM.put("expand","false");
-        sFM.put("tokenizerFactory","org.apache.lucene.analysis.core.KeywordTokenizerFactory");
+        sFM.put("tokenizerFactory",KeywordTokenizerFactory.class.getTypeName());
 
         //Todo: configuration for the directory
-        Path path = FileSystems.getDefault().getPath(this.synonymDir);
-        ResourceLoader rl = new FilesystemResourceLoader(path);
-        //
+        //Path path = FileSystems.getDefault().getPath(this.synonymDir);
+        ResourceLoader rl = new ClasspathResourceLoader(this.getClass().getClassLoader());
+
         SynonymFilterFactory sff = new SynonymFilterFactory(sFM);
 
         try {

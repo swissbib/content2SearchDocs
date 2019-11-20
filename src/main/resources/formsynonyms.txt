@@ -1,0 +1,82 @@
+#Formschlagworte: Reduktionsliste
+#Version 1.0. (09.09.2011)
+#Version 1.1 (31.10.2011/osc) - Anpassungen gross-Kleinschreibung
+#Version 1.2 (11.01.2012/Wiegart) - Korrekturen, Anpassungen
+#Version 1.3 (15.03.2017/swi) - Anpassungen GND mit neuer Rechtschreibung
+#UB Basel (Annabelle Wiegart, Alice Spinnler, Oliver Schihin)
+
+abhandlung,traité,treatise
+adressbuch,Adressverzeichnis,annuaire,directory
+#annuaire: Adressbuch, Jahrbuch
+altkarte,Karte vor 1850,Atlas vor 1850,carte ancienne
+anleitung,méthode
+anthologie,Sammlung,anthology
+atlas,atlases
+auktionskatalog,catalogue de vente aux enchères,auction catalogue
+aufsatzsammlung,Sammelwerk,études diverses,saggi,essays,collected works
+ausgabe,Kritische Ausgabe,édition,edition
+ausstellung,Ausstellungskatalog,catalogue d'exposition,exhibitions,esposizioni,mostra - catalogo
+autobiographie,Autobiografie,autobiography,Memoiren,memoirs,mémoires
+beispielsammlung,Mustersammlung,exercices,problems and exercises,problems,exercises,etc.
+belletristische_darstellung,Belletristische Darstellung,fiction,fictional works,belles-lettres,roman (genre littéraire),nouvelle (genre littéraire)
+bericht,Tätigkeitsbericht,publication officielle,pubblicazione ufficiale,report,rapport d'activités
+bestimmungsbuch,flore,faune,herbal,identification guide,liste de genres et d'espèces,lista dei generi e delle specie
+bildliche_Darstellung,carte postale
+bibliographie,Bibliografie,bibliography
+bildband,dessin,iconographie,drawings,pictorial works,peinture
+biographie,Biografie,biography
+briefsammlung,correspondance,correspondence
+cd,Hörbuch,Hörspiel
+comic,Comicstrip,bande dessinée
+dia,image projetée
+diskographie,Diskographie,discographie
+dvd-video,DVD vidéo,DVD
+einführung,introduction
+elektronische_Publikation,Elektronische Publikation,elektronisches Buch,document électronique,electronic publication
+entscheidungssammlung,jurisprudence,judicial publication,trials,litigation,etc.,cases
+fallstudiensammlung,Fallstudie,case studies,étude de cas
+führer,Reiseführer,guide,guidebooks
+genealogische_tafel,généalogie
+gesetzestext,texte législatif,legislation
+gespräch,entretien
+humoristische_Darstellung,Humoristische Darstellung,humor
+interview
+jugendbuch,juvenile literature,juvenile fiction,adolescents
+karte,Kartenmaterial,carte,maps
+katalog,catalogue,catalogs,catalogo
+kochbuch,Kochrezept
+kommentar,commentaire,commentary,english paraphrases,latin paraphrases
+kongressbericht,Kongress,Vortragssammlung,Konferenzschrift,congresses,congrès,congresso
+#Bei Kongressen Jahr und Ort weglassen
+konkordanz,concordance,liste de personnes,lista di persone
+#"Lehrbuch" entspricht frz. "manuel"; dieses entspricht aber auch "Handbuch", nach "Lehr-/Handbuch" übersetzen
+lehr_handbuch,manuel,Handbuch,offizielles Handbuch,manuale,handbooks,manuals,amateurs' manuals,Lehrbuch,textbooks,Gesamtdarstellung
+lehrmittel,Schulbuch,Lehrerhandbuch,Unterrichtsmaterial,Unterrichtsmittel,Unterrichtseinheit,matériel didactique,instructional materials,examination questions
+lyrik,poetry,poésie,poème
+medienkombination,multimédia
+nachruf,nécrologie
+photographie,Fotografie,photographies,document photographique,photographs
+plakat,politisches Plakat,affiche
+pressestimme,Pressebericht
+programmheft,Programm,programme
+quelle,Quellenmaterial,sources,source
+reglement,règlement,statuts
+#Problem: die in der Facette "Ratgeber" aufgelisteten engl. und frz. Medien sind meist mit "guide" betitelt, aber "guide" ist schon auf "Führer" reduziert. Für frz. effektiv nur die Übersetzung "guide" gefunden.
+reisebericht,récit de voyage,travel report
+schriftenreihe,collection,series
+statistik,statistisches Material,statistische Daten,statistiques,statistics
+tabelle,tableau synoptique,tables,tavole
+tagebuch,diaries,journal intime
+text,alter Text
+#"Text" entspricht oft "document", aber "document" kann auch Erlebnisbericht, Erzählung, Abhandlung, Chronik sein
+theaterstück,Drama,drama,drame,théâtre (genre littéraire)
+tonträger,enregistrement sonore,sound carrier
+verkaufskatalog,catalogue de vente,sales catalogue
+verzeichnis,Fundstellenverzeichnis,Quellenverzeichnis,répertoire,index,indexes,registers
+videokassette,enregistrement vidéo,videorecording
+werkverzeichnis,catalogue raisonné,catalogo ragionato
+#catalogue raisonné wird auch im Engl. verwendet
+wörterbuch,Aussprachewörterbuch,Bildwörterbuch,dictionnaire,dictionaries,encyclopédie,encyclopedias,Lexikon
+wörterbuch_mehrsprachig,Wörterbuch (mehrsprachig),Wörterbuch mehrsprachig,dictionnaire multilingue,multi-lingual dictionaries
+#Begriffe mit Klammern evtl. speziell behandeln
+zeitschrift,périodique,periodico,periodicals

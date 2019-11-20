@@ -10,6 +10,7 @@ import org.swissbib.documentprocessing.solr.analyzer.NavFieldCombinedAnalyzer;
 import org.swissbib.documentprocessing.solr.analyzer.NavFieldFormAnalyzer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -135,9 +136,20 @@ public class SolrStringTypePreprocessor extends DocProcPlugin {
     }
 
 
+
     @Override
     public void initPlugin(PipeConfig configuration) {
-        inProductionMode = checkProductive(configuration);
+
+        inProductionMode = checkProductive(configuration) && configuration.getPlugins().
+                containsKey("SolrStringTypePreprocessor") &&
+                configuration.getPlugins().get("SolrStringTypePreprocessor").containsKey("NAV_FIELD_FORM_SYNONYMS_FILE");
+
+        if (inProductionMode) {
+
+            initializeAalyser(configuration);
+        }
+
+
     }
 
     /*
@@ -175,10 +187,15 @@ public class SolrStringTypePreprocessor extends DocProcPlugin {
 
 
 
-    private void initializeAalyser(HashMap<String, String> configuration) {
+    private void initializeAalyser(PipeConfig configuration) {
 
-        String synonymDir = configuration.get("NAV_FIELD_FORM_SYNONYMS_DIR");
-        NavFieldFormAnalyzer nfa =  new NavFieldFormAnalyzer(synonymDir);
+
+
+        String synonymsFile = configuration.getPlugins().get("SolrStringTypePreprocessor").
+                get("NAV_FIELD_FORM_SYNONYMS_FILE");
+
+        //String synonymDir = configuration.get("NAV_FIELD_FORM_SYNONYMS_DIR");
+        NavFieldFormAnalyzer nfa =  new NavFieldFormAnalyzer(synonymsFile);
 
         //nfa.getReuseStrategy()
 

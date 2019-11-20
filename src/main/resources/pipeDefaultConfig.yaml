@@ -52,6 +52,8 @@ plugins:
   "PLUGINS_IN_PRODUCTIONMODE":
     1: "org.swissbib.documentprocessing.plugins.RemoveDuplicates"
     2: "org.swissbib.documentprocessing.plugins.CreateSecondISBN"
+    3: "org.swissbib.documentprocessing.plugins.CreateLibraryFacets"
+    4: "org.swissbib.documentprocessing.plugins.SolrStringTypePreprocessor"
 
   FulltextContentEnrichment:
     ALLOWED_DOCUMENTS: 'http://www\.ub\.unibas\.ch/tox/IDSLUZ/.*?/PDF###http://www\.ub\.unibas\.ch/tox/IDSBB/.*?/PDF###http://www\.ub\.unibas\.ch/tox/HBZ/.*?/OCR###http://d-nb\.info/.*?/04###http://aleph\.unisg\.ch/hsgscan/.*?\.pdf###http://opac\.nebis\.ch/objects/pdf/.*?\.pdf###http://biblio\.unizh\.ch/objects/pdf/.*?\.pdf###http://libraries\.admin\.ch/gw/toc/pdf/.*?\.pdf###https://www.edubs.ch/unterstuetzung/buecher/.*?\.pdf###https://www.edubs.ch/unterstuetzung/bibliothek/.*?\.pdf'
@@ -79,11 +81,13 @@ plugins:
     CONTENT_COLLECTION: 'sourceDNBGND1'
 
   SolrStringTypePreprocessor:
-    NAV_FIELD_FORM_SYNONYMS_DIR: '/swissbib_index/solrDocumentProcessing/MarcToSolr/dist/predoc'
+    #NAV_FIELD_FORM_SYNONYMS_DIR: '/swissbib_index/solrDocumentProcessing/MarcToSolr/dist/predoc'
+    NAV_FIELD_FORM_SYNONYMS_FILE: 'formsynonyms.txt'
 
 
 
-
+  CreateLibraryFacets:
+    LIBADMIN_DEFINITIONS: 'plugins/library-facet-green.json'
 
 
 

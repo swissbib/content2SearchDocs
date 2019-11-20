@@ -4,8 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.swissbib.documentprocessing.flink.helper.PipeConfig;
+import org.swissbib.documentprocessing.flink.helper.TemplateCreator;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.stream.StreamSource;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,31 +57,54 @@ public class CreateLibraryFacets extends DocProcPlugin {
         CreateLibraryFacets.facetLibraryLogger = LoggerFactory.getLogger("facetLibraries");
     }
 
+    /*
     @Override
     public void initPlugin(PipeConfig configuration) {
         initSucceeded = checkProductive(configuration);
     }
 
-    /*
+     */
+
+
     @Override
-    public void initPlugin(HashMap<String, String> configuration) {
+    public void initPlugin(PipeConfig configuration) {
 
         //todo
         //5) write Junit tests for it. Related to Jackson and tests compare
         //https://gitlab.com/swissbib/classic/kafka-cbs-consumer/tree/master/src/main/java/org/swissbib/kafka/consumer
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            // get libadminGeoJson from local file (synced by nightly cronjob)
-            libadminGeoJson = mapper.readValue(new FileInputStream(configuration.get("LIBADMIN_DEFINITIONS")), LibadminGeoJson.class);
-            initSucceeded = true;
-        } catch (Exception e) {
-            initSucceeded = false;
-            CreateLibraryFacets.facetLibraryLogger.warn(e.getMessage() + "\\r\\n" + e);
+        initSucceeded = checkProductive(configuration);
+
+        if (initSucceeded) {
+
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                // get libadminGeoJson from local file (synced by nightly cronjob)
+                if (configuration.getPlugins().containsKey("CreateLibraryFacets") &&
+                        configuration.getPlugins().get("CreateLibraryFacets").containsKey("LIBADMIN_DEFINITIONS")) {
+                    String definitions = configuration.getPlugins().get("CreateLibraryFacets").get("LIBADMIN_DEFINITIONS");
+
+                    //ClassLoader classLoader = TemplateCreator.class.getClassLoader();
+                    ClassLoader classLoader = this.getClass().getClassLoader();
+                    //try (InputStream is =  getClass()
+                    //        .getClassLoader().getResourceAsStream(templatePath)) {
+                    try (InputStream is = classLoader.getResourceAsStream(definitions)) {
+                        libadminGeoJson = mapper.readValue(is, LibadminGeoJson.class);
+                    } catch (IOException exc) {
+                        throw new RuntimeException(exc);
+                    } finally {
+                        initSucceeded = libadminGeoJson != null;
+                    }
+
+                }
+            } catch (Exception e) {
+                initSucceeded = false;
+                CreateLibraryFacets.facetLibraryLogger.warn(e.getMessage() + "\\r\\n" + e);
+            }
         }
     }
 
-     */
+
 
     @Override
     public void finalizePlugIn() {
