@@ -171,7 +171,7 @@ class ProcessSrwMessages:
             hDelete_File.write("<delete>" + os.linesep)
 
 
-            pPattern = re.compile(".*?REQ_(.*?)\.xml")
+            pPattern = re.compile(".*?REQ_(.*?)_.*?\.xml")
             #Pattern of File REQ_123456.xml
             self.writeLogMessage("files with delete messages:")
 
