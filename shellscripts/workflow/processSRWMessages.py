@@ -114,7 +114,7 @@ class ProcessSrwMessages:
 
     def shutdownMessageCatcher(self):
         #startResult = os.popen('/opt/swissbib/tools/java.tools/tomcat7-axis2/bin/shutdown.sh -force').read()
-        startResult = os.popen( self.CATCHER_WEBAPP_PATH + os.sep + 'shutdown.sh -force').read()
+        startResult = os.popen('docker container stop messagecatcher').read()
         #environment variables in shell
         #http://stackoverflow.com/questions/8365394/set-environment-variable-in-python-script
         #do something with result
@@ -125,7 +125,7 @@ class ProcessSrwMessages:
 
     def startMessageCatcher(self):
         #shutDownResult = os.popen('/opt/swissbib/tools/java.tools/tomcat7-axis2/bin/startup.sh').read()
-        shutDownResult = os.popen(self.CATCHER_WEBAPP_PATH + os.sep + 'startup.sh').read()
+        shutDownResult = os.popen('docker run --name messagecatcher -p 9000:9000  -d --rm  -v /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/data/update/updateDir:/updateDir -v /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/data/update/deleteDir:/deleteDir  -v /swissbib_index/solrDocumentProcessing/FrequentInitialPreProcessing/catcher:/base  messagecatcher').read()
         #do something with result
 
 
