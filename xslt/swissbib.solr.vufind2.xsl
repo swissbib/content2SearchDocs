@@ -700,6 +700,10 @@
                         <xsl:value-of select="concat('0/9/', '##xx##')" />
                         <xsl:value-of select="concat('1/9/1/', '##xx##')" />
                     </xsl:when>
+                    <xsl:when test="matches(., '^gw$')">
+                        <xsl:value-of select="concat('0/0/', '##xx##')" />
+                        <xsl:value-of select="concat('1/0/0/', '##xx##')" />
+                    </xsl:when>
                     <xsl:when test="matches(., '^ir$')">
                         <xsl:value-of select="concat('0/4/', '##xx##')" />
                         <xsl:value-of select="concat('1/4/4/', '##xx##')" />
@@ -752,6 +756,10 @@
                         <xsl:value-of select="concat('1/2/0/', '##xx##')" />
                         <xsl:value-of select="concat('1/2/9/', '##xx##')" />
                     </xsl:when>
+                    <xsl:when test="matches(., '^sp$')">
+                        <xsl:value-of select="concat('0/7/', '##xx##')" />
+                        <xsl:value-of select="concat('1/7/9/', '##xx##')" />
+                    </xsl:when>
                     <xsl:when test="matches(., '^te$')">
                         <xsl:value-of select="concat('0/6/', '##xx##')" />
                         <xsl:value-of select="concat('1/6/2/', '##xx##')" />
@@ -761,6 +769,10 @@
                     <xsl:when test="matches(., '^th$')">
                         <xsl:value-of select="concat('0/2/', '##xx##')" />
                         <xsl:value-of select="concat('1/2/3/', '##xx##')" />
+                    </xsl:when>
+                    <xsl:when test="matches(., '^uw$')">
+                        <xsl:value-of select="concat('0/3/', '##xx##')" />
+                        <xsl:value-of select="concat('1/3/3/', '##xx##')" />
                     </xsl:when>
                 </xsl:choose>
             </xsl:for-each>
