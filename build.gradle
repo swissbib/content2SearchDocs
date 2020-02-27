@@ -25,14 +25,14 @@ buildscript {
     }
     dependencies {
         //http://imperceptiblethoughts.com/shadow/
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
     }
 }
 
 
 repositories {
 
-    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "https://repo.maven.apache.org/maven2" }
     mavenLocal()
     //ich benoetige jcenter damit die dependency auf diese Komponente aufgelöst werden kann
     //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet/2.3.0/org.restlet-2.3.0.pom
