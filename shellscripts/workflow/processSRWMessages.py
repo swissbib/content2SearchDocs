@@ -156,7 +156,7 @@ class ProcessSrwMessages:
         #</delete>
 
 
-        numberOfFiles = len(glob.glob(self.DELETEDIRLOAD + os.sep + ".*?REQ_.*?_delete\.xml"))
+        numberOfFiles = len(glob.glob(self.DELETEDIRLOAD + os.sep + "*REQ_*.xml"))
         if numberOfFiles > 0:
 
             self.writeLogMessage("{0} messages to delete search docs".format(numberOfFiles))
