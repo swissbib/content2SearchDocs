@@ -2566,7 +2566,7 @@
         <xsl:param name="fragment" />
         <xsl:for-each select="$fragment/datafield/subfield[@code='0']">
             <xsl:choose>
-                <xsl:when test="parent::datafield[matches(@tag, '^[1278][01345][0124]')]">
+                <xsl:when test="parent::datafield[matches(@tag, '950')][matches(descendant::subfield[@code='P'], '100|110|111|700|710|711')]/subfield[@code='0']">
                     <xsl:variable name="source">
                         <xsl:call-template name="id_sourcecodes"/>
                     </xsl:variable>
