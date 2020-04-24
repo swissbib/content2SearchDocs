@@ -1,5 +1,6 @@
 kafka:
   bootstrap.servers: "localhost:9092,localhost:9093,localhost:9094"
+  #bootstrap.servers: "sb-uka7:9092,sb-uka8:9092,sb-uka9:9092"
   topicSource: "sb-all"
   topicSink: "sb-solr"
   auto.offset.reset: "earliest"
@@ -66,8 +67,11 @@ plugins:
     MAXLENGTH_FETCHED_DOCUMENTS: '30000'
     JDBCDRIVER: 'org.mariadb.jdbc.Driver'
     JDBCCONNECTION: 'jdbc:mysql://localhost:3306/remotecontent'
-    user: '??'
-    passwd: '??'
+    #JDBCCONNECTION: 'jdbc:mysql://xxxx:3306/remotecontent'
+    #user: 'xxx'
+    #passwd: 'xxx'
+    user: 'bla'
+    passwd: 'bla'
 
 
   GNDContentEnrichment:
@@ -76,10 +80,11 @@ plugins:
     TAGS_TO_USE: '400_a###400_b###400_c###400_d###400_x###410_a###410_b###411_a###411_b###430_a###450_a###450_x###451_a###451_x'
     TAGS_TO_USE_FOR_MACS: '750_a'
     DB_HOST: 'localhost'
+    #DB_HOST: 'sb-xxx.swissbib.unibas.ch'
     DB_PORT: '29017'
-    #AUTHENTICATION_DB: 'admin'
-    #AUTHENTICATION_USER: '??'
-    #AUTHENTICATION_PASSWD: '??'
+    #AUTHENTICATION_DB: 'xxx'
+    #AUTHENTICATION_USER: ''
+    #AUTHENTICATION_PASSWD: 'xxxx'
 
     CONTENT_DB: 'nativeSources'
     CONTENT_COLLECTION: 'sourceDNBGND1'

@@ -101,6 +101,7 @@ public class DocProcEngine {
                 getOrDefault("group.id",UUID.randomUUID().toString()));
         if (config.getKafka().containsKey("auto.offset.reset")) {
             properties.setProperty("auto.offset.reset",config.getKafka().get("auto.offset.reset"));
+        properties.setProperty("message.max.bytes", "" + 1024 * 1024 * 5);
         }
         //properties.setProperty("auto.offset.reset",config.getKafka().getOrDefault("auto.offset.reset",
         //        "earliest"));

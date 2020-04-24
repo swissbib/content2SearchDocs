@@ -29,11 +29,12 @@ buildscript {
     }
 }
 
-ext.flinkVersion = '1.9.1'
+//ext.flinkVersion = '1.9.1'
+ext.flinkVersion = '1.10.0'
 
 repositories {
 
-    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "https://repo.maven.apache.org/maven2" }
     mavenLocal()
     //ich benoetige jcenter damit die dependency auf diese Komponente aufgelöst werden kann
     //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet/2.3.0/org.restlet-2.3.0.pom
@@ -124,8 +125,8 @@ def jarDir="./lib"
 jar {
     manifest {
         //attributes "Class-Path": configurations.compile.collect { it.absolutePath }.join(" ")
-        attributes "Class-Path": configurations.runtime.files.collect { jarDir+"/$it.name" }.join(' ')
-        attributes "Main-Class": 'org.swissbib.documentprocessing.XML2SearchDocEngine'
+        //attributes "Class-Path": configurations.runtime.files.collect { jarDir+"/$it.name" }.join(' ')
+        attributes "Main-Class": 'org.swissbib.documentprocessing.flink.DocProcEngine'
 
         //attributes 'Class-Path': configurations.compile.collect{it.toURI().toString()}.join(' ')
     }

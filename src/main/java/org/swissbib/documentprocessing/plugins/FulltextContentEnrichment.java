@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 public class FulltextContentEnrichment extends DocProcPlugin{
 
 
-    private static  String ls = System.getProperties().getProperty("line.separator");
+    private static final String ls = System.getProperties().getProperty("line.separator");
     //private static ConfigContainer configContainer = null;
 
 
@@ -61,14 +61,14 @@ public class FulltextContentEnrichment extends DocProcPlugin{
 
 
     private static Connection dbmsConnection = null;
-    private static ArrayList<Pattern> patternsAllowed;
-    private static ArrayList<Pattern> patternsNotAllowed;
+    private static final ArrayList<Pattern> patternsAllowed;
+    private static final ArrayList<Pattern> patternsNotAllowed;
 
     private static Integer maxLength;
     private static Tika tika;
     private static Proxy proxy;
     private static String testPDF;
-    private static ArrayList<String> allowedContentType;
+    private static final ArrayList<String> allowedContentType;
     private static boolean execRemoteFetching;
     private static boolean  initialized;
     private static Pattern separator;

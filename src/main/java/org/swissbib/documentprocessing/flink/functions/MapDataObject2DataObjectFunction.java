@@ -56,18 +56,29 @@ public class MapDataObject2DataObjectFunction extends RichMapFunction<XSLTDataOb
     @Override
     public XSLTDataObject map(XSLTDataObject value) throws Exception {
 
-        String test = value.record;
-
         if (holdings && value.additions.containsKey("holdingsStructure")) {
             transformer.setParameter("holdingsStructure",value.additions.get("holdingsStructure"));
         }
-        String newRecord = new TemplateTransformer(test).transform(transformer);
 
-        XSLTDataObject xslt =  new XSLTDataObject();
-        xslt.record = newRecord;
-        xslt.additions = value.additions;
+        try {
 
-        return xslt;
+            String newRecord = new TemplateTransformer(value.record).transform(transformer);
+            XSLTDataObject xslt =  new XSLTDataObject();
+            xslt.record = newRecord;
+            xslt.additions = value.additions;
+
+            return xslt;
+
+        } catch (Throwable exceptionInTransformation) {
+            //todo make something which makes more sense
+            exceptionInTransformation.printStackTrace();
+            //todo
+            //better solution for this
+            //this isn't very cute because we shouldn't create solr docs with only part of the data
+            return value;
+
+        }
+
 
     }
 
@@ -100,7 +111,7 @@ public class MapDataObject2DataObjectFunction extends RichMapFunction<XSLTDataOb
                         (keyNumber, pluginClass) -> {
                             //System.out.println(keyNumber + "," + pluginClass);
                             try {
-                                Class tClass = Class.forName(pluginClass);
+                                Class<?> tClass = Class.forName(pluginClass);
                                 IDocProcPlugin docProcPlugin = (IDocProcPlugin)tClass.newInstance();
                                 docProcPlugin.initPlugin(pipeConfig);
                                 this.pluginList.add(docProcPlugin);
