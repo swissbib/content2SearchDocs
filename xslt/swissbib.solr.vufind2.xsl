@@ -418,6 +418,11 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
+        <xsl:for-each select="$fragment/datafield[@tag='082'][matches(descendant::subfield[@code='2'][1], '^15$', 'i')]/subfield[@code='a']">
+            <field name="classif_ddc_15">
+                <xsl:value-of select="." />
+            </field>
+        </xsl:for-each>
         <xsl:for-each select="$fragment/datafield[@tag='909'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'sb_2001', 'i')]/subfield[@code='c']">)">
             <field name="classif_ddc">
                 <xsl:value-of select="." />
