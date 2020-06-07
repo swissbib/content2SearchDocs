@@ -65,6 +65,16 @@ public class DocProcEngine {
                 .map(new MapDataObject2DataObjectFunction(config,"1"))
                 .map(new MapDataObject2DataObjectFunction(config,"2"))
                 .map(new MapDataObject2DataObjectFunction(config, "3", true,true))
+                /*
+                the default max size of message.max.bytes is 1000000
+                otherwise we get such error messages
+                Caused by: org.apache.flink.streaming.connectors.kafka.FlinkKafkaException: Failed to send data to Kafka: The message is 1620459 bytes when serialized which is larger than the maximum request size you have configured with the max.request.size configuration.
+                https://kafka.apache.org/081/documentation.html
+                give a little bit more space for the object to be serialized
+                The maximum size of a message that the server can receive. It is important that this property be in sync with the maximum fetch size your consumers use or else an unruly producer will be able to publish messages too large for consumers to consume.
+                => we have to sync producers and consumers for such topics
+                 */
+                .filter(xsltDataObject -> xsltDataObject.record.getBytes().length <= 990000)
                 .map(new MapDataObject2MetadaModelFunction(config)).returns(Types.GENERIC(SbMetadataModel.class))
 
             .addSink(kafkaProducer);

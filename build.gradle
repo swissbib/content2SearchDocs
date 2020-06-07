@@ -30,7 +30,7 @@ buildscript {
 }
 
 //ext.flinkVersion = '1.9.1'
-ext.flinkVersion = '1.10.0'
+ext.flinkVersion = '1.10.1'
 
 repositories {
 
@@ -71,9 +71,15 @@ dependencies {
 
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
-    compileOnly group: 'org.apache.flink', name: 'flink-connector-kafka_2.12', version: "${flinkVersion}"
-    compileOnly group: 'org.apache.flink', name: 'flink-java', version:  "${flinkVersion}"
-    compileOnly group: 'org.apache.flink', name: 'flink-streaming-java_2.12', version: "${flinkVersion}"
+    //compileOnly group: 'org.apache.flink', name: 'flink-connector-kafka_2.12', version: "${flinkVersion}"
+    //compileOnly group: 'org.apache.flink', name: 'flink-java', version:  "${flinkVersion}"
+    //compileOnly group: 'org.apache.flink', name: 'flink-streaming-java_2.12', version: "${flinkVersion}"
+
+    compile group: 'org.apache.flink', name: 'flink-connector-kafka_2.12', version: "${flinkVersion}"
+    compile group: 'org.apache.flink', name: 'flink-java', version:  "${flinkVersion}"
+    compile group: 'org.apache.flink', name: 'flink-streaming-java_2.12', version: "${flinkVersion}"
+
+
     compile group: 'org.apache.flink', name: 'flink-clients_2.12', version: "${flinkVersion}"
 
     compileOnly "org.apache.flink:flink-table-planner_2.12:${flinkVersion}"

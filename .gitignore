@@ -5,6 +5,7 @@ data
 lib
 target
 src/main/resources/saxon-license.lic
+src/main/resources/pipeDefaultConfig.prod.yaml
 out
 ghscripts.latest
 .gradle

@@ -1,0 +1,8 @@
+
+Fehler: zu grosse messages
+Caused by: org.apache.flink.streaming.connectors.kafka.FlinkKafkaException: Failed to send data to Kafka: The message is 1620459 bytes when serialized which is larger than the maximum request size you have configured with the max.request.size configuration.
+
+
+104857600
+1620459
+1000000
