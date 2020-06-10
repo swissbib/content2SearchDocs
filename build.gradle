@@ -32,7 +32,7 @@ buildscript {
 
 repositories {
 
-    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "https://repo.maven.apache.org/maven2" }
     mavenLocal()
     //ich benoetige jcenter damit die dependency auf diese Komponente aufgelöst werden kann
     //http://repo.maven.apache.org/maven2/org/restlet/jee/org.restlet/2.3.0/org.restlet-2.3.0.pom
@@ -54,7 +54,7 @@ dependencies {
         exclude(module: 'slf4j-log4j12')
     }
     compile group: 'org.apache.solr', name: 'solr-solrj', version:'7.3.1'
-    compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.4.1'
+    compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.6.3'
     compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version:'1.5.7'
     compile(group: 'org.apache.tika', name: 'tika-app', version:'1.19.1') {
         exclude(module: 'slf4j-log4j12')

@@ -611,17 +611,24 @@ public class GNDContentEnrichment implements IDocProcPlugin{
              mongoAuthentication = configuration.get("MONGO.AUTHENTICATION").split("###");
             }
 
-            ServerAddress server = new ServerAddress(mongoClient[0], Integer.valueOf(mongoClient[1]));
+            ServerAddress serverAdress = new ServerAddress(mongoClient[0], Integer.parseInt(mongoClient[1]));
             String[] mongoDB = configuration.get("MONGO.DB").split("###");
 
             DB db = null;
             if (mongoAuthentication != null ) {
-                MongoCredential credential = MongoCredential.createMongoCRCredential(mongoAuthentication[1], mongoAuthentication[0], mongoAuthentication[2].toCharArray());
-                mClient = new MongoClient(server, Arrays.asList(credential));
+
+                //this caused the error on Ubuntu 18
+                //source I found the solution: https://stackoverflow.com/questions/29006887/mongodb-cr-authentication-failed
+                //the guy who used the C# driver
+                MongoCredential credential =MongoCredential.createCredential(mongoAuthentication[1],
+                        mongoAuthentication[0],
+                        mongoAuthentication[2].toCharArray());
+                mClient = new MongoClient(serverAdress, credential,MongoClientOptions.builder().build());
+                //mClient = new MongoClient(server, Arrays.asList(credential));
                 db =  mClient.getDB(mongoAuthentication[0]);
             }
             else {
-                mClient = new MongoClient(server);
+                mClient = new MongoClient(serverAdress);
                 db =  mClient.getDB(mongoDB[0]);
             }
 
