@@ -623,7 +623,7 @@ public class GNDContentEnrichment extends DocProcPlugin{
 
             //String[] mongoClient = configuration.get("MONGO.CLIENT").split("###");
 
-            ServerAddress server = new ServerAddress(configuration.get("DB_HOST"),
+            ServerAddress serverAdress = new ServerAddress(configuration.get("DB_HOST"),
                     Integer.parseInt(configuration.get("DB_PORT")));
             String contentDB = configuration.get("CONTENT_DB");
             String collection = configuration.get("CONTENT_COLLECTION");
@@ -647,13 +647,13 @@ public class GNDContentEnrichment extends DocProcPlugin{
 
             DB db = null;
             if (authDB.isPresent() && authUser.isPresent() && authPw.isPresent()) {
-                MongoCredential credential = MongoCredential.createMongoCRCredential(
+                MongoCredential credential = MongoCredential.createCredential(
                         authUser.get(), authDB.get(), authPw.get().toCharArray());
-                mClient = new MongoClient(server, Arrays.asList(credential));
+                mClient = new MongoClient(serverAdress, credential,MongoClientOptions.builder().build());
                 db =  mClient.getDB(contentDB);
             }
             else {
-                mClient = new MongoClient(server);
+                mClient = new MongoClient(serverAdress);
                 db =  mClient.getDB(contentDB);
             }
 
