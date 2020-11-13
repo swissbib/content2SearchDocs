@@ -433,24 +433,6 @@
                 <xsl:value-of select="." />
             </field>
         </xsl:for-each>
-        <!-- RVK / ZDBS classifications  -->
-        <xsl:for-each select="$fragment/datafield[@tag='084']/subfield[@code='a']">
-            <xsl:if test="matches(following-sibling::subfield[@code='2'], 'rvk', 'i')">
-                <field name="classif_rvk">
-                    <xsl:value-of select="." />
-                </field>
-            </xsl:if>
-            <xsl:if test="matches(following-sibling::subfield[@code='2'], 'zdbs', 'i')">
-                <field name="classif_zdbs">
-                    <xsl:value-of select="." />
-                </field>
-            </xsl:if>
-            <xsl:if test="matches(following-sibling::subfield[@code='2'], 'sdnb', 'i')">
-                <field name="sdnb_str_mv">
-                    <xsl:value-of select="." />
-                </field>
-            </xsl:if>
-        </xsl:for-each>
         <!-- OCM / OWC classification-->
         <xsl:for-each select="$fragment/datafield[@tag='691'][@ind2='7'][matches(descendant::subfield[@code='2'][1], 'idsbb FG', 'i')]/subfield[@code='u'] ">
             <field name="classif_ocm">
@@ -1734,24 +1716,11 @@
     </xsl:template>
 
     <xsl:template name="filter">
-        <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
-            <xsl:for-each select="$fragment/datafield[@tag='898']/subfield[@code='a']">
-                <xsl:choose>
-                    <xsl:when test="matches(., '53$')">
-                        <xsl:text>ONL##xx##</xsl:text>
-                    </xsl:when>
-                    <xsl:otherwise />
-                </xsl:choose>
-            </xsl:for-each>
-            <xsl:for-each select="$fragment/datafield[@tag='900']/subfield[@code='a']">
-                <xsl:choose>
-                    <xsl:when test="matches(., 'Metadata rights reserved')">
-                        <xsl:text>MDRR##xx##</xsl:text>
-                    </xsl:when>
-                    <xsl:otherwise />
-                </xsl:choose>
-            </xsl:for-each>
+            <!-- for Master / Unique Export -->
+            <xsl:text>MU##xx##</xsl:text>
+            <!-- for Slave Export -->
+            <!-- <xsl:text>S##xx##</xsl:text> -->
         </xsl:variable>
         <xsl:variable name="uniqueSeqValues" select="swissbib:startDeduplication($forDeduplication)"/>
         <xsl:call-template name="createUniqueFields">
