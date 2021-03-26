@@ -25,17 +25,13 @@
     </xsl:template>
     
     <xsl:template match="datafield[@tag=852]/subfield">
-        <xsl:if test="matches(@code, 'a|F|B|b|j|s|x|c')">
             <xsl:copy-of select="." />
-        </xsl:if>
     </xsl:template>
     <!-- a=Holding-Notiz, F=CHB-Bibliothek (Zweigstelle), B=Verbund-Code,
          j=Signatur 1, s=Signatur 2 -->
     
     <xsl:template match="datafield[@tag=949]/subfield">
-        <xsl:if test="matches(@code, 'F|B|b|j|s|x|y|z|c')">
-            <xsl:copy-of select="." />    
-        </xsl:if>
+            <xsl:copy-of select="." />
     </xsl:template>
     <!-- F=CHB-Bibliothek (Zweigstelle), B=Verbund-Code, 
          j=Signatur 1, s=Signatur 2, x=interne Notiz (NEL), z=Notiz/Bemerkung -->

@@ -165,13 +165,10 @@
         <xsl:for-each select="following-sibling::datafield[@tag='852']">
             <xsl:call-template name="UnionAndBranchlib">
                 <xsl:with-param name="union" select="child::subfield[@code='B']" />
-                <xsl:with-param name="branchlib" select="child::subfield[@code='F']" />
+                <xsl:with-param name="branchlib" select="child::subfield[@code='b']" />
             </xsl:call-template>
         </xsl:for-each>
         <xsl:for-each select="following-sibling::datafield[@tag='856']">
-            <xsl:call-template name="UnionAndBranchlib">
-                <xsl:with-param name="union" select="child::subfield[@code='B']" />
-            </xsl:call-template>
             <uri856>
                 <xsl:value-of select="child::subfield[@code='u'][1]"/>
             </uri856>
@@ -180,7 +177,7 @@
         <xsl:for-each select="following-sibling::datafield[@tag='949']">
             <xsl:call-template name="UnionAndBranchlib">
                 <xsl:with-param name="union" select="child::subfield[@code='B']" />
-                <xsl:with-param name="branchlib" select="child::subfield[@code='F']" />
+                <xsl:with-param name="branchlib" select="child::subfield[@code='b']" />
             </xsl:call-template>
         </xsl:for-each>
         <xsl:for-each select="following-sibling::datafield[@tag='956']">
@@ -390,7 +387,7 @@
         <xsl:call-template name="pers_facet" />
     </xsl:template>
 
-    <xsl:template match="datafield[@tag='700'][not(matches(child::subfield[@code='l'][1], 'eng|fre'))]">
+    <xsl:template match="datafield[@tag='700']">
         <xsl:call-template name="pers_facet" />
     </xsl:template>
 

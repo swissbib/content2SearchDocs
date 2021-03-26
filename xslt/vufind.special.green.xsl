@@ -17,7 +17,7 @@
 
     <xsl:template match="record">
         <xsl:choose>
-            <xsl:when test="exists(datafield[@tag='490']/subfield[@code='9'])
+            <xsl:when test="exists(datafield[@tag='490']/subfield[@code='w'])
                 or exists(datafield[@tag='986'][matches(subfield[@code='a']/text(), '^SWISSBIB')])">
                 <xsl:copy>
                     <xsl:call-template name="green_special">
@@ -34,7 +34,7 @@
     <!-- fields for use in vufind hierarchy driver (standard linking fields 490) -->
     <xsl:template name="green_special">
         <xsl:param name="record" />
-        <xsl:if test="exists(datafield[@tag='490']/subfield[@code='9'])">
+        <xsl:if test="exists(datafield[@tag='490']/subfield[@code='w'])">
             <hierarchytype>series</hierarchytype>
             <is_hierarchy_id>
                 <xsl:value-of select="$record/myDocID" />
@@ -43,9 +43,9 @@
                 <xsl:value-of select="$record/datafield[@tag='245']/subfield[@code='a'][1]" />
             </is_hierarchy_title>
         </xsl:if>
-        <xsl:for-each select="datafield[@tag='490']/subfield[@code='9']">
+        <xsl:for-each select="datafield[@tag='490']/subfield[@code='w']">
             <hierarchy_top_id>
-                <xsl:value-of select="."></xsl:value-of>
+                <xsl:value-of select="."/>
             </hierarchy_top_id>
             <hierarchy_top_title>
                 <xsl:value-of select="preceding-sibling::subfield[@code='a'][1]" />
