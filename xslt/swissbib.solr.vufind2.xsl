@@ -1716,6 +1716,7 @@
     </xsl:template>
 
     <xsl:template name="filter">
+        <xsl:param name="fragment" />
         <xsl:variable name="forDeduplication">
             <!-- for Master / Unique Export -->
             <xsl:text>MU##xx##</xsl:text>
